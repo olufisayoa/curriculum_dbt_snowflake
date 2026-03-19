@@ -25,7 +25,9 @@ clean-targets:         # directories to be removed by `dbt clean`
 dispatch:
   - macro_namespace: dbt_utils
     search_order: ['curriculum_dbt_snowflake', 'dbt_utils']
-
+    
+quoting:
+  identifier: true
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
 

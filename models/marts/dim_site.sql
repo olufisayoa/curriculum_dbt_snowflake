@@ -1,18 +1,18 @@
-WITH dim_site AS (
+WITH Dim_Site AS (
 SELECT 
-       {{ dbt_utils.generate_surrogate_key(['SiteID']) }} AS SiteKey
-      ,s.Code
-      ,s.Description
-      ,s.Address1
-      ,s.Address2
-      ,s.Address3
-      ,s.Address4
-      ,s.PostcodeOut
-      ,s.PostcodeIn
-      ,s.Tel
-      ,s.Fax
-      ,s.Enabled
-FROM {{ ref('stg_prosolution_site') }} s
+       {{ dbt_utils.generate_surrogate_key(['"SiteID"']) }} AS "SiteKey"
+      ,"Code"
+      ,"Description"
+      ,"Address1"
+      ,"Address2"
+      ,"Address3"
+      ,"Address4"
+      ,"PostcodeOut"
+      ,"PostcodeIn"
+      ,"Tel"
+      ,"Fax"
+      ,"Enabled"
+FROM {{ ref('Stg_ProSolution__Site') }} 
 )
 
-SELECT * FROM dim_site
+SELECT * FROM Dim_Site
