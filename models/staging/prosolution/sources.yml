@@ -9,3 +9,9 @@ sources:
     
       - name: PROSOLUTION_ACADEMICYEAR
         description: "This table contains information about academic years, including their code, description, and other relevant details."
+
+      - name: PROSOLUTION_COLLEGELEVEL
+        description: "This table contains information about college levels, including their code, description, and other relevant details."
+
+      - name: PROSOLUTION_COLLEGELEVELNUM 
+        description: "This table contains information about college level numbers, including their code, description, and other relevant details."

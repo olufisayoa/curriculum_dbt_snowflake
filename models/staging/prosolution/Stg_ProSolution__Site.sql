@@ -1,4 +1,5 @@
 SELECT 
+{{ dbt_utils.generate_surrogate_key(['SiteID']) }} AS "SiteKey",
 SiteID ,
 Code ,
 Description ,

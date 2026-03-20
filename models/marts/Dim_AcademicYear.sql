@@ -1,6 +1,6 @@
 WITH dim_academicyear AS (
 SELECT 
-       {{ dbt_utils.generate_surrogate_key(['AcademicYearID']) }} AS "AcademicYearKey"
+       "AcademicYearKey" AS "AcademicYearKey"
       ,AcademicYearID AS "AcademicYear"
       ,StartDate AS "StartDate"
       ,EndDate AS "EndDate"

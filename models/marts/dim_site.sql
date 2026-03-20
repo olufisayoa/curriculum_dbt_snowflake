@@ -1,6 +1,6 @@
 WITH dim_site AS (
 SELECT 
-       {{ dbt_utils.generate_surrogate_key(['SiteID']) }} AS "SiteKey"
+       "SiteKey" AS "SiteKey"
       ,Code AS "Code"
       ,Description AS "Description"
       ,Address1 AS "Address1"
