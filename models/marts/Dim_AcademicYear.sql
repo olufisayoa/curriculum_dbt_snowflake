@@ -1,11 +1,11 @@
-WITH Dim_AcademicYear AS (
+WITH dim_academicyear AS (
 SELECT 
-       {{ dbt_utils.generate_surrogate_key(['"AcademicYearID"']) }} AS "AcademicYearKey"
-      ,"AcademicYearID" AS "AcademicYear"
-      ,"StartDate"
-      ,"EndDate"
-      ,"Number"
-FROM {{ ref('Stg_ProSolution__AcademicYear') }}
+       {{ dbt_utils.generate_surrogate_key(['AcademicYearID']) }} AS "AcademicYearKey"
+      ,AcademicYearID AS "AcademicYear"
+      ,StartDate AS "StartDate"
+      ,EndDate AS "EndDate"
+      ,Number AS "Number"
+FROM {{ ref('stg_prosolution__academicyear') }} 
 
 )
-SELECT * FROM Dim_AcademicYear
+SELECT * FROM dim_academicyear

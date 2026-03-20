@@ -1,6 +1,6 @@
 SELECT 
-"AcademicYearID" ,
-"StartDate" ,
-"EndDate",
-"Number" 
-FROM {{ source('ProSolution', 'ProSolution_Academic_Year') }}
+AcademicYearID ,
+StartDate,
+EndDate,
+Number
+FROM {{ source('ProSolution', 'PROSOLUTION_ACADEMICYEAR') }}

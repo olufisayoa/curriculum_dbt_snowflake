@@ -3,11 +3,9 @@ sources:
   - name: ProSolution
     schema: RAW
     database: CURRICULUM_DB
-    quoting:
-      identifier: true
     tables:
-      - name: ProSolution_Site
+      - name: PROSOLUTION_SITE
         description: "This table contains information about sites, including their code, description, and other relevant details."
     
-      - name: ProSolution_Academic_Year
+      - name: PROSOLUTION_ACADEMICYEAR
         description: "This table contains information about academic years, including their code, description, and other relevant details."
