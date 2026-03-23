@@ -1,0 +1,8 @@
+version: 2
+sources:
+  - name: Onegrade
+    schema: RAW
+    database: CURRICULUM_DB
+    tables:
+      - name: ONEGRADE_COHORTLOOKUP
+        description: "This table contains information about cohort details."
