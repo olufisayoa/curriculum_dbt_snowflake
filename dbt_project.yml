@@ -36,6 +36,12 @@ models:
   curriculum_dbt_snowflake:
     # Config indicated by + and applies to all files under models/example/
     marts:
-      +materialized: table
+      core:
+        +materialized: table
+        +schema: core
+        intermediate:
+          +materialized: table
+          +schema: int
     staging:
       +materialized: view
+      +schema: stg
