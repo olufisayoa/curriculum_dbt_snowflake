@@ -27,3 +27,17 @@ sources:
 
       - name: PROSOLUTION_LINKEDOFFERING
         description: "This table contains information about linked offerings, including their code, description, and other relevant details."
+
+      - name: PROSOLUTION_STUDENTDETAIL
+        description: "This table contains information about student details, including their code, description, and other relevant details."
+
+      - name: PROSOLUTION_STUDENTPHOTO
+        description: "This table contains information about student photos, including their code, description, and other relevant details."
+
+      - name: PROSOLUTION_ETHNICGROUP
+        description: "This table contains information about ethnic groups, including their code, description, and other relevant details."
+
+      - name: PROSOLUTION_LEARNERINFORMATION_LEARNERSTATUS
+        description: "This table contains information about learner status, including their code, description, and other relevant details."
+
+    
