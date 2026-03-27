@@ -88,24 +88,24 @@ WITH Prosolution_Student AS (
 ,
 	Onegrade_Student AS (
 		SELECT 
-             {{ dbt_utils.generate_surrogate_key(['TRIM(AcademicYearID)','TRIM(StudentRef)']) }} AS StudentKey,
-			  AcademicYearID
-			  ,StudentRef
-			  ,Surname
-			  ,Forenames
-			  ,DOB
-			  ,EthnicityID
-			  ,Gender
-			  ,TutorGroupCode
-			  ,FreeSchoolMeal
-		  FROM {{ ref('stg_onegrade__student') }}
+             _os.StudentKey AS StudentKey
+			  ,_os.AcademicYearID
+			  ,_os.StudentRef
+			  ,_os.Surname
+			  ,_os.Forenames
+			  ,_os.DOB
+			  ,_os.EthnicityID
+			  ,_os.Gender
+			  ,_os.TutorGroupCode
+			  ,_os.FreeSchoolMeal
+		  FROM {{ ref('stg_onegrade__student') }} as _os
 	)
 
 	SELECT 
           ps.StudentKey AS "StudentKey",
-          CAST(COALESCE(TRIM(ps.AcademicYearID), '00/00') AS VARCHAR) AS "AcademicYearID",
+          CAST(COALESCE(TRIM(ps.AcademicYearID), '00/00') AS VARCHAR) AS "AcademicYear",
 		  CAST(COALESCE(ps.StudentID, '-') AS VARCHAR) AS "StudentID",
-		  CAST(COALESCE(ps.FirstName,'-') AS VARCHAR) AS "FirstName",
+		  CAST(COALESCE(ps.FirstName,'-') AS VARCHAR) AS "Firstname",
 		  CAST(COALESCE(ps.Surname,'-') AS VARCHAR) AS "Surname",
 		  CAST(COALESCE(ps.StudentFullname,'-') AS VARCHAR) AS "StudentFullname",
 		  CAST(COALESCE(ps.DOB,'1753-01-01') AS TIMESTAMP) AS "DOB",
@@ -129,5 +129,5 @@ WITH Prosolution_Student AS (
 		  CAST(COALESCE(ps.StudentPhotoThumbnail,'-') AS VARCHAR) AS "StudentPhotoThumbnail",
 		  CAST(COALESCE(ps.StudentProfileUrl, '-') AS VARCHAR) AS "StudentProfileUrl"
 	FROM Prosolution_Student AS ps
-	LEFT JOIN Onegrade_Student AS os
-	 ON ps.StudentKey = os.StudentKey
+	LEFT JOIN Onegrade_Student AS _os
+	 ON ps.StudentKey = _os.StudentKey
