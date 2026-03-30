@@ -21,7 +21,7 @@ ParentCourses AS (
 
 ProsolutionOffering AS (
     SELECT
-         {{ dbt_utils.generate_surrogate_key(['TRIM(o.ACADEMICYEARID)', 'TRIM(o.CODE)']) }} AS CourseKey,
+         o.COURSEKEY AS CourseKey,
         o.ACADEMICYEARID::CHAR(5) AS ACADEMICYEARID,
         o.CODE::VARCHAR(50) AS COURSECODE,
         o.NAME::VARCHAR(255) AS COURSENAME,
@@ -52,4 +52,4 @@ SELECT
     COALESCE(p.OFFERINGSTAFF, '-')::VARCHAR(1000) AS "OfferingStaff"
 FROM ProsolutionOffering AS p
 LEFT JOIN {{ ref('stg_onegrade__course') }} AS c
-ON p.CourseKey = c.CourseKey
+ON TRIM(p.ACADEMICYEARID) = TRIM(c.AcademicYearID) AND TRIM(p.COURSECODE) = TRIM(c.CourseCode)

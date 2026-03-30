@@ -2,6 +2,7 @@ WITH base_data AS (
     SELECT 
         e.*,
         s.SiteID AS SiteID,
+        o.OfferingID AS OfferingID,
         o.SID AS CollegeLevelCode
     FROM {{ ref('stg_onegrade__estactva') }} AS e
     LEFT JOIN {{ ref('stg_onegrade__course') }} AS c 
@@ -25,7 +26,7 @@ unpivot_helper AS (
 SELECT 
     {{ dbt_utils.generate_surrogate_key(['TRIM(base.AcademicYearID)']) }} AS AcademicYear
     , {{ dbt_utils.generate_surrogate_key(['TRIM(base.AcademicYearID)','TRIM(base.StudentRef)']) }} AS StudentKey
-    , {{ dbt_utils.generate_surrogate_key(['TRIM(base.AcademicYearID)','TRIM(base.CourseCode)']) }} AS CourseKey
+    , {{ dbt_utils.generate_surrogate_key(['TRIM(base.OfferingID)']) }} AS CourseKey
     ,{{ dbt_utils.generate_surrogate_key(['TRIM(base.AcademicYearID)','TRIM(base.StudentRef)','TRIM(base.LearningAimRef)','TRIM(base.StartDate)','TRIM(base.CompletionID)','TRIM(base.CourseCode)']) }} AS EnrolmentKey
     , {{ dbt_utils.generate_surrogate_key(['TRIM(base.SiteID)']) }} AS SiteKey
     , CAST(base.CollegeLevelCode AS INT) AS CollegeLevelCode
