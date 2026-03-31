@@ -1,6 +1,7 @@
 WITH Prosolution_Student AS (
 		SELECT  
            s.StudentKey AS StudentKey,
+              s.StudentDetailID AS StudentDetailID,
 			CAST(s.AcademicYearID AS VARCHAR)                                 AS AcademicYearID,
 			CAST(s.RefNo AS VARCHAR)                                        AS StudentID,
 			CAST(s.FirstForename AS VARCHAR)                               AS FirstName,
@@ -77,7 +78,7 @@ WITH Prosolution_Student AS (
 					ON s.EthnicGroupID = eg.EthnicGroupID
 		LEFT JOIN	{{ ref('stg_prosolution__learnerinformation_learnerstatus') }} AS ls
                     ON TRIM(s.LEARNERSTATUSID) = TRIM(ls."LearnerStatusID") 
-		JOIN (
+		LEFT JOIN (
 			SELECT  AcademicYearID,
 					CAST(CONCAT(YEAR(StartDate), '-08-31') AS DATE) AS Aug31Date
 			FROM    {{ ref('stg_prosolution__academicyear') }}
@@ -130,4 +131,4 @@ WITH Prosolution_Student AS (
 		  CAST(COALESCE(ps.StudentProfileUrl, '-') AS VARCHAR) AS "StudentProfileUrl"
 	FROM Prosolution_Student AS ps
 	LEFT JOIN Onegrade_Student AS _os
-	 ON ps.StudentKey = _os.StudentKey
+	 ON TRIM(ps.AcademicYearID) = TRIM(_os.AcademicYearID) AND TRIM(ps.StudentID) = TRIM(_os.StudentRef)
