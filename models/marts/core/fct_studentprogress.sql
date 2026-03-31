@@ -1,24 +1,25 @@
 select 
-        AcademicYear
-        , StudentKey
-        , CourseKey
-        , EnrolmentKey
-        , SiteKey
-        , CollegeLevelCode
-        , CohortKey
-        , PriorAttainmentPoint
-        , MinimumTargetGrade
-        , MinimumTargetGradeNo
-        , AspirationalTargetGrade
-        , MinimumTargetPoints
-        , PersonalTargetGrade
-        , IYMostRecentGradeNumeric
-        , BandingCategory
-        , MPKey
-        , CurrentGrade
-        , CurrentPoint
-        , ValueAdded
-        , EnrolmentGrade
-        , EnrolmentPoint
-        , DfeIncluded
+        AcademicYear AS "AcademicYearKey"
+        , StudentKey AS "StudentKey"
+        , CourseKey AS "CourseKey"
+        , EnrolmentKey AS "EnrolmentKey"
+        , SiteKey AS "SiteKey"
+        , CollegeLevelCode AS "CollegeLevelCode"
+        , CohortKey AS "CohortKey"
+        ,  VATypeKey AS "VATypeKey"
+        , PriorAttainmentPoint AS "PriorAttainmentPoint"
+        , MinimumTargetGrade AS "MinimumTargetGrade"
+        , MinimumTargetGradeNo AS "MinimumTargetGradeNo"
+         , AspirationalTargetGrade AS "AspirationalTargetGrade"
+        , MinimumTargetPoints AS "MinimumTargetPoints"
+        , PersonalTargetGrade AS "PersonalTargetGrade"
+        , IYMostRecentGradeNumeric AS "IYMostRecentGradeNumeric"
+        , BandingCategory AS "BandingCategory"
+        , MPKey AS "MPKey"
+        , CurrentGrade AS "CurrentGrade"
+        , CurrentPoint AS "CurrentPoint"
+        , ValueAdded AS "ValueAdded"
+        , EnrolmentGrade AS "EnrolmentGrade"
+        , EnrolmentPoint AS "EnrolmentPoint"
+        , DfeIncluded AS "DfeIncluded"
 from {{ ref('int_student_progress') }}

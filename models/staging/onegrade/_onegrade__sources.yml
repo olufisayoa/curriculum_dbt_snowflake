@@ -12,3 +12,15 @@ sources:
         description: "This table contains information about students, including their code, description, and other relevant details."
       - name: ONEGRADE_ESTACTVA
         description: "This table contains information about estimated actual values, including their code, description, and other relevant details."
+      - name: ONEGRADE_LEARNINGAIM
+        description: "This table contains information about learning aims, including their code, description, and other relevant details."
+      - name: ONEGRADE_VLEARNINGAIM
+        description: "This table contains information about learning aim details, including their code, description, and other relevant details."
+      - name: ONEGRADE_VLEARNINGAIMOTHER
+        description: "This table contains information about other learning aims, including their code, description, and other relevant details."
+      - name: ONEGRADE_OFQUAL 
+        description: "This table contains information about Ofqual details, including their code, description, and other relevant details."
+      - name: ONEGRADE_VLEARNINGAIML3VA 
+        description: "This table contains information about learning aim L3VA details, including their code, description, and other relevant details."
+      - name: ONEGRADE_VLEARNINGAIMCA 
+        description: "This table contains information about learning aim CA details, including their code, description, and other relevant details."
