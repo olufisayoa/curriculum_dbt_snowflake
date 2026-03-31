@@ -4,7 +4,7 @@ select
         , CourseKey AS "CourseKey"
         , EnrolmentKey AS "EnrolmentKey"
         , SiteKey AS "SiteKey"
-        , CollegeLevelCode AS "CollegeLevelCode"
+        , CollegeLevelKey "CollegeLevelKey"
         , CohortKey AS "CohortKey"
         ,  VATypeKey AS "VATypeKey"
         , PriorAttainmentPoint AS "PriorAttainmentPoint"

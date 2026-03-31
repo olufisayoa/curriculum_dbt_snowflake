@@ -40,4 +40,7 @@ sources:
       - name: PROSOLUTION_LEARNERINFORMATION_LEARNERSTATUS
         description: "This table contains information about learner status, including their code, description, and other relevant details."
 
+      - name: PROSOLUTION_VCOLLEGELEVEL_INFO
+        description: "This table contains information about college level details, including their code, description, and other relevant details."
+
     

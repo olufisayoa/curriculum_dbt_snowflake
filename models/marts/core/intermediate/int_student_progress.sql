@@ -32,7 +32,7 @@ SELECT
     , {{ dbt_utils.generate_surrogate_key(['TRIM(base.OfferingID)']) }} AS CourseKey
     ,{{ dbt_utils.generate_surrogate_key(['TRIM(base.AcademicYearID)','TRIM(base.StudentRef)','TRIM(base.LearningAimRef)','TRIM(base.StartDate)','TRIM(base.CompletionID)','TRIM(base.CourseCode)']) }} AS EnrolmentKey
     , {{ dbt_utils.generate_surrogate_key(['TRIM(base.SiteID)']) }} AS SiteKey
-    , CAST(base.CollegeLevelCode AS INT) AS CollegeLevelCode
+    , {{ dbt_utils.generate_surrogate_key(['TRIM(base.CollegeLevelCode)']) }} AS CollegeLevelKey
     , {{ dbt_utils.generate_surrogate_key(['TRIM(base.Cohort)']) }} AS CohortKey
     , {{ dbt_utils.generate_surrogate_key(['base.VA_Type']) }} AS VATypeKey
     , CAST(CASE
