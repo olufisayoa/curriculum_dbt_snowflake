@@ -24,3 +24,11 @@ sources:
         description: "This table contains information about learning aim L3VA details, including their code, description, and other relevant details."
       - name: ONEGRADE_VLEARNINGAIMCA 
         description: "This table contains information about learning aim CA details, including their code, description, and other relevant details."
+
+      - name: ONEGRADE_VENROLMENT
+        description: "This table contains information about enrolment details, including their code, description, and other relevant details."
+
+      - name: ONEGRADE_COMPLETION 
+        description: "This table contains information about completion details, including their code, description, and other relevant details."
+
+      

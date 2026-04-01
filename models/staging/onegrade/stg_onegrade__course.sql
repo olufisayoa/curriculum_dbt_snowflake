@@ -1,5 +1,6 @@
 SELECT 
 {{ dbt_utils.generate_surrogate_key(['TRIM(AcademicYearID)', 'TRIM(CourseCode)']) }} AS CourseKey,
+ID,
 AcademicYearID,
 CourseCode,
 Title

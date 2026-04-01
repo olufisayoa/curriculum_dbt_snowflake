@@ -43,4 +43,15 @@ sources:
       - name: PROSOLUTION_VCOLLEGELEVEL_INFO
         description: "This table contains information about college level details, including their code, description, and other relevant details."
 
+      - name: PROSOLUTION_ENROLMENT
+        description: "This table contains information about enrolments, including their code, description, and other relevant details."
+      
+      - name: PROSOLUTION_COMPLETIONSTATUS
+        description: "This table contains information about completion status, including their code, description, and other relevant details."
+      
+      - name: PROSOLUTION_OUTCOME
+        description: "This table contains information about outcomes, including their code, description, and other relevant details."
+
+        
+
     
