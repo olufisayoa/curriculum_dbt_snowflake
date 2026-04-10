@@ -2,7 +2,7 @@ WITH base_data AS (
     SELECT 
         e.*,
         s.SiteID AS SiteID,
-        ps.StudentDetailID AS StudentDetailID,
+        --ps.StudentDetailID AS StudentDetailID,
         o.OfferingID AS OfferingID,
         o.SID AS CollegeLevelCode
     FROM {{ ref('stg_onegrade__estactva') }} AS e
@@ -14,8 +14,8 @@ WITH base_data AS (
         AND o.AcademicYearID = c.AcademicYearID
     LEFT JOIN {{ ref('stg_prosolution__site') }} AS s 
         ON s.SiteID = o.SiteID
-    LEFT JOIN {{ ref('stg_prosolution__student')}} AS ps
-        ON TRIM(e.AcademicYearID) = TRIM(ps.AcademicYearID) AND TRIM(e.StudentRef) = TRIM(ps.RefNo)
+    /*LEFT JOIN {{ ref('stg_prosolution__student')}} AS ps
+        ON TRIM(e.AcademicYearID) = TRIM(ps.AcademicYearID) AND TRIM(e.StudentRef) = TRIM(ps.RefNo)*/
     WHERE e.CompletionID IN (1,2)
 ),
 unpivot_helper AS (
@@ -28,7 +28,7 @@ unpivot_helper AS (
 
 SELECT 
     {{ dbt_utils.generate_surrogate_key(['TRIM(base.AcademicYearID)']) }} AS AcademicYear
-    , {{ dbt_utils.generate_surrogate_key(['TRIM(base.StudentDetailID)']) }} AS StudentKey
+    , {{ dbt_utils.generate_surrogate_key(['TRIM(base.AcademicYearID)', 'TRIM(base.StudentRef)']) }} AS StudentKey
     , {{ dbt_utils.generate_surrogate_key(['TRIM(base.OfferingID)']) }} AS CourseKey
     ,{{ dbt_utils.generate_surrogate_key([
     'TRIM(base.AcademicYearID)',   
