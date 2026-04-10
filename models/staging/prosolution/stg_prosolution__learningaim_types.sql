@@ -1,0 +1,1 @@
+select * from {{ source('ProSolution', 'PROSOLUTION_LEARNING_AIM_TYPES') }}

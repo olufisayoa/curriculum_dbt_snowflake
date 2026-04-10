@@ -37,7 +37,7 @@ OneGrade_Enrichment AS (
 		 vla.QualType AS Cohort,
 		 OGE.NotionalNVQLevel,
          OGE.WDNumDaysAfterStart,
-		 ofq.QualificationLevel,
+		 ofq."QualificationLevel" AS QualificationLevel,
          OGE.AgeOn31Aug,
          OGE.LearningAimRef,
          OGE.WholeQualID,
@@ -46,7 +46,7 @@ OneGrade_Enrichment AS (
      FROM {{ ref('stg_onegrade__enrolment') }} OGE
      LEFT  JOIN {{ ref('stg_onegrade__course') }} OGC ON OGE.CourseID = OGC.ID
 	 LEFT  JOIN {{ ref('stg_onegrade__completion') }} C ON C.ID=OGE.CompletionID
-	 LEFT JOIN {{ ref('stg_onegrade__ofqual') }} ofq ON ofq.QualificationNumber=OGE.LearningAimRef
+	 LEFT JOIN {{ ref('stg_onegrade__ofqual') }} ofq ON ofq."QualificationNumber"=OGE.LearningAimRef
 	 LEFT JOIN {{ ref('stg_onegrade__learningaim') }} vla ON vla.LearningAimRef=OGE.LearningAimRef AND vla.WholeQualID=OGE.WholeQualID
      WHERE OGE.StudentRef IS NOT NULL
 )

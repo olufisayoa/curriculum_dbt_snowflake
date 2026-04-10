@@ -42,6 +42,8 @@ SELECT
     , {{ dbt_utils.generate_surrogate_key(['TRIM(base.CollegeLevelCode)']) }} AS CollegeLevelKey
     , {{ dbt_utils.generate_surrogate_key(['TRIM(base.Cohort)']) }} AS CohortKey
     , {{ dbt_utils.generate_surrogate_key(['base.VA_Type']) }} AS VATypeKey
+    ,{{ dbt_utils.generate_surrogate_key([
+    'TRIM(base.LearningAimRef)', 'TRIM(base.WholeQualID)']) }} AS LearningAimKey
     , CAST(CASE
         WHEN base.Cohort IN ('A Level', 'Academic') THEN base.QOEPoints_GCSE_College2dp
         WHEN base.Cohort IN ('Applied General','None','Tech Level VA') THEN base.QOEPoints_College2dp
