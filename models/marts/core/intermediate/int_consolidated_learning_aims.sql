@@ -76,18 +76,18 @@ WITH DistinctOneGradeLearningAims AS (
   )
     SELECT 
     {{ dbt_utils.generate_surrogate_key([
-    'TRIM(LearningAimRef)', 'TRIM(WholeQualID)']) }} AS LearningAimKey,
-        CAST(COALESCE(LearningAimRef,'-') AS NVARCHAR(20)) AS LearningAimRef,
-        CAST(COALESCE(LearningAimTitle,'-') AS NVARCHAR(255)) AS LearningAimTitle,
-         CAST(COALESCE(Cohort,'-') AS NVARCHAR(50)) AS Cohort,
-        CAST(COALESCE(QualificationLevel,'-') AS NVARCHAR(20)) AS QualificationLevel,
-        CAST(COALESCE(IsMathsOrEnglish,0) AS BOOLEAN) AS IsMathsOrEnglish,
-        CAST(COALESCE(IsGraded,0) AS BOOLEAN) AS IsGraded,
-        CAST(COALESCE(CollegeMapped,0) AS BOOLEAN) AS CollegeMapped,
-        CAST(COALESCE(InScope,0) AS BOOLEAN) AS InScope,
-		CAST(COALESCE(IsFacilitatingSubject,0) AS BOOLEAN) AS IsFacilitatingSubject,
-        CAST(COALESCE(SectorSubjectArea,'-') AS NVARCHAR(150)) AS SectorSubjectArea,
-        CAST(COALESCE(WholeQualID,'-') AS NVARCHAR(20)) AS WholeQualID,
-        CAST(COALESCE(DC,'-') AS NVARCHAR(20)) AS DC
+    'TRIM(LearningAimRef)', 'TRIM(WholeQualID)']) }} AS "LearningAimKey",
+        CAST(COALESCE(LearningAimRef,'-') AS NVARCHAR(20)) AS "LearningAimRef",
+        CAST(COALESCE(LearningAimTitle,'-') AS NVARCHAR(255)) AS "LearningAimTitle",
+         CAST(COALESCE(Cohort,'-') AS NVARCHAR(50)) AS "Cohort",
+        CAST(COALESCE(QualificationLevel,'-') AS NVARCHAR(20)) AS "QualificationLevel",
+        CAST(COALESCE(IsMathsOrEnglish,0) AS BOOLEAN) AS "IsMathsOrEnglish",
+        CAST(COALESCE(IsGraded,0) AS BOOLEAN) AS "IsGraded",
+        CAST(COALESCE(CollegeMapped,0) AS BOOLEAN) AS "CollegeMapped",
+        CAST(COALESCE(InScope,0) AS BOOLEAN) AS "InScope",
+		CAST(COALESCE(IsFacilitatingSubject,0) AS BOOLEAN) AS "IsFacilitatingSubject",
+        CAST(COALESCE(SectorSubjectArea,'-') AS NVARCHAR(150)) AS "SectorSubjectArea",
+        CAST(COALESCE(WholeQualID,'-') AS NVARCHAR(20)) AS "WholeQualID",
+        CAST(COALESCE(DC,'-') AS NVARCHAR(20)) AS "DC"
     FROM EnrichedOneGradeLearningAims
     
