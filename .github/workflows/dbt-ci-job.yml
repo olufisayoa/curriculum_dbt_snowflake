@@ -63,6 +63,7 @@ jobs:
                 database: ${{ secrets.SNOWFLAKE_DATABASE }}
                 threads: 1
                 private_key_path: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
+          EOF
 
       - name: Run dbt models
         run: dbt run --profiles-dir ~/.dbt --target ${{ steps.env.outputs.target }}
