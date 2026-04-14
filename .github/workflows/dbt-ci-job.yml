@@ -1,0 +1,72 @@
+name: deploy dbt models on merge to staging or main
+on:
+  push:
+    branches:
+      - '!main'
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  dbt-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install requirements
+        run: pip install -r requirements.txt
+
+      - name: Install dbt dependencies
+        run: dbt deps
+
+      - name: Set dbt target environment
+        id: env
+        run: |
+          if [[ "${GITHUB_REF}" == "refs/heads/staging" ]]; then
+            echo "target=staging" >> $GITHUB_OUTPUT
+          elif [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
+            echo "target=prod" >> $GITHUB_OUTPUT
+          else
+            echo "target=staging" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Write profiles.yml
+        run: |
+          mkdir -p ~/.dbt
+          cat <<EOF > ~/.dbt/profiles.yml
+          curriculum_dbt_snowflake:
+            target: ${{ steps.env.outputs.target }}
+            outputs:
+              staging:
+                type: snowflake
+                account: ${{ secrets.SNOWFLAKE_ACCOUNT}}
+                user: ${{ secrets.SNOWFLAKE_USER }}
+                role: ${{ secrets.SNOWFLAKE_ROLE }}
+                warehouse: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+                database: ${{ secrets.SNOWFLAKE_DATABASE }}
+                threads: 1
+                private_key_path: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
+              prod:
+                type: snowflake
+                account: ${{ secrets.SNOWFLAKE_ACCOUNT}}
+                user: ${{ secrets.SNOWFLAKE_USER }}
+                role: ${{ secrets.SNOWFLAKE_ROLE }}
+                warehouse: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+                database: ${{ secrets.SNOWFLAKE_DATABASE }}
+                threads: 1
+                private_key_path: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
+          EOF
+
+      - name: Run dbt models
+        run: dbt run --profiles-dir ~/.dbt --target ${{ steps.env.outputs.target }}
+
+  
+

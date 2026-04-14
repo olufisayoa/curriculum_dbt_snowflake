@@ -60,7 +60,7 @@ SELECT
     'TRIM(PM.QualID)',            
     'CAST(PM.StartDate AS DATE)',      
     'CAST(PM.CompletionStatusID AS INTEGER)'                            
-    ]) }} AS EnrolmentKey,
+    ]) }} AS "EnrolmentKey",
     CAST(COALESCE(LTRIM(RTRIM(PM.AcademicYearID)), OE.AcademicYearID) AS NCHAR(5)) AS "AcademicYear",
 
     CAST(COALESCE(PM.StudentRef, OE.StudentRef) AS NCHAR(50)) AS "StudentID",
