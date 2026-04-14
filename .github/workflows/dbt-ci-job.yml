@@ -1,13 +1,9 @@
-name: deploy dbt models on merge to staging or main
+name: deploy dbt models
 on:
   push:
     branches:
-      - '!main'
-  pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
+      - staging
+      - main
 
 jobs:
   dbt-deploy:
@@ -24,18 +20,20 @@ jobs:
       - name: Install requirements
         run: pip install -r requirements.txt
 
-      - name: Install dbt dependencies
-        run: dbt deps
+      - name: Write snowflake private key
+        run: |
+          mkdir -p ~/.dbt
+          echo "${{ secrets.SNOWFLAKE_PRIVATE_KEY }}" > ~/.dbt/private_key.pem
+          chmod 600 ~/.dbt/private_key.pem
 
       - name: Set dbt target environment
         id: env
         run: |
-          if [[ "${GITHUB_REF}" == "refs/heads/staging" ]]; then
+          TARGET_BRANCH="${GITHUB_BASE_REF:-$GITHUB_REF_NAME}"
+          if [[ "${TARGET_BRANCH}" == "staging" ]]; then
             echo "target=staging" >> $GITHUB_OUTPUT
-          elif [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
-            echo "target=prod" >> $GITHUB_OUTPUT
           else
-            echo "target=staging" >> $GITHUB_OUTPUT
+            echo "target=prod" >> $GITHUB_OUTPUT
           fi
 
       - name: Write profiles.yml
@@ -52,8 +50,9 @@ curriculum_dbt_snowflake:
       role: ${{ secrets.SNOWFLAKE_ROLE }}
       warehouse: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
       database: ${{ secrets.SNOWFLAKE_DATABASE }}
+      schema: staging
       threads: 1
-      private_key_path: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
+      private_key_path: /.dbt/private_key.pem
     prod:
       type: snowflake
       account: ${{ secrets.SNOWFLAKE_ACCOUNT }}
@@ -61,12 +60,16 @@ curriculum_dbt_snowflake:
       role: ${{ secrets.SNOWFLAKE_ROLE }}
       warehouse: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
       database: ${{ secrets.SNOWFLAKE_DATABASE }}
+      schema: prod
       threads: 1
-      private_key_path: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
+      private_key_path: /.dbt/private_key.pem
 EOF
 
+      - name: Install dbt dependencies
+        run: dbt deps
+
       - name: Run dbt models
-        run: dbt run --profiles-dir ~/.dbt --target ${{ steps.env.outputs.target }}
+        run: dbt build --profiles-dir ~/.dbt --target ${{ steps.env.outputs.target }}
 
 
 
