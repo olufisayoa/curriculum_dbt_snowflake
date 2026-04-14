@@ -1,0 +1,9 @@
+version: 2
+sources:
+  - name: Promonitor
+    schema: RAW
+    database: CURRICULUM_DB
+    tables:
+      - name: PROMONITOR_STUDENTCODEMAPPING
+        description: "This table contains mapping information between ProMonitor and student codes."
+    

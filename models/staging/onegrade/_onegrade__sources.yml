@@ -1,0 +1,55 @@
+version: 2
+sources:
+  - name: Onegrade
+    schema: RAW
+    database: CURRICULUM_DB
+    tables:
+      - name: ONEGRADE_COHORTLOOKUP
+        description: "This table contains information about cohort details."
+      - name: ONEGRADE_COURSE
+        description: "This table contains information about courses, including their code, description, and other relevant details."
+      - name: ONEGRADE_STUDENT 
+        description: "This table contains information about students, including their code, description, and other relevant details."
+      - name: ONEGRADE_ESTACTVA
+        description: "This table contains information about estimated actual values, including their code, description, and other relevant details."
+      - name: ONEGRADE_LEARNINGAIM
+        description: "This table contains information about learning aims, including their code, description, and other relevant details."
+      - name: ONEGRADE_VLEARNINGAIM
+        description: "This table contains information about learning aim details, including their code, description, and other relevant details."
+      - name: ONEGRADE_VLEARNINGAIMOTHER
+        description: "This table contains information about other learning aims, including their code, description, and other relevant details."
+      - name: ONEGRADE_OFQUAL 
+        description: "This table contains information about Ofqual details, including their code, description, and other relevant details."
+      - name: ONEGRADE_VLEARNINGAIML3VA 
+        description: "This table contains information about learning aim L3VA details, including their code, description, and other relevant details."
+      - name: ONEGRADE_VLEARNINGAIMCA 
+        description: "This table contains information about learning aim CA details, including their code, description, and other relevant details."
+
+      - name: ONEGRADE_VENROLMENT
+        description: "This table contains information about enrolment details, including their code, description, and other relevant details."
+
+      - name: ONEGRADE_COMPLETION 
+        description: "This table contains information about completion details, including their code, description, and other relevant details."
+
+      - name: ONEGRADE_QAN 
+        description: "This table contains information about QAN details, including their code, description, and other relevant details."
+      - name: ONEGRADE_QUALIFICATION_LOOKUP
+        description: "This table contains information about qualification lookup details, including their code, description, and other relevant details."
+
+      - name: ONEGRADE_SUBJECT_LOOKUP
+        description: "This table contains information about subject lookup details, including their code, description, and other relevant details."
+      - name: ONEGRADE_QUALIFICATIONLEARNINGAIMCOLLEGE
+        description: "This table contains information about qualification learning aim college details, including their code, description, and other relevant details."
+
+      - name: ONEGRADE_QUALIFICATIONLEARNINGAIMCOURSECOLLEGE
+        description: "This table contains information about qualification learning aim course college details, including their code, description, and other relevant details."
+
+      - name: ONEGRADE_L3VATECHLEVEL_SCOPE
+        description: "This table contains information about L3VA tech level scope details, including their code, description, and other relevant details."  
+      - name: ONEGRADE_APPLIEDGENERAL_SCOPE
+        description: "This table contains information about applied general scope details, including their code, description, and other relevant details."
+
+      - name: ONEGRADE_CA_LEARNINGAIMACYR_SCOPE
+        description: "This table contains information about CA learning aim academic year scope details, including their code, description, and other relevant details."
+
+      

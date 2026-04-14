@@ -1,0 +1,1 @@
+select * from {{ source('Onegrade', 'ONEGRADE_CA_LEARNINGAIMACYR_SCOPE') }}

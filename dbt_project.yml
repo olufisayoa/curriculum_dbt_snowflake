@@ -22,7 +22,10 @@ clean-targets:         # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
 
-
+dispatch:
+  - macro_namespace: dbt_utils
+    search_order: ['curriculum_dbt_snowflake', 'dbt_utils']
+    
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
 
@@ -32,5 +35,13 @@ clean-targets:         # directories to be removed by `dbt clean`
 models:
   curriculum_dbt_snowflake:
     # Config indicated by + and applies to all files under models/example/
-    example:
+    marts:
+      core:
+        +materialized: table
+        +schema: core
+        intermediate:
+          +materialized: table
+          +schema: int
+    staging:
       +materialized: view
+      +schema: stg
