@@ -22,5 +22,6 @@ select
         , ValueAdded AS "ValueAdded"
         , EnrolmentGrade AS "EnrolmentGrade"
         , EnrolmentPoint AS "EnrolmentPoint"
+        , TargetBand AS "TargetBand"
         , DfeIncluded AS "DfeIncluded"
 from {{ ref('int_student_progress') }}
