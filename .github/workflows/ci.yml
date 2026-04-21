@@ -72,9 +72,9 @@ jobs:
       - name: Validate changes (Slim CI when state is available)
         run: |
           if [ -f ./state/manifest.json ]; then
-            echo "✅ State found. Running Slim CI validation..."
+            echo "State found. Running Slim CI validation..."
             dbt build --target pr --vars "schema_id: ${{ env.SCHEMA_ID }}" --state ./state --select state:modified+ --defer
           else
-            echo "⚠️ No manifest found, running full dbt build"
+            echo "No manifest found, running full dbt build"
             dbt build --target pr --vars "schema_id: ${{ env.SCHEMA_ID }}"
           fi
