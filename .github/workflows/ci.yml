@@ -32,7 +32,10 @@ jobs:
 
       - name: Get Schema ID
         id: get_schema_id
-        run: echo "SCHEMA_ID=${{ github.event.pull_request.number }}__${{ github.event.pull_request.head.sha }} | cut -c1-7 | tr '[:lower:]' '[:upper:]')" >> $GITHUB_ENV
+        run: |
+          SHA_SHORT=${{ github.event.pull_request.head.sha }} | cut -c1-7 
+          ID="${{ github.event.pull_request.number }}__${SHA_SHORT}"
+          echo "SCHEMA_ID=$(echo ${ID} | tr '[:lower:]' '[:upper:]')" >> $GITHUB_ENV
 
       - name: Write Snowflake private key
         run: |
@@ -51,6 +54,7 @@ jobs:
 
       - name: Use state manifest if present
         run: |
+          mkdir -p target
           if [ -f ./state/manifest.json ]; then
             echo "Using manifest from previous successful CI run"
             cp ./state/manifest.json ./target/manifest.json

@@ -1,11 +1,10 @@
 {%- macro drop_pr_schemas() -%}
-  {% set db = target.database %}
-  {% set sch = target.schema %}
+  {% set pr_schema = "PR_" ~ var('schema_id') %}
 
-  {% do log("Dropping schema: " ~ db ~ "." ~ sch, info=true) %}
+  {{ log("Dropping PR staging schemas for schema: " ~ pr_schema, info=true) }}
 
-  {% set drop_sql = 'drop schema if exists ' ~ adapter.quote(db) ~ '.' ~ adapter.quote(sch) ~ ' cascade' %}
-  {% do log("DROP SQL: " ~ drop_sql, info=true) %}
+  {% set drop_query = 'drop schema if exists ' ~ target.database ~ '.' ~ pr_schema ~ ' cascade' %}
 
-  {% do run_query(drop_sql) %}
+  {% do run_query(drop_query) %}
+  {{ log("Schema " ~ pr_schema ~ " dropped successfully", info=true) }}
 {%- endmacro -%}
