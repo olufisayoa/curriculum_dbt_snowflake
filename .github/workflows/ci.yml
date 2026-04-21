@@ -64,16 +64,18 @@ jobs:
           fi
 
       - name: dbt debug
-        run: dbt debug --target pr --vars "schema_id: ${{ env.SCHEMA_ID }}"
+        run: |
+          dbt debug --target pr --vars "schema_id: $SCHEMA_ID"
 
       - name: Install dbt dependencies
-        run: dbt deps --target pr --vars "schema_id: ${{ env.SCHEMA_ID }}"
+        run: |
+          dbt deps --target pr --vars "schema_id: $SCHEMA_ID"
 
       - name: Validate changes (Slim CI when state is available)
         run: |
           if [ -f ./state/manifest.json ]; then
             echo "State found. Running Slim CI validation..."
-            dbt build --target pr --vars "schema_id: ${{ env.SCHEMA_ID }}" --state ./state --select state:modified+ --defer
+            dbt build --target pr --vars "schema_id: ${{ env.SCHEMA_ID }}" --state ./state --select "state:modified+" --defer
           else
             echo "No manifest found, running full dbt build"
             dbt build --target pr --vars "schema_id: ${{ env.SCHEMA_ID }}"

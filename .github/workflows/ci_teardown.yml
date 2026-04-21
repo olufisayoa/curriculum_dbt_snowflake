@@ -48,4 +48,5 @@ jobs:
         run: dbt deps --target pr
 
       - name: Drop PR schema
-        run: dbt run-operation drop_pr_schema --target pr --vars "schema_id: ${{ env.SCHEMA_ID }}"
+        run: |
+          dbt run-operation drop_pr_schema --target pr --vars "schema_id: $SCHEMA_ID"
