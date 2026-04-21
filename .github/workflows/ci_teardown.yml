@@ -5,6 +5,9 @@ on:
     types: [closed]
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   dbt-ci-schema-teardown:
     runs-on: ubuntu-latest
