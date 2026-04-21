@@ -33,7 +33,7 @@ jobs:
       - name: Get Schema ID
         id: get_schema_id
         run: |
-          SHA_SHORT=$echo( "${{ github.event.pull_request.head.sha }}" | cut -c1-7 )
+          SHA_SHORT=$(echo "${{ github.event.pull_request.head.sha }}" | cut -c1-7)
           ID="${{ github.event.pull_request.number }}__${SHA_SHORT}"
           CLEAN_ID=$(echo ${ID} | tr '[:lower:]' '[:upper:]')
           echo "SCHEMA_ID=${CLEAN_ID}" >> $GITHUB_ENV
