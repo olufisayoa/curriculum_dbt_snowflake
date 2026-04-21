@@ -4,7 +4,7 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
     branches: [main]
-    
+
 permissions:
   contents: read
   actions: read
@@ -69,11 +69,11 @@ jobs:
 
       - name: dbt debug
         run: |
-          dbt debug --target pr --vars "schema_id: $SCHEMA_ID"
+          dbt debug --target pr --vars "schema_id: ${{env.SCHEMA_ID}}"
 
       - name: Install dbt dependencies
         run: |
-          dbt deps --target pr --vars "schema_id: $SCHEMA_ID"
+          dbt deps --target pr --vars "schema_id: ${{env.SCHEMA_ID}}"
 
       - name: Validate changes (Slim CI when state is available)
         run: |
