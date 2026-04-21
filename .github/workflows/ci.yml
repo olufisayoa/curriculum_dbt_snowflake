@@ -2,13 +2,20 @@ name: dbt CI (pull request validation)
 
 on:
   pull_request:
-    branches: [staging, main]
+    types: [opened, synchronize, reopened]
+    branches: [main]
 
 jobs:
   dbt-validate:
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: read
+    runs-on: ubuntu-latest
+    env:
+      SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+      SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+      SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
+      SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+      SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
+      SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
+      SNOWFLAKE_PRIVATE_KEY: /home/runner/.dbt/private_key.pem
 
     steps:
       - name: Check out the repository
@@ -23,33 +30,53 @@ jobs:
       - name: Install requirements
         run: pip install -r requirements.txt
 
+      - name: Get Schema ID
+        id: get_schema_id
+        run: |
+          SHA_SHORT=$(echo "${{ github.event.pull_request.head.sha }}" | cut -c1-7)
+          ID="${{ github.event.pull_request.number }}__${SHA_SHORT}"
+          CLEAN_ID=$(echo ${ID} | tr '[:lower:]' '[:upper:]')
+          echo "SCHEMA_ID=${CLEAN_ID}" >> $GITHUB_ENV
+
       - name: Write Snowflake private key
         run: |
           mkdir -p ~/.dbt
           echo "${{ secrets.SNOWFLAKE_PRIVATE_KEY }}" > ~/.dbt/private_key.pem
           chmod 600 ~/.dbt/private_key.pem
 
-      - name: Write profiles.yml
+      - name: Download manifest from previous succesful CI run
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          branch: main
+          name: dbt-manifest
+          path: ./state
+          if_no_artifact_found: warn 
+          workflow_conclusion: success
+
+      - name: Use state manifest if present
         run: |
-          mkdir -p ~/.dbt
-          cat > ~/.dbt/profiles.yml <<EOF
-          curriculum_dbt_snowflake:
-            target: staging
-            outputs:
-              staging:
-                type: snowflake
-                account: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-                user: ${{ secrets.SNOWFLAKE_USER }}
-                role: ${{ secrets.SNOWFLAKE_ROLE }}
-                warehouse: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
-                database: ${{ secrets.SNOWFLAKE_DATABASE }}
-                schema: staging
-                threads: 4
-                private_key_path: /home/runner/.dbt/private_key.pem
-          EOF
+          mkdir -p target
+          if [ -f ./state/manifest.json ]; then
+            echo "Using manifest from previous successful CI run"
+            cp ./state/manifest.json ./target/manifest.json
+          else
+            echo "No manifest found from previous CI run, proceeding without it"
+          fi
+
+      - name: dbt debug
+        run: |
+          dbt debug --target pr --vars "schema_id: $SCHEMA_ID"
 
       - name: Install dbt dependencies
-        run: dbt deps
+        run: |
+          dbt deps --target pr --vars "schema_id: $SCHEMA_ID"
 
-      - name: Validate changes 
-        run: dbt build --select state:modified+ --target staging
+      - name: Validate changes (Slim CI when state is available)
+        run: |
+          if [ -f ./state/manifest.json ]; then
+            echo "State found. Running Slim CI validation..."
+            dbt build --target pr --vars "schema_id: ${{ env.SCHEMA_ID }}" --state ./state --select "state:modified+" --defer
+          else
+            echo "No manifest found, running full dbt build"
+            dbt build --target pr --vars "schema_id: ${{ env.SCHEMA_ID }}"
+          fi

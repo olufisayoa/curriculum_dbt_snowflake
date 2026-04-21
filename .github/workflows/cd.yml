@@ -2,16 +2,27 @@ name: Deploy dbt models
 
 on:
   push:
-    branches:
-      - staging
-      - main
+    branches: [ main ]
 
 permissions:
   contents: read
 
+concurrency:
+  group: 'dbt-deploy'
+  cancel-in-progress: false
+
 jobs:
   dbt-deploy:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
+
+    env:
+      SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+      SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+      SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
+      SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+      SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
+      SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
+      SNOWFLAKE_PRIVATE_KEY: /home/runner/.dbt/private_key.pem
 
     steps:
       - name: Check out the repository
@@ -32,55 +43,34 @@ jobs:
           echo "${{ secrets.SNOWFLAKE_PRIVATE_KEY }}" > ~/.dbt/private_key.pem
           chmod 600 ~/.dbt/private_key.pem
 
-      - name: Set dbt target environment
-        id: env
-        run: |
-          case "${{github.ref_name}}" in staging)
-            echo "target=staging" >> $GITHUB_OUTPUT
-            echo "Deploying to staging environment"
-            ;;
-            main)
-            echo "target=prod" >> $GITHUB_OUTPUT
-            echo "Deploying to production environment"
-            ;;
-            *)
-            echo "❌ Error: Deployment not allowed from branch '${{ github.ref_name }}'". 
-            echo "Only 'main' and 'staging' are allowed."
-            exit 1
-            ;;
-          esac
-
-      - name: Write profiles.yml
-        run: |
-          mkdir -p ~/.dbt
-          cat > ~/.dbt/profiles.yml <<EOF
-          curriculum_dbt_snowflake:
-            target: ${{ steps.env.outputs.target }}
-            outputs:
-              staging:
-                type: snowflake
-                account: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-                user: ${{ secrets.SNOWFLAKE_USER }}
-                role: ${{ secrets.SNOWFLAKE_ROLE }}
-                warehouse: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
-                database: ${{ secrets.SNOWFLAKE_DATABASE }}
-                schema: staging
-                threads: 4
-                private_key_path: /home/runner/.dbt/private_key.pem
-              prod:
-                type: snowflake
-                account: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-                user: ${{ secrets.SNOWFLAKE_USER }}
-                role: ${{ secrets.SNOWFLAKE_ROLE }}
-                warehouse: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
-                database: ${{ secrets.SNOWFLAKE_DATABASE }}
-                schema: prod
-                threads: 4
-                private_key_path: /home/runner/.dbt/private_key.pem
-          EOF
+      - name: Download manifest from previous succesful CI run
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          branch: main
+          name: dbt-manifest
+          path: ./state
+          if_no_artifact_found: warn 
+          workflow_conclusion: success
 
       - name: Install dbt dependencies
         run: dbt deps
 
       - name: Run dbt build
-        run: dbt build --profiles-dir ~/.dbt --target ${{ steps.env.outputs.target }}
+        run: |
+          if [ -f ./state/manifest.json ]; then
+            echo "✅ State found. Running Slim CD build..."
+            dbt build --target prod --state ./state --select state:modified+
+          else
+            echo "⚠️ No manifest found, running full dbt build"
+            dbt build --target prod
+          fi
+
+      - name: Upload manifest for future runs
+        uses: actions/upload-artifact@v3
+        if: success() 
+        with:
+          name: dbt-manifest
+          path: ./target/manifest.json
+          if-no-files-found: error
+          retention-days: 7
+
