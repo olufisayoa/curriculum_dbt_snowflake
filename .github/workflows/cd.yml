@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: 'dbt-deploy'
@@ -58,10 +59,10 @@ jobs:
       - name: Run dbt build
         run: |
           if [ -f ./state/manifest.json ]; then
-            echo "✅ State found. Running Slim CD build..."
-            dbt build --target prod --state ./state --select state:modified+
+            echo "State found. Running Slim CD build..."
+            dbt build --target prod --state ./state --select "state:modified+"
           else
-            echo "⚠️ No manifest found, running full dbt build"
+            echo "No manifest found, running full dbt build"
             dbt build --target prod
           fi
 
