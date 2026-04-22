@@ -14,7 +14,8 @@ WITH  ProSolution_Master AS (
         PSE.OfferingID                                        AS ProSolutionOfferingID,
         PSE.CompletionStatusID                                AS CompletionStatusID,
         PSO.QualID                                              AS QualID,
-        PSE.StudentDetailID                                   AS StudentDetailID
+        PSE.StudentDetailID                                   AS StudentDetailID,
+        PSE.StudyYear                                         AS StudyYear
     FROM {{ ref('stg_prosolution__enrolment') }} PSE
     INNER JOIN {{ ref('stg_prosolution__student') }} PSD   ON PSE.StudentDetailID = PSD.StudentDetailID
     INNER JOIN {{ ref('stg_prosolution__offering') }} PSO       ON PSE.OfferingID = PSO.OfferingID
@@ -90,6 +91,9 @@ SELECT
 	CAST(COALESCE(OE.Cohort, '-')  AS NVARCHAR(20)) AS "Cohort",
     CAST(COALESCE(OE.QualificationLevel, '-') AS NVARCHAR(255)) 
         AS "QualificationLevel",
+
+    CAST(PM.StudyYear AS DECIMAL(19,2)) 
+        AS "StudyYear",
 
 	CAST(COALESCE(PM.Outcome, '-') AS NVARCHAR(100)) 
         AS "Outcome"
