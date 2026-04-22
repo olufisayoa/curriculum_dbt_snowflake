@@ -24,4 +24,5 @@ select
         , EnrolmentPoint AS "EnrolmentPoint"
         , TargetBand AS "TargetBand"
         , DfeIncluded AS "DfeIncluded"
+        , QualificationSize AS "QualificationSize"
 from {{ ref('int_student_progress') }}
