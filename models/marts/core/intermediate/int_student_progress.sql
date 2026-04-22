@@ -92,6 +92,6 @@ SELECT
     , CAST(CASE 
         WHEN base.VA_Type = 'L3VA' AND base.AgeOn31Aug IN (16,17,18) AND base.CompletionID IN (1,2) THEN 1
     END AS BOOLEAN) AS DfeIncluded
-
+    , CAST(base.Size AS DECIMAL(19,2)) AS QualificationSize
 FROM base_data AS base
 CROSS JOIN unpivot_helper AS h
