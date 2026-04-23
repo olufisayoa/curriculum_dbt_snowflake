@@ -3,7 +3,7 @@
 
   {{ log("Dropping PR staging schemas for schema: " ~ pr_schema, info=true) }}
 
-  {% set drop_query = 'drop schema if exists ' ~ target.database ~ '.' ~ pr_schema ~ ' cascade' %}
+  {% set drop_query = 'drop schema if exists ' ~ adapter.quote(target.database) ~ '.' ~ adapter.quote(pr_schema) ~ ' cascade' %}
 
   {% if execute %}
     {% do run_query(drop_query) %}
