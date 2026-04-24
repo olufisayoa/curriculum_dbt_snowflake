@@ -64,6 +64,21 @@ sources:
       - name: PROSOLUTION_LEARNINGAIM
         description: "This table contains information about learning aims, including their code, description, and other relevant details."
 
+      - name: PROSOLUTION_REGISTER
+        description: "This table contains information about registers, including their code, description, and other relevant details."
+
+      - name: PROSOLUTION_REGISTERMARK
+        description: "This table contains information about register marks, including their code, description, and other relevant details."
+
+      - name: PROSOLUTION_REGISTERSESSION
+        description: "This table contains information about register sessions, including their code, description, and other relevant details."
+
+      - name: PROSOLUTION_REGISTERSTUDENT
+        description: "This table contains information about register students, including their code, description, and other relevant details."
+
+      - name: PROSOLUTION_MARKTYPE
+        description: "This table contains information about mark types, including their code, description, and other relevant details."
+
 
 
     
