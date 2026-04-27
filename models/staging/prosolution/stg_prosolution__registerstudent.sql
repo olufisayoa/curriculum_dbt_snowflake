@@ -1,5 +1,5 @@
 SELECT
-    RegisterStudentID,
-    EnrolmentID
+    "RegisterStudentID",
+    "EnrolmentID"
     
 FROM {{ source('ProSolution', 'PROSOLUTION_REGISTERSTUDENT') }}

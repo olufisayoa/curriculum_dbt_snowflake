@@ -1,5 +1,5 @@
 SELECT
-MarkTypeID,
-RegisterSessionID, 
-RegisterStudentID
+"MarkTypeID",
+"RegisterSessionID", 
+"RegisterStudentID"
 FROM {{ source('ProSolution', 'PROSOLUTION_MARKTYPE') }}
