@@ -1,5 +1,6 @@
 SELECT
 "MarkTypeID",
-"RegisterSessionID", 
-"RegisterStudentID"
+"MarkTypeStatusID",
+"IsAuthorisedAbsense",
+"IsLate"
 FROM {{ source('ProSolution', 'PROSOLUTION_MARKTYPE') }}
