@@ -24,7 +24,9 @@ SELECT			{{ dbt_utils.generate_surrogate_key(['TRIM( R.AcademicYearID)']) }} AS 
 						 AND MT.IsAuthorisedAbsence = 1 THEN 1 ELSE 0 END AS MrkAuthAbsent,
 
 				CASE WHEN MT.MarkTypeStatusID = 1 
-						 AND MT.IsLate = 1 THEN 1 ELSE 0 END AS MrkLate
+						 AND MT.IsLate = 1 THEN 1 ELSE 0 END AS MrkLate,
+                    
+                CASE WHEN MT.MarkTypeStatusID IN (0,1) THEN 1 ELSE 0 END AS MrkRequired
 
 
 FROM			{{ ref('stg_prosolution__registermark') }}  M
@@ -49,4 +51,4 @@ ON				E.OfferingID = O.OfferingID
 JOIN			{{ ref('stg_prosolution__student') }} SD 
 ON				E.StudentDetailID = SD.StudentDetailID
 
-WHERE MT.MarkTypeStatusID IN (0,1)
+
