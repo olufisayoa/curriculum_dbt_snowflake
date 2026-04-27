@@ -1,6 +1,6 @@
 SELECT
 "MarkTypeID",
 "MarkTypeStatusID",
-"IsAuthorisedAbsense",
+"IsAuthorisedAbsence",
 "IsLate"
 FROM {{ source('ProSolution', 'PROSOLUTION_MARKTYPE') }}

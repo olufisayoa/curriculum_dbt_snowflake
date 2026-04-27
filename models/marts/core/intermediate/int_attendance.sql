@@ -1,35 +1,30 @@
 
 
-SELECT			R.AcademicYearID,
-				SD.RefNo,
-				E.StartDate,
-				E.CompletionStatusID AS CompletionStatus,
-				O.Code AS CourseCode,
-				O.QualID AS LearningAimRef,
-				O.Name AS CourseTile,
-				R.RegisterID,
-				O.SID,
-				O.SiteID,
+SELECT			{{ dbt_utils.generate_surrogate_key(['TRIM( R.AcademicYearID)']) }} AS AcademicYearKey, 
+				{{ dbt_utils.generate_surrogate_key(['TRIM( R.AcademicYearID)','TRIM(SD.RefNo)' ] ) }} AS StudentKey,
+                {{ dbt_utils.generate_surrogate_key([
+                    'TRIM(R.AcademicYearID)',   
+                    'TRIM(SD.RefNo)',
+                    'TRIM(O.Code)',   
+                    'TRIM(O.QualID)',            
+                    'CAST(E.StartDate AS DATE)',      
+                    'CAST(E.CompletionStatusID AS INTEGER)'                            
+                    ]) }} AS EnrolmentKey,
+				{{ dbt_utils.generate_surrogate_key(['TRIM(R.RegisterID)']) }} AS RegisterKey,
+				{{ dbt_utils.generate_surrogate_key(['TRIM(O.SID)']) }} AS CollegeLevelKey,
+				{{ dbt_utils.generate_surrogate_key(['TRIM(O.SiteID)']) }} AS SiteKey,
+                {{ dbt_utils.generate_surrogate_key(['TRIM(M.MarkTypeID)']) }} AS MarkTypeKey,
+
 				CAST(S.Date AS DATE) AS RegisterSessionDate,
-				M.MarkTypeID,
-				SUM(CASE WHEN MT.MarkTypeStatusID = 1 THEN 1 ELSE 0 END) AS MrkPresent,           
-				SUM(CASE WHEN MT.MarkTypeStatusID = 0 THEN 1 ELSE 0 END) AS MrkAbsent,            
-				SUM(CASE WHEN MT.MarkTypeStatusID NOT IN (0,1) THEN 1 ELSE 0 END) AS MrkNotReq,   
+				CASE WHEN MT.MarkTypeStatusID = 1 THEN 1 ELSE 0 END AS MrkPresent,           
+				CASE WHEN MT.MarkTypeStatusID = 0 THEN 1 ELSE 0 END AS MrkAbsent,            
+				CASE WHEN MT.MarkTypeStatusID NOT IN (0,1) THEN 1 ELSE 0 END AS MrkNotReq,   
 
-				SUM(CASE WHEN MT.MarkTypeStatusID IN (0,1) 
-						 AND MT.IsAuthorisedAbsence = 1 THEN 1 ELSE 0 END) AS MrkAuthAbsent,
+				CASE WHEN MT.MarkTypeStatusID IN (0,1) 
+						 AND MT.IsAuthorisedAbsence = 1 THEN 1 ELSE 0 END AS MrkAuthAbsent,
 
-				SUM(CASE WHEN MT.MarkTypeStatusID = 1 
-						 AND MT.IsLate = 1 THEN 1 ELSE 0 END) AS MrkLate,
-    
-				CAST(
-					CASE WHEN SUM(CASE WHEN MT.MarkTypeStatusID IN (0,1) THEN 1 ELSE 0 END) = 0 
-						 THEN 0 
-						 ELSE CAST(
-									  SUM(CASE WHEN MT.MarkTypeStatusID = 1 THEN 1 ELSE 0 END) AS decimal(6,3)) 
-							/ CAST(
-									  SUM(CASE WHEN MT.MarkTypeStatusID IN (0,1) THEN 1 ELSE 0 END) AS decimal(6,3))
-				END AS decimal(6,3)) AS PcntAtt
+				CASE WHEN MT.MarkTypeStatusID = 1 
+						 AND MT.IsLate = 1 THEN 1 ELSE 0 END AS MrkLate
 
 
 FROM			{{ ref('stg_prosolution__registermark') }}  M
@@ -55,17 +50,3 @@ JOIN			{{ ref('stg_prosolution__student') }} SD
 ON				E.StudentDetailID = SD.StudentDetailID
 
 WHERE MT.MarkTypeStatusID IN (0,1)
-
-GROUP BY
-	R.AcademicYearID,
-	SD.RefNo,
-	E.StartDate,
-	E.CompletionStatusID ,
-	O.Code ,
-	O.QualID ,
-	O.Name,
-	R.RegisterID,
-	O.SID,
-	O.SiteID,
-	S.Date,
-	M.MarkTypeID
