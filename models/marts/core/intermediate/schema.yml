@@ -1,0 +1,27 @@
+version: 2
+
+models:
+  - name: int_attendance
+    description: Intermediate attendance model with attendance marks and session details
+    config:
+      materialized: incremental
+      unique_key:
+        - RegisterKey
+        - StudentKey
+        - RegisterSessionDate
+      on_schema_change: fail
+    columns:
+      - name: RegisterSessionDate
+        description: Date of the registration session
+      - name: MrkPresent
+        description: Flag indicating present attendance
+      - name: MrkAbsent
+        description: Flag indicating absence
+      - name: MrkNotReq
+        description: Flag indicating attendance not required
+      - name: MrkAuthAbsent
+        description: Flag indicating authorised absence
+      - name: MrkLate
+        description: Flag indicating late attendance
+      - name: MrkRequired
+        description: Flag indicating attendance required

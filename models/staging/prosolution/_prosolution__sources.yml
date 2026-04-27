@@ -79,6 +79,9 @@ sources:
       - name: PROSOLUTION_MARKTYPE
         description: "This table contains information about mark types, including their code, description, and other relevant details."
 
+      - name: PROSOLUTION_MARKTYPESTATUS
+        description: "This table contains information about mark type status, including their code, description, and other relevant details."
+
 
 
     
