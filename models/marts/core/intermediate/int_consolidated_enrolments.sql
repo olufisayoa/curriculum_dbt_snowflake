@@ -15,12 +15,14 @@ WITH  ProSolution_Master AS (
         PSE.CompletionStatusID                                AS CompletionStatusID,
         PSO.QualID                                              AS QualID,
         PSE.StudentDetailID                                   AS StudentDetailID,
-        PSE.StudyYear                                         AS StudyYear
+        PSE.StudyYear                                         AS StudyYear,
+        ET.Description AS EnrolmentType
     FROM {{ ref('stg_prosolution__enrolment') }} PSE
     INNER JOIN {{ ref('stg_prosolution__student') }} PSD   ON PSE.StudentDetailID = PSD.StudentDetailID
     INNER JOIN {{ ref('stg_prosolution__offering') }} PSO       ON PSE.OfferingID = PSO.OfferingID
     LEFT  JOIN {{ ref('stg_prosolution__completionstatus') }} PSC ON PSC.CompletionStatusID = PSE.CompletionStatusID
     LEFT  JOIN {{ ref('stg_prosolution__outcome') }} O           ON O.OutcomeID = PSE.OutcomeID
+    LEFT JOIN {{ ref('stg_prosolution__enrolmenttype') }} ET      ON ET.EnrolmentTypeID = PSE.EnrolmentTypeID
 ),
 
 OneGrade_Enrichment AS (
@@ -94,7 +96,8 @@ SELECT
 
     CAST(PM.StudyYear AS DECIMAL(19,2)) 
         AS "StudyYear",
-
+    CAST(PM.EnrolmentType AS NVARCHAR(100)) 
+        AS "EnrolmentType",
 	CAST(COALESCE(PM.Outcome, '-') AS NVARCHAR(100)) 
         AS "Outcome"
 
