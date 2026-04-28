@@ -5,12 +5,11 @@ models:
     description: Intermediate attendance model with attendance marks and session details
     config:
       materialized: incremental
-      unique_key:
-        - RegisterKey
-        - StudentKey
-        - RegisterSessionDate
-      on_schema_change: fail
+      unique_key: RegisterMarkID
+      incremental_strategy: merge
     columns:
+      - name: RegisterMarkID
+        description: Unique identifier for register mark record
       - name: RegisterSessionDate
         description: Date of the registration session
       - name: MrkPresent

@@ -3,13 +3,13 @@
 {{
   config(
     materialized='incremental',
-    unique_key=['M.RegisterMarkID'],
+    unique_key=['RegisterMarkID'],
     incremental_strategy='merge'
   )
 }}
 
-SELECT			{{ dbt_utils.generate_surrogate_key(['TRIM(M.RegisterMarkID)']) }} AS AttendanceKey,
-                {{ dbt_utils.generate_surrogate_key(['TRIM( R.AcademicYearID)']) }} AS AcademicYearKey, 
+SELECT			M.RegisterMarkID,
+				{{ dbt_utils.generate_surrogate_key(['TRIM( R.AcademicYearID)']) }} AS AcademicYearKey,
 				{{ dbt_utils.generate_surrogate_key(['TRIM( R.AcademicYearID)','TRIM(SD.RefNo)' ] ) }} AS StudentKey,
                 {{ dbt_utils.generate_surrogate_key([
                     'TRIM(R.AcademicYearID)',   
