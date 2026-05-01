@@ -45,3 +45,7 @@ models:
     staging:
       +materialized: view
       +schema: stg
+
+seeds:
+  curriculum_dbt_snowflake:
+    +schema: int
