@@ -1,6 +1,6 @@
 
 curriculum_dbt_snowflake:
-  target: prod
+  target: dev
   outputs:
     prod:
       type: snowflake

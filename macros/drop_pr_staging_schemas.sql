@@ -1,5 +1,5 @@
 {%- macro drop_pr_schemas() -%}
-  {% set pr_schema = "PR_" ~ var('schema_id') %}
+  {% set pr_schema = "PR__" ~ var('schema_id') %}
 
   {{ log("Dropping PR staging schemas for schema: " ~ pr_schema, info=true) }}
 
