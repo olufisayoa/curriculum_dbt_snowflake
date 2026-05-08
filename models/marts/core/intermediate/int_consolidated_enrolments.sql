@@ -57,10 +57,9 @@ Attendance_Aggregated AS (
     SELECT
         EnrolmentKey,
         SUM(MrkPresent)                             AS TotalPresent,
-        SUM(MrkLate)                                AS TotalLate,
         SUM(MrkRequired)                            AS TotalRequired,
         DIV0(
-            SUM(MrkPresent) + SUM(MrkLate),
+            SUM(MrkPresent),
             SUM(MrkRequired)
         )                                           AS AttendanceRate
     FROM {{ ref('int_attendance') }}
@@ -125,7 +124,6 @@ LEFT JOIN OneGrade_Enrichment OE
 SELECT
     E.*,
     CAST(COALESCE(A.TotalPresent, 0)  AS INT)           AS "TotalPresent",
-    CAST(COALESCE(A.TotalLate, 0)     AS INT)           AS "TotalLate",
     CAST(COALESCE(A.TotalRequired, 0) AS INT)           AS "TotalRequired",
     CAST(COALESCE(A.AttendanceRate, 0) AS DECIMAL(5,4)) AS "AttendanceRate"
 FROM Enrolments E
