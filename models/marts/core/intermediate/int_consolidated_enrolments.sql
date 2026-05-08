@@ -52,8 +52,21 @@ OneGrade_Enrichment AS (
 	 LEFT JOIN {{ ref('stg_onegrade__ofqual') }} ofq ON ofq."QualificationNumber"=OGE.LearningAimRef
 	 LEFT JOIN {{ ref('stg_onegrade__learningaim') }} vla ON vla.LearningAimRef=OGE.LearningAimRef AND vla.WholeQualID=OGE.WholeQualID
      WHERE OGE.StudentRef IS NOT NULL
-)
-
+),
+Attendance_Aggregated AS (
+    SELECT
+        EnrolmentKey,
+        SUM(MrkPresent)                             AS TotalPresent,
+        SUM(MrkLate)                                AS TotalLate,
+        SUM(MrkRequired)                            AS TotalRequired,
+        DIV0(
+            SUM(MrkPresent) + SUM(MrkLate),
+            SUM(MrkRequired)
+        )                                           AS AttendanceRate
+    FROM {{ ref('int_attendance') }}
+    GROUP BY EnrolmentKey
+),
+Enrolments AS (
 SELECT 
 
     {{ dbt_utils.generate_surrogate_key([
@@ -107,3 +120,14 @@ LEFT JOIN OneGrade_Enrichment OE
     AND UPPER(LTRIM(RTRIM(PM.CourseCode)))   = UPPER(LTRIM(RTRIM(OE.CourseCode)))
     AND LTRIM(RTRIM(PM.AcademicYearID))             = LTRIM(RTRIM(OE.AcademicYearID))
 	AND LTRIM(RTRIM(PM.StartDate))                   = LTRIM(RTRIM(OE.StartDate))
+)
+
+SELECT
+    E.*,
+    CAST(COALESCE(A.TotalPresent, 0)  AS INT)           AS "TotalPresent",
+    CAST(COALESCE(A.TotalLate, 0)     AS INT)           AS "TotalLate",
+    CAST(COALESCE(A.TotalRequired, 0) AS INT)           AS "TotalRequired",
+    CAST(COALESCE(A.AttendanceRate, 0) AS DECIMAL(5,4)) AS "AttendanceRate"
+FROM Enrolments E
+LEFT JOIN Attendance_Aggregated A
+    ON E."EnrolmentKey" = A.EnrolmentKey
