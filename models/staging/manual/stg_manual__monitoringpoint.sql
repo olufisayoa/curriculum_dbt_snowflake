@@ -11,5 +11,5 @@ WITH mp_data AS (
 SELECT 
     MPKey::INT AS "MPKey",
     MonitoringPointCode::VARCHAR(20) AS "MonitoringPointCode",
-    MPCode::CHAR(3) AS "MPCode"
+    MPCode::CHAR(10) AS "MPCode"
 FROM mp_data
