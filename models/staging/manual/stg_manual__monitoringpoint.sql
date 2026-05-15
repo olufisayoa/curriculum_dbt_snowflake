@@ -5,7 +5,7 @@ WITH mp_data AS (
     SELECT 3, 'Monitoring Point 3', 'MP3' UNION ALL
     SELECT 4, 'Monitoring Point 4', 'MP4' UNION ALL
     SELECT 5, 'Monitoring Point 5', 'MP5' UNION ALL
-    SELECT 6, 'Final Monitoring Point', 'Final VA' 
+    SELECT 6, 'Final MP', 'Final VA' 
 )
 
 SELECT 
