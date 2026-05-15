@@ -20,8 +20,6 @@ select
         , CurrentGrade AS "Current Grade"
         , CurrentPoint AS "Current Point"
         , ValueAdded AS "Value Added"
-        , EnrolmentGrade AS "Enrolment Grade"
-        , EnrolmentPoint AS "Enrolment Point"
         , TargetBand AS "Target Band"
         , DfeIncluded AS "Dfe Included"
         , QualificationSize AS "Qualification Size"
