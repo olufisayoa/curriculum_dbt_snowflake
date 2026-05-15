@@ -2,7 +2,6 @@ WITH base_data AS (
     SELECT 
         e.*,
         s.SiteID AS SiteID,
-        --ps.StudentDetailID AS StudentDetailID,
         o.OfferingID AS OfferingID,
         o.SID AS CollegeLevelCode
     FROM {{ ref('stg_onegrade__estactva') }} AS e
@@ -14,16 +13,15 @@ WITH base_data AS (
         AND o.AcademicYearID = c.AcademicYearID
     LEFT JOIN {{ ref('stg_prosolution__site') }} AS s 
         ON s.SiteID = o.SiteID
-    /*LEFT JOIN {{ ref('stg_prosolution__student')}} AS ps
-        ON TRIM(e.AcademicYearID) = TRIM(ps.AcademicYearID) AND TRIM(e.StudentRef) = TRIM(ps.RefNo)*/
-    WHERE e.CompletionID IN (1,2)
+    WHERE e.CompletionID IN (1,2,3)
 ),
 unpivot_helper AS (
     SELECT 1 AS MonitoringPointID UNION ALL
     SELECT 2 UNION ALL
     SELECT 3 UNION ALL
     SELECT 4 UNION ALL
-    SELECT 5
+    SELECT 5 UNION ALL
+    SELECT 6
 )
 
 SELECT 
@@ -64,6 +62,7 @@ SELECT
         WHEN h.MonitoringPointID = 3 THEN base.Point3_Grade
         WHEN h.MonitoringPointID = 4 THEN base.Point4_Grade
         WHEN h.MonitoringPointID = 5 THEN base.Point5_Grade
+        WHEN h.MonitoringPointID = 6 THEN base.EnrolmentGrade
       END AS VARCHAR(20)) AS CurrentGrade
     , CAST(CASE 
         WHEN h.MonitoringPointID = 1 THEN base.Point1_Points
@@ -71,6 +70,7 @@ SELECT
         WHEN h.MonitoringPointID = 3 THEN base.Point3_Points
         WHEN h.MonitoringPointID = 4 THEN base.Point4_Points
         WHEN h.MonitoringPointID = 5 THEN base.Point5_Points
+        WHEN h.MonitoringPointID = 6 THEN base.EnrolmentPoints
       END AS DECIMAL(19,2)) AS CurrentPoint
     , CAST(CASE 
         WHEN h.MonitoringPointID = 1 THEN base.Point1_vs_MostRecent2dp
@@ -78,11 +78,8 @@ SELECT
         WHEN h.MonitoringPointID = 3 THEN base.Point3_vs_MostRecent2dp
         WHEN h.MonitoringPointID = 4 THEN base.Point4_vs_MostRecent2dp
         WHEN h.MonitoringPointID = 5 THEN base.Point5_vs_MostRecent2dp
+        WHEN h.MonitoringPointID = 6 THEN base.EnrolmentGradeVAScore_vs_MostRecent2dp
       END AS DECIMAL(19,2)) AS ValueAdded
-
-    , CAST(base.EnrolmentGrade AS VARCHAR(20)) AS EnrolmentGrade
-    , CAST(base.EnrolmentPoints AS DECIMAL(19,2)) AS EnrolmentPoint
-
     , CASE 
         WHEN base.MostRecentAtTarget = 1 THEN 'On Target'
         WHEN base.MostRecentAboveTarget = 1 THEN 'Above Target'
@@ -90,8 +87,10 @@ SELECT
     END AS TargetBand
 
     , CAST(CASE 
-        WHEN base.VA_Type = 'L3VA' AND base.AgeOn31Aug IN (16,17,18) AND base.CompletionID IN (1,2) THEN 1
-    END AS BOOLEAN) AS DfeIncluded
+        WHEN base.VA_Type = 'L3VA' AND base.AgeOn31Aug IN (16,17,18) AND base.CompletionID IN (1,2) THEN 'L3VA Rules'
+        WHEN base.VA_Type = 'CA' AND base.AgeOn31Aug IN (16,17,18) AND base.CompletionID IN (1,2,3) AND base.IsGraded='Yes' 
+            AND base.WDNumDaysAfterStart IS NULL OR base.WDNumDaysAfterStart >= 42 THEN 'CA Rules'
+    END AS VARCHAR(20)) AS DfeIncluded
     , CAST(base.Size AS DECIMAL(19,2)) AS QualificationSize
 FROM base_data AS base
 CROSS JOIN unpivot_helper AS h
