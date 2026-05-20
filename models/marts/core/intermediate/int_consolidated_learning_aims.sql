@@ -1,93 +1,143 @@
-WITH DistinctOneGradeLearningAims AS (
-        SELECT DISTINCT
-            e.LearningAimRef AS LearningAimRef,
-            e.WholeQualID AS WholeQualID,
-            e.LearningAimTitle AS LearningAimTitle
-        FROM {{ ref('stg_onegrade__estactva') }} e
-    ),
-  EnrichedOneGradeLearningAims AS (
+WITH college_offerrings AS (
+    SELECT DISTINCT 
+        O.AcademicYearID,
+        O.QualID AS LearningAimRef
+    FROM {{ ref('stg_prosolution__offering') }} O
+    WHERE O.QualID IS NOT NULL
+),
+learning_aim_details AS (
+    SELECT 
+        LA.LEARNING_AIM_REF,
+        LAT.LEARNING_AIM_TYPE_DESC      AS QualificationTypeName,
+        LA.NOTIONAL_NVQ_LEVEL_CODE       AS NVQLevel,
+        LA.LEARNING_AIM_TYPE_CODE,
+        LA.LEARNING_AIM_TITLE,
+        s1.SSA_Tier1_Desc                AS SectorSubjectArea1,
+        s2.SSA_Tier2_Desc                AS SectorSubjectArea2
+    FROM {{ ref('stg_prosolution__learningaim') }} LA
+    LEFT JOIN {{ ref('stg_prosolution__learningaim_types') }} LAT 
+        ON LA.Learning_Aim_Type_Code = LAT.Learning_Aim_Type_Code
+    LEFT JOIN {{ ref('stg_prosolution__ssa1') }} s1 
+        ON LA.SSA1ID = s1.SSA_Tier1_Code
+    LEFT JOIN {{ ref('stg_prosolution__ssa2') }} s2 
+        ON LA.SSA2ID = s2.SSA_Tier2_code
+),
+
+enriched_learning_aims AS (
         SELECT 
-            ola.LearningAimRef,
+           co.AcademicYearID,
+            lad.LEARNING_AIM_REF                  AS LearningAimRef,
+            lad.LEARNING_AIM_TITLE               AS LearningAimTitle,
+            lad.QualificationTypeName,
+            lad.NVQLevel,
+            lad.SectorSubjectArea1,
+            lad.SectorSubjectArea2,
             ola.WholeQualID,
-            vla.Size,
-            vla.QualType AS Cohort,
-            vla.ValueAddedType,
-            vla.GradeRange,
-			ola.LearningAimTitle,
-			 CAST(CASE 
-                WHEN vla.ValueAddedType IS NOT NULL THEN 1 
-                WHEN ofq."OverallGradingType" = 'Graded' THEN 1 
-                ELSE 0 
-            END AS BOOLEAN) AS IsGraded,
-			ofq."QualificationLevel" AS QualificationLevel,
-        CASE WHEN EXISTS (
-                SELECT 1 FROM {{ ref('stg_onegrade__qualificationlearningaimcollege') }} coll 
-                WHERE coll."LearningAimRef" = ola.LearningAimRef
-                UNION
-                SELECT 1 FROM {{ ref('stg_onegrade__qualificationlearningaimcoursecollege') }} ccoll 
-                WHERE ccoll."LearningAimRef" = ola.LearningAimRef
-            ) THEN 1 ELSE 0 END  AS CollegeMapped,
 			 CASE 
-                WHEN EXISTS (SELECT 1 FROM {{ ref('stg_onegrade__ca_learningaimacyr_scope')}} s WHERE s."LearningAimRef" = ola.LearningAimRef) THEN 1
+                WHEN EXISTS (SELECT 1 FROM {{ ref('stg_onegrade__ca_learningaimacyr_scope')}} s WHERE s."LearningAimRef" = ola.LearningAimRef AND s."AcademicYearID" = co.AcademicYearID) THEN 1
                 WHEN EXISTS (SELECT 1 FROM {{ ref('stg_onegrade__appliedgeneral_scope') }} s WHERE s."LearningAimRef" = ola.LearningAimRef) THEN 1
                 WHEN EXISTS (SELECT 1 FROM {{ ref('stg_onegrade__l3va_techlevel_scope') }} s WHERE s."LearningAimRef" = ola.LearningAimRef) THEN 1
                 ELSE 0 
             END AS InScope,
-            CASE 
-                WHEN ola.LearningAimTitle LIKE '%GCSE%English%' 
-                  OR ola.LearningAimTitle LIKE '%GCSE%Math%' 
-                  OR ola.LearningAimTitle LIKE '%Functional Skills%English%' 
-                  OR ola.LearningAimTitle LIKE '%Functional Skills%Math%'
-                THEN 1 ELSE 0 
-            END AS IsMathsOrEnglish,
+           CASE
+                WHEN lad.Learning_Aim_Title LIKE '%Literature%' THEN 'Not Maths or English'
+                WHEN lad.LEARNING_AIM_TYPE_CODE = '0003' AND lad.Learning_Aim_Title LIKE '%Math%' THEN 'GCSE Maths'
+                WHEN lad.LEARNING_AIM_TYPE_CODE= '1439' AND lad.Learning_Aim_Title LIKE '%Math%' THEN 'FSKL Maths'
+                WHEN lad.LEARNING_AIM_TYPE_CODE = '0003' AND lad.Learning_Aim_Title LIKE '%English%' THEN 'GCSE English'
+                WHEN lad.LEARNING_AIM_TYPE_CODE = '1439' AND lad.Learning_Aim_Title LIKE '%English%' THEN 'FSKL English'
+                ELSE 'Not Maths or English'
+		    END AS MathsAndEnglish,
             
             CASE 
-                WHEN vla.NOTIONALNVQLEVEL NOT LIKE '%3%' OR ola.LearningAimTitle LIKE '%Extended Project%'THEN 0
-                WHEN vla.QualType NOT IN ('A level', 'Academic') THEN 0
-                WHEN TRIM(vla.DC) LIKE 'RB%' 
-                OR TRIM(vla.DC) IN ('2210','2230','2330','2340')                    THEN TRUE
-                WHEN TRIM(vla.DC) IN ('FC4','5110')                                   THEN TRUE
-                WHEN TRIM(vla.DC) LIKE 'RH3%' OR TRIM(vla.DC) = '1010'                 THEN TRUE
-                WHEN TRIM(vla.DC) LIKE 'RD1%' OR TRIM(vla.DC) = '1110'                 THEN TRUE
-                WHEN TRIM(vla.DC) LIKE 'RC1%' OR TRIM(vla.DC) LIKE 'RC5%' 
-                OR TRIM(vla.DC) = '1210'                                            THEN TRUE
-                WHEN TRIM(vla.DC) LIKE 'RF%'  OR TRIM(vla.DC) = '3910'                 THEN TRUE
-                WHEN TRIM(vla.DC) LIKE 'DB%'  OR TRIM(vla.DC) = '4010'                 THEN TRUE
-                WHEN (TRIM(vla.DC) LIKE 'F%' OR TRIM(vla.DC) LIKE 'G%' OR TRIM(vla.DC) LIKE 'H%')
-                    AND TRIM(vla.DC) NOT LIKE 'FC%' 
-                    AND TRIM(vla.DC) NOT LIKE 'FK2%' 
-                    AND TRIM(vla.DC) NOT LIKE 'FKA%' 
-                OR TRIM(vla.DC) IN ('5650','5670','5750','5690','6610','6550')     THEN TRUE
-                ELSE FALSE 
+                WHEN lad.Learning_Aim_Title LIKE '%Extended Project%'
+                    OR lad.Learning_Aim_Title LIKE '%Complementary Therapy%'
+                    OR lad.Learning_Aim_Title LIKE '%Beauty Therapy%'
+                    OR lad.Learning_Aim_Title LIKE '%Hair%'
+                    OR lad.Learning_Aim_Title LIKE '%Hairdressing%'
+                    OR lad.Learning_Aim_Title LIKE '%Barbering%'
+                    OR lad.Learning_Aim_Title LIKE '%Nail Services%'
+                    OR lad.Learning_Aim_Title LIKE '%Massage%'
+                    OR lad.Learning_Aim_Title LIKE '%Aromatherapy%'
+                    OR lad.Learning_Aim_Title LIKE '%Reflexology%'
+                    OR lad.Learning_Aim_Title LIKE '%Supporting Teaching%'
+                    OR lad.Learning_Aim_Title LIKE '%T Level%'
+                THEN 0
+
+                WHEN COALESCE(TRIM(lad.NVQLevel), '') NOT LIKE '%3%' 
+                    AND COALESCE(TRIM(ofq."QualificationLevel"), '') NOT LIKE '%3%'
+                THEN 0
+
+                WHEN COALESCE(TRIM(lad.QualificationTypeName), '') NOT IN ('A Level', 'GCE A level', 'A level') 
+                    AND lad.Learning_Aim_Title NOT LIKE '%GCE A Level%'
+                    AND lad.Learning_Aim_Title NOT LIKE '%Advanced GCE%'
+                THEN 0
+
+                WHEN lad.Learning_Aim_Title LIKE '%Biology%' 
+                    OR lad.Learning_Aim_Title LIKE '%Chemistry%'
+                    OR lad.Learning_Aim_Title LIKE '%Physics%'
+                    OR lad.Learning_Aim_Title LIKE '%Mathematics%'
+                    OR lad.Learning_Aim_Title LIKE '%Further Mathematics%'
+                    OR lad.Learning_Aim_Title LIKE '%English Literature%'
+                    OR lad.Learning_Aim_Title LIKE '%History%'
+                    OR lad.Learning_Aim_Title LIKE '%Geography%'
+                    OR lad.Learning_Aim_Title LIKE '%French%'
+                    OR lad.Learning_Aim_Title LIKE '%Spanish%'
+                    OR lad.Learning_Aim_Title LIKE '%German%'
+                    OR lad.Learning_Aim_Title LIKE '%Latin%'
+                THEN 1
+
+                WHEN TRIM(COALESCE(q.DC, '')) IN ('FC4','5110')
+                    OR TRIM(COALESCE(q.DC, '')) LIKE 'RB%'
+                    OR TRIM(COALESCE(q.DC, '')) LIKE 'RH3%'
+                    OR TRIM(COALESCE(q.DC, '')) LIKE 'RD1%'
+                    OR TRIM(COALESCE(q.DC, '')) LIKE 'RC1%'
+                    OR TRIM(COALESCE(q.DC, '')) LIKE 'RC5%'
+                THEN 1
+
+                ELSE 0 
             END AS IsFacilitatingSubject,
-            vla.DC AS DC,
-        sl."SubjectName" AS SectorSubjectArea
+
                     
-        FROM DistinctOneGradeLearningAims ola    
-        LEFT JOIN {{ ref('stg_onegrade__learningaim')}} vla 
-            ON vla.LearningAimRef = ola.LearningAimRef
-            AND (
-                COALESCE(vla.WholeQualID,'') = COALESCE(ola.WholeQualID,'')
-            )
-		
-		LEFT JOIN {{ ref('stg_onegrade__ofqual') }} ofq ON ofq."QualificationNumber" = ola.LearningAimRef 
-        LEFT JOIN {{ ref('stg_onegrade__qualification_lookup') }} ql ON ql."WholeQualID" = ola.WholeQualID
-        LEFT JOIN {{ ref('stg_onegrade__subject_lookup') }} sl ON ql."SubjectID" = sl."ID"
-  )
+        FROM college_offerrings co
+        INNER JOIN learning_aim_details lad 
+        ON lad.LEARNING_AIM_REF = co.LearningAimRef
+
+        LEFT JOIN (
+            SELECT DISTINCT AcademicYearID, LearningAimRef, WholeQualID
+            FROM {{ ref('stg_onegrade__estactva') }}
+        ) ola 
+            ON ola.LearningAimRef = co.LearningAimRef 
+        AND ola.AcademicYearID = co.AcademicYearID
+
+        LEFT JOIN {{ ref('stg_onegrade__qan') }} q 
+            ON q.LearningAimRef = co.LearningAimRef
+
+        LEFT JOIN {{ ref('stg_onegrade__ofqual') }} ofq 
+            ON ofq."QualificationNumber" = co.LearningAimRef
+
+        LEFT JOIN {{ ref('stg_onegrade__learningaim') }} vla 
+            ON vla.LearningAimRef = co.LearningAimRef
+)    
+       
     SELECT 
     {{ dbt_utils.generate_surrogate_key([
-    'TRIM(LearningAimRef)', 'TRIM(WholeQualID)']) }} AS "LearningAimKey",
+    'TRIM(AcademicYearID)','TRIM(LearningAimRef)']) }} AS "LearningAimKey",
         CAST(COALESCE(LearningAimRef,'-') AS NVARCHAR(20)) AS "LearningAimRef",
         CAST(COALESCE(LearningAimTitle,'-') AS NVARCHAR(255)) AS "LearningAimTitle",
-         CAST(COALESCE(Cohort,'-') AS NVARCHAR(50)) AS "Cohort",
-        CAST(COALESCE(QualificationLevel,'-') AS NVARCHAR(20)) AS "QualificationLevel",
-        CAST(COALESCE(IsMathsOrEnglish,0) AS BOOLEAN) AS "IsMathsOrEnglish",
-        CAST(COALESCE(IsGraded,0) AS BOOLEAN) AS "IsGraded",
-        CAST(COALESCE(CollegeMapped,0) AS BOOLEAN) AS "CollegeMapped",
-        CAST(COALESCE(InScope,0) AS BOOLEAN) AS "InScope",
-		CAST(COALESCE(IsFacilitatingSubject,0) AS BOOLEAN) AS "IsFacilitatingSubject",
-        CAST(COALESCE(SectorSubjectArea,'-') AS NVARCHAR(150)) AS "SectorSubjectArea",
+         CAST(COALESCE(QualificationTypeName,'-') AS NVARCHAR(150)) AS "QualificationTypeName",
+        CAST(COALESCE(NVQLevel,'-') AS NCHAR(1)) AS "NVQLevel",
+        CAST(COALESCE(SectorSubjectArea1,'-') AS NVARCHAR(150)) AS "SectorSubjectArea1",
+        CAST(COALESCE(SectorSubjectArea2,'-') AS NVARCHAR(150)) AS "SectorSubjectArea2",
         CAST(COALESCE(WholeQualID,'-') AS NVARCHAR(20)) AS "WholeQualID",
-        CAST(COALESCE(DC,'-') AS NVARCHAR(20)) AS "DC"
-    FROM EnrichedOneGradeLearningAims
+        CAST(COALESCE(InScope,0) AS BOOLEAN) AS "InScope",
+        CAST(COALESCE(MathsAndEnglish,'-') AS NVARCHAR(50)) AS "MathsAndEnglish",
+		CAST(COALESCE(IsFacilitatingSubject,0) AS BOOLEAN) AS "IsFacilitatingSubject",
+
+        
+    FROM enriched_learning_aims
+    QUALIFY ROW_NUMBER() OVER (
+    PARTITION BY AcademicYearID, LearningAimRef 
+    ORDER BY WholeQualID DESC, IsFacilitatingSubject DESC
+) = 1
+ORDER BY AcademicYearID, LearningAimRef
     
