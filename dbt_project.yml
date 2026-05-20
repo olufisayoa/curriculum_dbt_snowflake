@@ -49,3 +49,10 @@ models:
 seeds:
   curriculum_dbt_snowflake:
     +schema: int
+    student_characteristics:
+      +schema: core
+      +column_types:
+        selection_label: varchar(100)
+        category: varchar(50)
+        data_value: varchar(50)
+        sort_order: integer

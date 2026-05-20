@@ -1,0 +1,24 @@
+selection_label,category,data_value,sort_order
+Include: All,All,All,0
+Age Group: U14,AgeGroup,U14,1
+Age Group: 14-15,AgeGroup,14-15,2
+Age Group: 16-18,AgeGroup,16-18,3
+Age Group: 19-23,AgeGroup,19-23,4
+Age Group: 24+,AgeGroup,24+,5
+Age Group: 19+,AgeGroup,19+,6
+Care Leaver: Yes,CareLeaver,Yes,7
+Care Leaver: No,CareLeaver,No,8
+EHCP: Yes,EHCP,Yes,9
+EHCP: No,EHCP,No,10
+FSM: Yes,FSM,Yes,11
+FSM: No,FSM,No,12
+Gender: F,Gender,F,13
+Gender: M,Gender,M,14
+High Needs: Yes,HighNeeds,Yes,15
+High Needs: No,HighNeeds,No,16
+Looked After Child: Yes,LookedAfterChild,Yes,17
+Looked After Child: No,LookedAfterChild,No,18
+Safeguarding: Yes,Safeguarding,Yes,19
+Safeguarding: No,Safeguarding,No,20
+SEND: Yes,SEND,Yes,21
+SEND: No,SEND,No,22
