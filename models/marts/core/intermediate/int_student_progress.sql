@@ -43,8 +43,8 @@ SELECT
     ,{{ dbt_utils.generate_surrogate_key([
     'TRIM(AcademicYearID)','TRIM(LearningAimRef)']) }} AS LearningAimKey
     , CAST(CASE
-        WHEN base.Cohort IN ('A Level', 'Academic') THEN base.QOEPoints_GCSE_College2dp
-        WHEN base.Cohort IN ('Applied General','None','Tech Level VA') THEN base.QOEPoints_College2dp
+        WHEN base.Cohort IN ('A level', 'Academic') THEN base.QOEPoints_GCSE_College2dp
+        WHEN base.Cohort IN ('Applied general','None','Tech Level VA', 'Tech Level') THEN base.QOEPoints_College2dp
     END AS DECIMAL(19,2)) AS PriorAttainmentPoint
 
     , CAST(base.MostRecentCollegeEstGrade AS VARCHAR(50)) AS MinimumTargetGrade  
