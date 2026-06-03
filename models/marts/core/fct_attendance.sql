@@ -3,6 +3,7 @@
 SELECT	 AcademicYearKey AS "AcademicYearKey", 
 	StudentKey AS "StudentKey",
     EnrolmentKey AS "EnrolmentKey",
+	CourseKey AS "CourseKey",
 	RegisterKey AS "RegisterKey",
 	CollegeLevelKey AS "CollegeLevelKey",
 	SiteKey AS "SiteKey",
