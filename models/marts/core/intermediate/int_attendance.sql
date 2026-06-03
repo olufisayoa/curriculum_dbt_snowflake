@@ -9,8 +9,8 @@
 }}
 
 SELECT			M.RegisterMarkID,
-				{{ dbt_utils.generate_surrogate_key(['TRIM( R.AcademicYearID)']) }} AS AcademicYearKey,
-				{{ dbt_utils.generate_surrogate_key(['TRIM( R.AcademicYearID)','TRIM(SD.RefNo)' ] ) }} AS StudentKey,
+				{{ dbt_utils.generate_surrogate_key(['TRIM(R.AcademicYearID)']) }} AS AcademicYearKey,
+				{{ dbt_utils.generate_surrogate_key(['TRIM(R.AcademicYearID)', 'TRIM(SD.RefNo)']) }} AS StudentKey,
                 {{ dbt_utils.generate_surrogate_key([
                     'TRIM(R.AcademicYearID)',   
                     'TRIM(SD.RefNo)',
@@ -19,7 +19,8 @@ SELECT			M.RegisterMarkID,
                     'CAST(E.StartDate AS DATE)',      
                     'CAST(E.CompletionStatusID AS INTEGER)'                            
                     ]) }} AS EnrolmentKey,
-				{{ dbt_utils.generate_surrogate_key(['R.RegisterID']) }} AS RegisterKey,
+			{{ dbt_utils.generate_surrogate_key(['R.RegisterID']) }} AS RegisterKey,
+        {{ dbt_utils.generate_surrogate_key(['TRIM(O.OfferingID)']) }} AS CourseKey,
 				{{ dbt_utils.generate_surrogate_key(['TRIM(O.SID)']) }} AS CollegeLevelKey,
 				{{ dbt_utils.generate_surrogate_key(['TRIM(O.SiteID)']) }} AS SiteKey,
                 {{ dbt_utils.generate_surrogate_key(['TRIM(M.MarkTypeID)']) }} AS MarkTypeKey,

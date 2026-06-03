@@ -21,7 +21,7 @@ ParentCourses AS (
 
 ProsolutionOffering AS (
     SELECT
-         o.COURSEKEY AS CourseKey,
+
         o.ACADEMICYEARID::CHAR(5) AS ACADEMICYEARID,
         o.CODE::VARCHAR(50) AS COURSECODE,
         o.NAME::VARCHAR(255) AS COURSENAME,
@@ -40,7 +40,7 @@ ProsolutionOffering AS (
 )
 
 SELECT
-    p.CourseKey AS "CourseKey",
+    {{ dbt_utils.generate_surrogate_key(['TRIM(p._SOURCEPROSOLUTIONCOURSEID)']) }} AS "CourseKey",
     COALESCE(TRIM(p.ACADEMICYEARID), '00/00')::CHAR(5) AS "AcademicYear",
     COALESCE(TRIM(p.COURSECODE), '-')::VARCHAR(50) AS "CourseCode",
     COALESCE(p.COURSENAME, '-')::VARCHAR(255) AS "CourseName",
@@ -51,5 +51,4 @@ SELECT
     COALESCE(p.PARENTCOURSENAME, '-') AS "ParentCourseName",
     COALESCE(p.OFFERINGSTAFF, '-')::VARCHAR(1000) AS "OfferingStaff"
 FROM ProsolutionOffering AS p
-LEFT JOIN {{ ref('stg_onegrade__course') }} AS c
-ON TRIM(p.ACADEMICYEARID) = TRIM(c.AcademicYearID) AND TRIM(p.COURSECODE) = TRIM(c.CourseCode)
+
