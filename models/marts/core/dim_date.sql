@@ -48,8 +48,8 @@ SELECT
     COALESCE(teaching_week_number, 99) AS "TeachingWeekSort",
     
     CASE
-        WHEN teaching_week_number IS NULL THEN 'Non-teaching Week'
-        WHEN term = 'Break' THEN 'Week ' || teaching_week_number || ' (Break)'
+        WHEN teaching_week_number IS NULL THEN 'Week'
+        WHEN term = 'Break' THEN 'Week'
         ELSE 'Week ' || teaching_week_number
     END AS "TeachingWeek"
 FROM with_term
