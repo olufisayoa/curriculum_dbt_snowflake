@@ -45,11 +45,12 @@ SELECT
     academic_year AS "AcademicYear",
     term AS "Term",
     week_number AS "WeekNumber",
-    CAST(teaching_week_number AS INTEGER) AS "TeachingWeekNumber",
-    -- teaching week label will be a concat of "Week + teaching_week_number", if term is break or teaching_week_number is null then Week + ''
+    COALESCE(teaching_week_number, 99) AS "TeachingWeekSort",
+    
     CASE
-        WHEN term = 'Break' OR teaching_week_number IS NULL THEN 'Week '
+        WHEN teaching_week_number IS NULL THEN 'Non-teaching Week'
+        WHEN term = 'Break' THEN 'Week ' || teaching_week_number || ' (Break)'
         ELSE 'Week ' || teaching_week_number
-    END AS "TeachingWeekLabel"
+    END AS "TeachingWeek"
 FROM with_term
 ORDER BY date_day
