@@ -49,7 +49,6 @@ SELECT
     COALESCE(p.ENDDATE, '9999-12-31'::TIMESTAMP) AS "EndDate",
     COALESCE(p.PARENTCOURSECODE, '-') AS "ParentCourseCode",
     COALESCE(p.PARENTCOURSENAME, '-') AS "ParentCourseName",
-    COALESCE(p.OFFERINGSTAFF, '-')::VARCHAR(1000) AS "OfferingStaff",
-    COALESCE(p.SubjectType, '-') AS "SubjectType"
+    COALESCE(p.OFFERINGSTAFF, '-')::VARCHAR(1000) AS "OfferingStaff"
 FROM ProsolutionOffering AS p
 
