@@ -11,7 +11,7 @@ curriculum_dbt_snowflake:
       database: "{{ env_var('SNOWFLAKE_DATABASE') }}"
       schema: "{{ env_var('SNOWFLAKE_SCHEMA') }}"
       threads: 4
-      private_key_path: "{{ env_var('SNOWFLAKE_PRIVATE_KEY') }}"
+      private_key_content: "{{ env_var('SNOWFLAKE_PRIVATE_KEY') }}"
       client_session_keep_alive: false
     dev:
       type: snowflake
@@ -22,7 +22,7 @@ curriculum_dbt_snowflake:
       database: "{{ env_var('SNOWFLAKE_DATABASE') }}"
       schema: "{{ env_var('SNOWFLAKE_SCHEMA') }}"
       threads: 4
-      private_key_path: "{{ env_var('SNOWFLAKE_PRIVATE_KEY') }}"
+      private_key_content: "{{ env_var('SNOWFLAKE_PRIVATE_KEY') }}"
       client_session_keep_alive: false
     pr:
       type: snowflake
@@ -33,5 +33,5 @@ curriculum_dbt_snowflake:
       database: "{{ env_var('SNOWFLAKE_DATABASE') }}"
       schema: "{{ env_var('SCHEMA_PREFIX', 'PR') }}__{{ var('schema_id') }}"
       threads: 4
-      private_key_path: "{{ env_var('SNOWFLAKE_PRIVATE_KEY') }}"
+      private_key_content: "{{ env_var('SNOWFLAKE_PRIVATE_KEY') }}"
       client_session_keep_alive: false

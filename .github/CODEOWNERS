@@ -1,0 +1,11 @@
+# CODEOWNERS file for curriculum-dw-analytics
+# 
+# This file defines code ownership and automatic reviewer assignment for pull requests.
+# More information: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+#
+# Format: [path] [@github-username or @team-name]
+# You can specify multiple owners separated by spaces
+
+# Default owners for the entire repository
+* @olufisayoa
+

@@ -18,7 +18,7 @@ jobs:
       SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
       SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
       SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
-      SNOWFLAKE_PRIVATE_KEY: /home/runner/.dbt/private_key.pem
+      SNOWFLAKE_PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
 
     steps:
       - name: Check out the repository
@@ -32,12 +32,6 @@ jobs:
 
       - name: Install requirements
         run: pip install -r requirements.txt
-
-      - name: Write Snowflake private key
-        run: |
-          mkdir -p ~/.dbt
-          echo "${{ secrets.SNOWFLAKE_PRIVATE_KEY }}" > ~/.dbt/private_key.pem
-          chmod 600 ~/.dbt/private_key.pem
 
       - name: Capture SCHEMA_ID number
         id: get_schema_id

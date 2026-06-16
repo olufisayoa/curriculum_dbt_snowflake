@@ -19,7 +19,7 @@ jobs:
       SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
       SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
       SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
-      SNOWFLAKE_PRIVATE_KEY: /home/runner/.dbt/private_key.pem
+      SNOWFLAKE_PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
 
     steps:
       - name: Check out the repository
@@ -41,12 +41,6 @@ jobs:
           ID="${{ github.event.pull_request.number }}__${SHA_SHORT}"
           CLEAN_ID=$(echo ${ID} | tr '[:lower:]' '[:upper:]')
           echo "SCHEMA_ID=${CLEAN_ID}" >> $GITHUB_ENV
-
-      - name: Write Snowflake private key
-        run: |
-          mkdir -p ~/.dbt
-          echo "${{ secrets.SNOWFLAKE_PRIVATE_KEY }}" > ~/.dbt/private_key.pem
-          chmod 600 ~/.dbt/private_key.pem
 
       - name: Download manifest from previous succesful CI run
         uses: dawidd6/action-download-artifact@v3
