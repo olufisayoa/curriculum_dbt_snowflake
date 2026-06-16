@@ -61,6 +61,15 @@ jobs:
             echo "No manifest found from previous CI run, proceeding without it"
           fi
 
+      - name: Debug env var
+        run: |
+          if [ -z "$SNOWFLAKE_PRIVATE_KEY" ]; then
+            echo "ERROR: SNOWFLAKE_PRIVATE_KEY is empty"
+          else
+            echo "OK: SNOWFLAKE_PRIVATE_KEY is set"
+            echo "Length: ${#SNOWFLAKE_PRIVATE_KEY}"
+          fi
+
       - name: dbt debug
         run: |
           dbt debug --target pr --vars "schema_id: ${{env.SCHEMA_ID}}"
