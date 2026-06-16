@@ -19,7 +19,7 @@ jobs:
       SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
       SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
       SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
-      SNOWFLAKE_PRIVATE_KEY: /home/runner/.dbt/private_key.pem
+      SNOWFLAKE_PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
 
     steps:
       - name: Check out the repository
@@ -42,12 +42,6 @@ jobs:
           CLEAN_ID=$(echo ${ID} | tr '[:lower:]' '[:upper:]')
           echo "SCHEMA_ID=${CLEAN_ID}" >> $GITHUB_ENV
 
-      - name: Write Snowflake private key
-        run: |
-          mkdir -p ~/.dbt
-          echo "${{ secrets.SNOWFLAKE_PRIVATE_KEY }}" > ~/.dbt/private_key.pem
-          chmod 600 ~/.dbt/private_key.pem
-
       - name: Download manifest from previous succesful CI run
         uses: dawidd6/action-download-artifact@v3
         with:
@@ -65,6 +59,15 @@ jobs:
             cp ./state/manifest.json ./target/manifest.json
           else
             echo "No manifest found from previous CI run, proceeding without it"
+          fi
+
+      - name: Debug env var
+        run: |
+          if [ -z "$SNOWFLAKE_PRIVATE_KEY" ]; then
+            echo "ERROR: SNOWFLAKE_PRIVATE_KEY is empty"
+          else
+            echo "OK: SNOWFLAKE_PRIVATE_KEY is set"
+            echo "Length: ${#SNOWFLAKE_PRIVATE_KEY}"
           fi
 
       - name: dbt debug
