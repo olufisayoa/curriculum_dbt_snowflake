@@ -63,6 +63,17 @@ jobs:
             dbt build --target prod
           fi
 
+      - name: Generate dbt docs
+        if: success()
+        run: dbt docs generate --target prod
+
+      - name: Deploy documentation to GitHub Pages
+        if: success()
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./target
+
       - name: Upload manifest for future runs
         uses: actions/upload-artifact@v4
         if: success() 
