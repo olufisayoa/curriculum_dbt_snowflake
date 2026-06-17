@@ -67,6 +67,10 @@ jobs:
         if: success()
         run: dbt docs generate --target prod
 
+      - name: Disable Jekyll  
+        if: success()
+        run: touch ./target/.nojekyll
+
       - name: Deploy documentation to GitHub Pages
         if: success()
         uses: peaceiris/actions-gh-pages@v4
