@@ -1,0 +1,17 @@
+SELECT	 AcademicYearKey AS "AcademicYearKey", 
+	StudentKey AS "StudentKey",
+    EnrolmentKey AS "EnrolmentKey",
+	CourseKey AS "CourseKey",
+	RegisterKey AS "RegisterKey",
+	CollegeLevelKey AS "CollegeLevelKey",
+	SiteKey AS "SiteKey",
+    MarkTypeKey AS "MarkTypeKey",
+	DateKey AS "DateKey",
+	RegisterSessionDate AS "RegisterSessionDate",
+	MrkPresent AS "MrkPresent",           
+	MrkAbsent AS "MrkAbsent",            
+	MrkNotReq   AS "MrkNotReq",   
+    MrkAuthAbsent   AS "MrkAuthAbsent",
+    MrkLate AS "MrkLate",             
+    MrkRequired AS "MrkRequired"
+FROM CURRICULUM_DB.int.int_attendance

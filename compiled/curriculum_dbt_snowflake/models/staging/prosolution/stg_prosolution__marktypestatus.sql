@@ -1,0 +1,4 @@
+SELECT 
+"MarkTypeStatusID" AS MarkTypeStatusID,
+"Description" AS Description
+FROM CURRICULUM_DB.RAW.PROSOLUTION_MARKTYPESTATUS

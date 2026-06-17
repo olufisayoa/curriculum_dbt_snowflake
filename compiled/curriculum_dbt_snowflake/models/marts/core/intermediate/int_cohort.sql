@@ -1,0 +1,2 @@
+select distinct Cohort
+from CURRICULUM_DB.stg.stg_onegrade__estactva

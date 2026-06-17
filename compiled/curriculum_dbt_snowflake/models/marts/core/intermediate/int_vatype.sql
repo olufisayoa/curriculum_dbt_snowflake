@@ -1,0 +1,2 @@
+select distinct VA_Type
+from CURRICULUM_DB.stg.stg_onegrade__estactva

@@ -1,0 +1,12 @@
+
+    
+    
+    truncate table "CURRICULUM_DB"."INT"."ACADEMIC_CALENDAR_LOOKUP";
+    -- dbt seed --
+    
+            insert into CURRICULUM_DB.int.academic_calendar_lookup (academic_year, term_1_start, term_1_end, term_2_start, term_2_end, term_3_start, term_3_end) values
+            (%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s)
+        
+
+;
+  
