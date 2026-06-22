@@ -7,6 +7,6 @@ WITH gcse_subject AS (
 )
 
 SELECT 
-    gcse_subject_key::INT AS "gcse_subject_key",
-    gcse_subject_name::VARCHAR(100) AS "gcse_subject_name"
+    gcse_subject_key::INT AS gcse_subject_key,
+    gcse_subject_name::VARCHAR(100) AS gcse_subject_name
 FROM gcse_subject
