@@ -21,6 +21,6 @@ select
         , CurrentPoint AS "Current Point"
         , ValueAdded AS "Value Added"
         , TargetBand AS "Target Band"
-        , DfeIncluded AS "Dfe Included"
+        , DfeRules AS "Dfe Rules"
         , QualificationSize AS "Qualification Size"
 from {{ ref('int_student_progress') }}
