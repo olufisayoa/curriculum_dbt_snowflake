@@ -7,6 +7,7 @@ select
         , CollegeLevelKey "CollegeLevelKey"
         , CohortKey AS "CohortKey"
         ,  VATypeKey AS "VATypeKey"
+        , SubjectKey AS "SubjectKey"
         , LearningAimKey AS "LearningAimKey"
         , PriorAttainmentPoint AS "PriorAttainmentPoint"
         , MinimumTargetGrade AS "MinimumTargetGrade"

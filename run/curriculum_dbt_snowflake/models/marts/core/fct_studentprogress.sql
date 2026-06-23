@@ -15,6 +15,7 @@ create or replace transient table CURRICULUM_DB.core.fct_studentprogress
         , CollegeLevelKey "CollegeLevelKey"
         , CohortKey AS "CohortKey"
         ,  VATypeKey AS "VATypeKey"
+        , SubjectKey AS "SubjectKey"
         , LearningAimKey AS "LearningAimKey"
         , PriorAttainmentPoint AS "PriorAttainmentPoint"
         , MinimumTargetGrade AS "MinimumTargetGrade"
