@@ -1,1 +1,22 @@
-select * from {{ ref('int_engmat_inyear') }}
+select 
+ACADEMICYEARKEY AS "AcademicYearKey",
+	STUDENTKEY AS "StudentKey",
+	COURSEKEY AS "CourseKey",
+	ENROLMENTKEY AS "EnrolmentKey",
+	SITEKEY AS "SiteKey",
+	COLLEGELEVELKEY AS "CollegeLevelKey",
+	SUBJECTKEY AS "SubjectKey",
+	PRIORATTAINMENT_KS4 AS "PriorAttainment_KS4",
+	ENROLMENTGRADE AS "EnrolmentGrade",
+	PROGRESS AS "Progress",
+	CAPPEDPROGRESS AS "CappedProgress",
+	CURRENTYEAR AS "CurrentYear",
+	MOSTRECENTIYGRADE AS "MostRecentIYGrade",
+	TARGETGRADE AS "TargetGrade",
+	PERSONALTARGETGRADE AS "PersonalTargetGrade",
+	TARGETPOINTS AS "TargetPoints",
+	MPKEY AS "MPKey",
+	CURRENTGRADE AS "CurrentGrade",
+	CURRENTPOINT AS "CurrentPoint",
+	INYEARPROGRESS AS "InYearProgress"
+    from {{ ref('int_engmat_inyear') }}

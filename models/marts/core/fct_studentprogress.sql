@@ -1,5 +1,5 @@
 select 
-        AcademicYear AS "AcademicYearKey"
+        AcademicYearKey AS "AcademicYearKey"
         , StudentKey AS "StudentKey"
         , CourseKey AS "CourseKey"
         , EnrolmentKey AS "EnrolmentKey"
@@ -7,7 +7,6 @@ select
         , CollegeLevelKey "CollegeLevelKey"
         , CohortKey AS "CohortKey"
         ,  VATypeKey AS "VATypeKey"
-        , SubjectKey AS "SubjectKey"
         , LearningAimKey AS "LearningAimKey"
         , PriorAttainmentPoint AS "PriorAttainmentPoint"
         , MinimumTargetGrade AS "MinimumTargetGrade"
