@@ -71,7 +71,7 @@ SELECT
     ]) }} AS EnrolmentKey
     , {{ dbt_utils.generate_surrogate_key(['TRIM(base.SiteID)']) }} AS SiteKey
     , {{ dbt_utils.generate_surrogate_key(['TRIM(base.CollegeLevelCode)']) }} AS CollegeLevelKey
-    CAST(CASE 
+    ,CAST(CASE 
         WHEN base.EngMatType='English' THEN 1
         WHEN base.EngMatType='Maths' THEN 2
         ELSE 3
