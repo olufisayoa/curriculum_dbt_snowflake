@@ -1,4 +1,12 @@
-WITH base_data AS (
+
+  
+    
+
+create or replace transient table CURRICULUM_DB.int.int_student_progress
+    
+    
+    
+    as (WITH base_data AS (
     SELECT 
         e.*,
         s.SiteID AS SiteID,
@@ -86,3 +94,8 @@ SELECT
     , CAST(base.Size AS DECIMAL(19,2)) AS QualificationSize
 FROM base_data AS base
 CROSS JOIN unpivot_helper AS h
+    )
+;
+
+
+  

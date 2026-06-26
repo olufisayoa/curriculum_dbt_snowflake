@@ -1,4 +1,12 @@
-select 
+
+  
+    
+
+create or replace transient table CURRICULUM_DB.core.fct_studentprogress
+    
+    
+    
+    as (select 
         AcademicYearKey AS "AcademicYearKey"
         , StudentKey AS "StudentKey"
         , CourseKey AS "CourseKey"
@@ -24,3 +32,8 @@ select
         , DfeRules AS "Dfe Rules"
         , QualificationSize AS "Qualification Size"
 from CURRICULUM_DB.int.int_student_progress
+    )
+;
+
+
+  

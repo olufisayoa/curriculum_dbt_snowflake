@@ -66,7 +66,7 @@ unpivot_helper AS (
 )
 
 SELECT 
-    md5(cast(coalesce(cast(TRIM(base.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS AcademicYear
+    md5(cast(coalesce(cast(TRIM(base.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS AcademicYearKey
     , md5(cast(coalesce(cast(TRIM(base.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(base.StudentRef) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS StudentKey
     , md5(cast(coalesce(cast(TRIM(base.OfferingID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS CourseKey
     ,md5(cast(coalesce(cast(TRIM(base.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(base.StudentRef) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(base.CourseCode) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(base.LearningAimRef) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(CAST(base.StartDate AS DATE) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(CAST(base.CompletionID AS INTEGER) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS EnrolmentKey
