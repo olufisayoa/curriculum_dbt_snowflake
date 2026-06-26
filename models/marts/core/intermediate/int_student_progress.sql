@@ -25,7 +25,7 @@ unpivot_helper AS (
 )
 
 SELECT 
-    {{ dbt_utils.generate_surrogate_key(['TRIM(base.AcademicYearID)']) }} AS AcademicYear
+    {{ dbt_utils.generate_surrogate_key(['TRIM(base.AcademicYearID)']) }} AS AcademicYearKey
     , {{ dbt_utils.generate_surrogate_key(['TRIM(base.AcademicYearID)', 'TRIM(base.StudentRef)']) }} AS StudentKey
     , {{ dbt_utils.generate_surrogate_key(['TRIM(base.OfferingID)']) }} AS CourseKey
     ,{{ dbt_utils.generate_surrogate_key([
@@ -91,11 +91,6 @@ SELECT
         WHEN base.VA_Type = 'CA' AND base.AgeOn31Aug IN (16,17,18) AND base.CompletionID IN (1,2,3) AND base.IsGraded='Yes' 
             AND base.WDNumDaysAfterStart IS NULL OR base.WDNumDaysAfterStart >= 42 THEN 'CA Rules'
     END AS VARCHAR(20)) AS DfeRules
-    ,CAST(CASE 
-        WHEN base.VA_Type = 'L3VA' AND base.AgeOn31Aug IN (16,17,18) AND base.CompletionID IN (1,2) AND base.DCName='English Language' THEN 1
-        WHEN base.VA_Type = 'L3VA' AND base.AgeOn31Aug IN (16,17,18) AND base.CompletionID IN (1,2) AND base.DCName='Mathematics' THEN 2
-        ELSE 3
-    END AS INTEGER) AS SubjectKey
     , CAST(base.Size AS DECIMAL(19,2)) AS QualificationSize
 FROM base_data AS base
 CROSS JOIN unpivot_helper AS h
