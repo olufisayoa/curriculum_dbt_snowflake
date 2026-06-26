@@ -50,4 +50,13 @@ sources:
       - name: ONEGRADE_CA_LEARNINGAIMACYR_SCOPE
         description: "This table contains information about CA learning aim academic year scope details, including their code, description, and other relevant details."
 
+      - name: ONEGRADE_ENGMAT_ENGLISH_INYEAR
+        description: "This table contains information about English in-year details, including their code, description, and other relevant details."
+
+      - name: ONEGRADE_ENGMAT_MATHS_INYEAR
+        description: "This table contains information about Maths in-year details, including their code, description, and other relevant details."
+
+      - name: ONEGRADE_ENGMAT_ENROLMENT_INYEAR
+        description: "This table contains information about English and Maths enrolment in-year details, including their code, description, and other relevant details."
+
       
