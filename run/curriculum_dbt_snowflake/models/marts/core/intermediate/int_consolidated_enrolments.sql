@@ -1,4 +1,12 @@
-WITH  ProSolution_Master AS (
+
+  
+    
+
+create or replace transient table CURRICULUM_DB.int.int_consolidated_enrolments
+    
+    
+    
+    as (WITH  ProSolution_Master AS (
     SELECT 
         PSE.EnrolmentID                                      AS ProSolutionEnrolmentID,
         LTRIM(RTRIM(PSD.RefNo))                               AS StudentRef,
@@ -170,3 +178,8 @@ SELECT
 FROM Enrolments E
 LEFT JOIN Attendance_Aggregated A
     ON E."EnrolmentKey" = A.EnrolmentKey
+    )
+;
+
+
+  
