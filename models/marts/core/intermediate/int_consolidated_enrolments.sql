@@ -45,7 +45,7 @@ OneGrade_Enrichment AS (
          LTRIM(RTRIM(OGE.LearningAimRef)) AS LearningAimRef,
          OGE.WholeQualID,
          OGE.CourseID              AS OneGradeCourseID,
-		 C.Description AS CompletionStatus
+		 C.Description AS CompletionStatus,
          ROW_NUMBER() OVER (PARTITION BY OGE.AcademicYearID, OGE.StudentRef, OGC.CourseCode, OGE.LearningAimRef, OGE.StartDate, OGE.CompletionID
          ORDER BY OGE.ID DESC) AS rn
      FROM {{ ref('stg_onegrade__enrolment') }} OGE
