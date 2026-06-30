@@ -128,7 +128,7 @@ SELECT
     CAST(COALESCE(PM.ActualEndDate, OE.ActualEndDate) AS TIMESTAMP_NTZ)     
         AS "ActualEndDate",
 
-    CAST(COALESCE(PM.CompletionStatus,OE.OnegradeCourseCompletionStatus) AS NVARCHAR(50)) AS "CompletionStatus",
+    CAST(COALESCE(PM.CompletionStatus,OE.CompletionStatus) AS NVARCHAR(50)) AS "CompletionStatus",
 	
     CAST(COALESCE(OE.NotionalNVQLevel, '-') AS NCHAR(1)) AS "NotionalNVQLevel",
 
