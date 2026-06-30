@@ -117,9 +117,9 @@ SELECT
 
     CAST(COALESCE(PM.StudentRef, OE.StudentRef) AS NCHAR(50)) AS "StudentID",
 
-    CAST(COALESCE(PM.CourseCode, OE.OneGradeCourseCode) AS NVARCHAR(24)) AS "CourseCode",
+    CAST(COALESCE(PM.CourseCode, OE.CourseCode) AS NVARCHAR(24)) AS "CourseCode",
 
-    CAST(COALESCE(PM.CourseTitle, OE.OnegradeCourseTitle) AS NVARCHAR(255)) AS "CourseName",
+    CAST(COALESCE(PM.CourseTitle, OE.CourseTitle) AS NVARCHAR(255)) AS "CourseName",
 
     CAST(COALESCE(PM.StartDate, OE.StartDate) AS TIMESTAMP_NTZ ) AS "StartDate",
 
