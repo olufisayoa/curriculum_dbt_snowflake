@@ -88,7 +88,7 @@ EngMat_Enrichment AS (
         e."StartDate" AS StartDate,
         e."ActualEndDate" AS ActualEndDate,
         e."CompletionID" AS CompletionID,
-    FROM {{ ref('stg_onegrade__engmat_enrolment_inyear') }} 
+    FROM {{ ref('stg_onegrade__engmat_enrolment_inyear') }} e
 ),
 Attendance_Aggregated AS (
     SELECT
