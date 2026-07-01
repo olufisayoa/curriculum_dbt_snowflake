@@ -1,4 +1,12 @@
-WITH CourseStaff AS (
+
+  
+    
+
+create or replace transient table CURRICULUM_DB.int.int_consolidated_course_offerings
+    
+    
+    
+    as (WITH CourseStaff AS (
     SELECT
         os.OFFERINGID,
         UPPER(LISTAGG(s.FIRSTNAME || '.' || s.SURNAME, ', ')) AS OFFERINGSTAFF
@@ -67,3 +75,8 @@ SELECT
     COALESCE(p.OFFERINGSTAFF, '-')::VARCHAR(1000) AS "OfferingStaff",
     COALESCE(p.CourseType, '-')::VARCHAR(50) AS "CourseType"
 FROM ProsolutionOffering AS p
+    )
+;
+
+
+  
