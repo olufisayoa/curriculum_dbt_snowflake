@@ -31,6 +31,21 @@ ProsolutionOffering AS (
         pc.PARENTCOURSECODE,
         pc.PARENTCOURSENAME,
         cs.OFFERINGSTAFF,
+        CASE 
+            WHEN O.Code LIKE '%-TX%' 
+                OR O.Name LIKE '%Work Experience%' 
+                OR O.Name LIKE '%Work Placement%' 
+                OR O.Name LIKE '%Work Exp%' 
+                OR O.Name LIKE '%work experience%'
+            THEN 'Work Experience'
+
+            WHEN O.Code LIKE '%-TU%' 
+                OR O.Name LIKE '%Tutorial%' 
+                OR O.Name LIKE '%tutorial%' 
+            THEN 'Tutorial'
+
+            ELSE 'Taught'
+        END AS CourseType,
         o.OFFERINGID::INT AS _SOURCEPROSOLUTIONCOURSEID
     FROM {{ ref('stg_prosolution__offering') }} AS o
     LEFT JOIN CourseStaff AS cs
@@ -49,6 +64,7 @@ SELECT
     COALESCE(p.ENDDATE, '9999-12-31'::TIMESTAMP) AS "EndDate",
     COALESCE(p.PARENTCOURSECODE, '-') AS "ParentCourseCode",
     COALESCE(p.PARENTCOURSENAME, '-') AS "ParentCourseName",
-    COALESCE(p.OFFERINGSTAFF, '-')::VARCHAR(1000) AS "OfferingStaff"
+    COALESCE(p.OFFERINGSTAFF, '-')::VARCHAR(1000) AS "OfferingStaff",
+    COALESCE(p.CourseType, '-')::VARCHAR(50) AS "CourseType"
 FROM ProsolutionOffering AS p
 
