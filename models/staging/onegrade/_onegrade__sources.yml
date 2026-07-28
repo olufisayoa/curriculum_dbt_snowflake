@@ -59,4 +59,13 @@ sources:
       - name: ONEGRADE_ENGMAT_ENROLMENT_INYEAR
         description: "This table contains information about English and Maths enrolment in-year details, including their code, description, and other relevant details."
 
+      - name: ONEGRADE_STAFFTEACHINGGROUP
+        description: "This table contains information about staff teaching group details, including their code, description, and other relevant details."
+
+      - name: ONEGRADE_INYEARGRADE
+        description: "This table contains information about in-year grade details, including their code, description, and other relevant details."
+
+      - name: ONEGRADE_STAFF
+        description: "This table contains information about staff details, including their code, description, and other relevant details."
+
       
