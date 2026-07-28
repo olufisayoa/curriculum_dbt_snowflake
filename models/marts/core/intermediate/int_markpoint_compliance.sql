@@ -50,7 +50,7 @@ unpivoted AS (
         WHEN h.MonitoringPointID = 3 THEN base.Point3_Grade
         WHEN h.MonitoringPointID = 4 THEN base.Point4_Grade
         WHEN h.MonitoringPointID = 5 THEN base.Point5_Grade
-      END AS VARCHAR(5)) AS PointGrade,
+      END AS VARCHAR(20)) AS PointGrade,
     CAST(CASE 
         WHEN h.MonitoringPointID = 1 THEN base.Point1_EffortID
         WHEN h.MonitoringPointID = 2 THEN base.Point2_EffortID
