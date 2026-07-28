@@ -63,7 +63,7 @@ unpivoted AS (
 	CROSS JOIN unpivot_helper AS h
 )
 SELECT 
-       {{ dbt_utils.generate_surrogate_key(['TRIM(AcademicYearID)']) }} AS AcademicYearKey
+       {{ dbt_utils.generate_surrogate_key(['TRIM(AcademicYearID)']) }} AS AcademicYearKey,
        {{ dbt_utils.generate_surrogate_key(['TRIM(Forenames)', 'TRIM(Surname)']) }} AS StaffKey,
        {{ dbt_utils.generate_surrogate_key(['TRIM(AcademicYearID)', 'TRIM(StudentRef)']) }} AS StudentKey,
        {{ dbt_utils.generate_surrogate_key(['TRIM(OfferingID)']) }} AS CourseKey,
