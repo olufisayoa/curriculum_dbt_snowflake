@@ -72,12 +72,13 @@ unpivoted AS (
 )
 SELECT 
        md5(cast(coalesce(cast(TRIM(AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS AcademicYearKey,
-       md5(cast(coalesce(cast(TRIM(Forenames) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(Surname) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS StaffKey,
        md5(cast(coalesce(cast(TRIM(AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(StudentRef) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS StudentKey,
        md5(cast(coalesce(cast(TRIM(OfferingID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS CourseKey,
        md5(cast(coalesce(cast(TRIM(CollegeLevel) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS CollegeLevelKey,
        md5(cast(coalesce(cast(TRIM(SiteID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS SiteKey,
 	   MPKey,
+       Forenames,
+       Surname,
 	   PointGrade,
 	   PointEffort,
 	   CASE WHEN PointGrade IS NULL OR LTRIM(RTRIM(PointGrade)) = '' THEN 0 ELSE 1 END AS PointGradeMarked,
