@@ -64,12 +64,13 @@ unpivoted AS (
 )
 SELECT 
        {{ dbt_utils.generate_surrogate_key(['TRIM(AcademicYearID)']) }} AS AcademicYearKey,
-       {{ dbt_utils.generate_surrogate_key(['TRIM(Forenames)', 'TRIM(Surname)']) }} AS StaffKey,
        {{ dbt_utils.generate_surrogate_key(['TRIM(AcademicYearID)', 'TRIM(StudentRef)']) }} AS StudentKey,
        {{ dbt_utils.generate_surrogate_key(['TRIM(OfferingID)']) }} AS CourseKey,
        {{ dbt_utils.generate_surrogate_key(['TRIM(CollegeLevel)']) }} AS CollegeLevelKey,
        {{ dbt_utils.generate_surrogate_key(['TRIM(SiteID)']) }} AS SiteKey,
 	   MPKey,
+       Forenames,
+       Surname,
 	   PointGrade,
 	   PointEffort,
 	   CASE WHEN PointGrade IS NULL OR LTRIM(RTRIM(PointGrade)) = '' THEN 0 ELSE 1 END AS PointGradeMarked,
