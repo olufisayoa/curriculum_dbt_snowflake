@@ -16,9 +16,17 @@ WITH compliance_base AS (
 
         
         CAST(RS.Date AS DATE) AS session_date,
+
+        TIMESTAMP_NTZ_FROM_PARTS(
+            YEAR(RS.Date), MONTH(RS.Date), DAY(RS.Date),
+            HOUR(RS.StartTime), MINUTE(RS.StartTime), SECOND(RS.StartTime)
+        ) AS session_start_datetime,
+
+        TIMESTAMP_NTZ_FROM_PARTS(
+            YEAR(RS.Date), MONTH(RS.Date), DAY(RS.Date),
+            HOUR(RS.EndTime), MINUTE(RS.EndTime), SECOND(RS.EndTime)
+        ) AS session_end_datetime,
         
-        CAST(RS.Date AS DATETIME) + CAST(RS.StartTime AS DATETIME) AS session_start_datetime,
-		CAST(RS.Date AS DATETIME) + CAST(RS.EndTime AS DATETIME) AS session_end_datetime,
 		RS.Duration AS session_duration_minutes,
         
         S.FirstName AS lecturer_first_name,
@@ -30,16 +38,22 @@ WITH compliance_base AS (
         MAX(M.CreatedDate) AS last_mark_datetime,
 
         DATEDIFF(
-            MINUTE,
-            CAST(RS.Date AS DATETIME) + CAST(RS.StartTime AS DATETIME),
+            'minute',
+            TIMESTAMP_NTZ_FROM_PARTS(
+                YEAR(RS.Date), MONTH(RS.Date), DAY(RS.Date),
+                HOUR(RS.StartTime), MINUTE(RS.StartTime), SECOND(RS.StartTime)
+            ),
             MIN(M.CreatedDate)
         ) AS minutes_to_first_mark,
 
         CASE 
             WHEN MIN(M.CreatedDate) IS NULL THEN 1
             WHEN DATEDIFF(
-                    MINUTE,
-                    CAST(RS.Date AS DATETIME) + CAST(RS.StartTime AS DATETIME),
+                    'minute',
+                    TIMESTAMP_NTZ_FROM_PARTS(
+                        YEAR(RS.Date), MONTH(RS.Date), DAY(RS.Date),
+                        HOUR(RS.StartTime), MINUTE(RS.StartTime), SECOND(RS.StartTime)
+                    ),
                     MIN(M.CreatedDate)
                  ) > 15 
             THEN 1 
