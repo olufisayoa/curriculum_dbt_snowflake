@@ -88,6 +88,19 @@ WITH compliance_base AS (
         S.Surname
 )
 
-SELECT * 
-FROM compliance_base
-ORDER BY session_date DESC;
+SELECT 
+    base.LecturerSessionID AS "LecturerSessionID",
+	base.RegisterSessionID AS "RegisterSessionID",
+	base.RegisterID AS "RegisterID",
+	{{ dbt_utils.generate_surrogate_key(['TRIM(base.SID)']) }} AS "CollegeLevelKey",
+	{{ dbt_utils.generate_surrogate_key(['TRIM(base.AcademicYearID)']) }} AS "AcademicYearKey",
+	base.session_date AS "Session Date",
+	base.session_start_datetime AS "Session Start Date",
+	base.session_end_datetime AS "Session End Date",
+	base.session_duration_minutes AS "Session Duration",
+	base.lecturer_full_name AS "Lecturer Name",
+	base.students_marked AS "Students Marked",
+	base.total_students_on_session AS "Total Students",
+	base.pct_students_marked AS "Percentage Marked"
+FROM compliance_base AS base
+ORDER BY session_date DESC
