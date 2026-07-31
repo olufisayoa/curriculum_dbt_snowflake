@@ -26,31 +26,31 @@ WITH compliance_base AS (
         CONCAT(S.FirstName, ', ', S.Surname) AS lecturer_full_name,
 
         
-        MIN(RM.CreatedDate) AS first_mark_datetime,
-        MAX(RM.CreatedDate) AS last_mark_datetime,
+        MIN(M.CreatedDate) AS first_mark_datetime,
+        MAX(M.CreatedDate) AS last_mark_datetime,
 
         DATEDIFF(
             MINUTE,
             CAST(RS.Date AS DATETIME) + CAST(RS.StartTime AS DATETIME),
-            MIN(RM.CreatedDate)
+            MIN(M.CreatedDate)
         ) AS minutes_to_first_mark,
 
         CASE 
-            WHEN MIN(RM.CreatedDate) IS NULL THEN 1
+            WHEN MIN(M.CreatedDate) IS NULL THEN 1
             WHEN DATEDIFF(
                     MINUTE,
                     CAST(RS.Date AS DATETIME) + CAST(RS.StartTime AS DATETIME),
-                    MIN(RM.CreatedDate)
+                    MIN(M.CreatedDate)
                  ) > 15 
             THEN 1 
             ELSE 0 
         END AS is_marked_late_over_15mins,
 
-        COUNT(DISTINCT RM.RegisterMarkID) AS students_marked,
+        COUNT(DISTINCT M.RegisterMarkID) AS students_marked,
         COUNT(DISTINCT RST.RegisterStudentID) AS total_students_on_session,
 
         ROUND(
-            COUNT(DISTINCT RM.RegisterMarkID) * 100.0 / 
+            COUNT(DISTINCT M.RegisterMarkID) * 100.0 / 
             NULLIF(COUNT(DISTINCT RST.RegisterStudentID), 0), 
             2
         ) AS pct_students_marked
@@ -68,10 +68,10 @@ WITH compliance_base AS (
     LEFT JOIN {{ ref('stg_prosolution__registerstudent') }} RST 
         ON R.RegisterID = RST.RegisterID
 
-    LEFT JOIN {{ ref('stg_prosolution__registermark') }} RM 
-        ON RM.RegisterSessionID = RS.RegisterSessionID
-       AND RST.RegisterStudentID = RM.RegisterStudentID
-       AND CAST(RM.CreatedDate AS DATE) = CAST(RS.Date AS DATE)
+    LEFT JOIN {{ ref('stg_prosolution__registermark') }} M 
+        ON M.RegisterSessionID = RS.RegisterSessionID
+       AND RST.RegisterStudentID = M.RegisterStudentID
+       AND CAST(M.CreatedDate AS DATE) = CAST(RS.Date AS DATE)
 
 
     GROUP BY 
