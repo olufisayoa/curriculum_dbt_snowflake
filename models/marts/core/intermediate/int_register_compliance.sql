@@ -12,7 +12,7 @@ WITH compliance_base AS (
         RS.RegisterSessionID,
         R.RegisterID,
 		R.AcademicYearID,
-		CL.SID,
+		O.SID,
         O.OfferingID,
 
         
@@ -94,15 +94,12 @@ WITH compliance_base AS (
     LEFT JOIN {{ ref('stg_prosolution__offering') }} O
         ON E.OfferingID = O.OfferingID
 
-    LEFT JOIN {{ ref('stg_prosolution__collegelevel') }} CL
-        ON O.SID = CL.SID
-
 
     GROUP BY 
         RSL.LecturerSessionID,
         RS.RegisterSessionID,
         R.RegisterID,
-		CL.SID,
+		O.SID,
         O.OfferingID,
 		R.AcademicYearID,
         RS.Date,                    
