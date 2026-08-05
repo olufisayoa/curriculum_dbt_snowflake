@@ -14,7 +14,8 @@ WITH compliance_base AS (
         RS.RegisterSessionID,
         R.RegisterID,
 		R.AcademicYearID,
-		R.SID,
+		O.SID,
+        O.OfferingID,
 
         
         CAST(RS.Date AS DATE) AS session_date,
@@ -88,13 +89,20 @@ WITH compliance_base AS (
         ON M.RegisterSessionID = RS.RegisterSessionID
        AND RST.RegisterStudentID = M.RegisterStudentID
        AND CAST(M.CreatedDate AS DATE) = CAST(RS.Date AS DATE)
+    
+    LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__enrolment E
+        ON RST.EnrolmentID = E.EnrolmentID
+
+    LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__offering O
+        ON E.OfferingID = O.OfferingID
 
 
     GROUP BY 
         RSL.LecturerSessionID,
         RS.RegisterSessionID,
         R.RegisterID,
-		R.SID,
+		O.SID,
+        O.OfferingID,
 		R.AcademicYearID,
         RS.Date,                    
         RS.StartTime,
@@ -110,6 +118,7 @@ SELECT
 	base.RegisterID AS "RegisterID",
 	md5(cast(coalesce(cast(TRIM(base.SID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS "CollegeLevelKey",
 	md5(cast(coalesce(cast(TRIM(base.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS "AcademicYearKey",
+    md5(cast(coalesce(cast(TRIM(base.OfferingID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS "CourseKey",
 	base.session_date AS "Session Date",
 	base.session_start_datetime AS "Session Start Date",
 	base.session_end_datetime AS "Session End Date",
