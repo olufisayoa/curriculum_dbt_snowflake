@@ -12,7 +12,8 @@ WITH compliance_base AS (
         RS.RegisterSessionID,
         R.RegisterID,
 		R.AcademicYearID,
-		R.SID,
+		CL.SID,
+        O.OfferingID,
 
         
         CAST(RS.Date AS DATE) AS session_date,
@@ -86,13 +87,23 @@ WITH compliance_base AS (
         ON M.RegisterSessionID = RS.RegisterSessionID
        AND RST.RegisterStudentID = M.RegisterStudentID
        AND CAST(M.CreatedDate AS DATE) = CAST(RS.Date AS DATE)
+    
+    LEFT JOIN {{ ref('stg_prosolution__enrolment') }} E
+        ON RST.EnrolmentID = E.EnrolmentID
+
+    LEFT JOIN {{ ref('stg_prosolution__offering') }} O
+        ON E.OfferingID = O.OfferingID
+
+    LEFT JOIN {{ ref('stg_prosolution__collegelevel') }} CL
+        ON O.SID = CL.SID
 
 
     GROUP BY 
         RSL.LecturerSessionID,
         RS.RegisterSessionID,
         R.RegisterID,
-		R.SID,
+		CL.SID,
+        O.OfferingID,
 		R.AcademicYearID,
         RS.Date,                    
         RS.StartTime,
@@ -108,6 +119,7 @@ SELECT
 	base.RegisterID AS "RegisterID",
 	{{ dbt_utils.generate_surrogate_key(['TRIM(base.SID)']) }} AS "CollegeLevelKey",
 	{{ dbt_utils.generate_surrogate_key(['TRIM(base.AcademicYearID)']) }} AS "AcademicYearKey",
+    {{ dbt_utils.generate_surrogate_key(['TRIM(base.OfferingID)']) }} AS "CourseKey",
 	base.session_date AS "Session Date",
 	base.session_start_datetime AS "Session Start Date",
 	base.session_end_datetime AS "Session End Date",
