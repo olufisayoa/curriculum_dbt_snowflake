@@ -1,7 +1,7 @@
 {{
     config(
         materialized='incremental',
-        unique_key=['LecturerSessionID'],
+        unique_key=['"LecturerSessionID"'],
         incremental_strategy='merge'
     )
 }}
