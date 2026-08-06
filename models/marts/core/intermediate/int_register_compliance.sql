@@ -118,6 +118,7 @@ SELECT
 	{{ dbt_utils.generate_surrogate_key(['TRIM(base.SID)']) }} AS "CollegeLevelKey",
 	{{ dbt_utils.generate_surrogate_key(['TRIM(base.AcademicYearID)']) }} AS "AcademicYearKey",
     {{ dbt_utils.generate_surrogate_key(['TRIM(base.OfferingID)']) }} AS "CourseKey",
+    (YEAR(base.session_date) * 10000) + (MONTH(base.session_date) * 100) + DAY(base.session_date) AS "DateKey",
 	base.session_date AS "Session Date",
 	base.session_start_datetime AS "Session Start Date",
 	base.session_end_datetime AS "Session End Date",
