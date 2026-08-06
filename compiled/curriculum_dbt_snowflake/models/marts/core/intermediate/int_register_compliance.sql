@@ -112,6 +112,7 @@ SELECT
 	md5(cast(coalesce(cast(TRIM(base.SID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS "CollegeLevelKey",
 	md5(cast(coalesce(cast(TRIM(base.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS "AcademicYearKey",
     md5(cast(coalesce(cast(TRIM(base.OfferingID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS "CourseKey",
+    (YEAR(base.session_date) * 10000) + (MONTH(base.session_date) * 100) + DAY(base.session_date) AS "DateKey",
 	base.session_date AS "Session Date",
 	base.session_start_datetime AS "Session Start Date",
 	base.session_end_datetime AS "Session End Date",
