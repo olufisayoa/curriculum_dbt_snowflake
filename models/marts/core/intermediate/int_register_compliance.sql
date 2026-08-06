@@ -1,7 +1,7 @@
 {{
     config(
         materialized='incremental',
-        unique_key=['"LecturerSessionID"'],
+        unique_key=['"RegisterComplianceKey"'],
         incremental_strategy='merge'
     )
 }}
@@ -80,7 +80,7 @@ WITH compliance_base AS (
     LEFT JOIN {{ ref('stg_prosolution__staff') }} S
         ON RSL.StaffID = S.StaffID
 
-    LEFT JOIN {{ ref('stg_prosolution__registerstudent') }} RST 
+    INNER JOIN {{ ref('stg_prosolution__registerstudent') }} RST 
         ON R.RegisterID = RST.RegisterID
 
     LEFT JOIN {{ ref('stg_prosolution__registermark') }} M 
@@ -88,13 +88,13 @@ WITH compliance_base AS (
        AND RST.RegisterStudentID = M.RegisterStudentID
        AND CAST(M.CreatedDate AS DATE) = CAST(RS.Date AS DATE)
     
-    LEFT JOIN {{ ref('stg_prosolution__enrolment') }} E
+    INNER JOIN {{ ref('stg_prosolution__enrolment') }} E
         ON RST.EnrolmentID = E.EnrolmentID
 
-    LEFT JOIN {{ ref('stg_prosolution__offering') }} O
+    INNER JOIN {{ ref('stg_prosolution__offering') }} O
         ON E.OfferingID = O.OfferingID
 
-
+    WHERE O.SID IS NOT NULL
     GROUP BY 
         RSL.LecturerSessionID,
         RS.RegisterSessionID,
@@ -111,9 +111,10 @@ WITH compliance_base AS (
 )
 
 SELECT 
-    base.LecturerSessionID AS "LecturerSessionID",
-	base.RegisterSessionID AS "RegisterSessionID",
-	base.RegisterID AS "RegisterID",
+    {{ dbt_utils.generate_surrogate_key(['base.LecturerSessionID', 'base.OfferingID']) }} AS "RegisterComplianceKey",
+    {{ dbt_utils.generate_surrogate_key(['base.LecturerSessionID']) }} AS "LecturerSessionKey",
+	{{ dbt_utils.generate_surrogate_key(['base.RegisterSessionID']) }} AS "RegisterSessionKey",
+	{{ dbt_utils.generate_surrogate_key(['base.RegisterID']) }} AS "RegisterKey",
 	{{ dbt_utils.generate_surrogate_key(['TRIM(base.SID)']) }} AS "CollegeLevelKey",
 	{{ dbt_utils.generate_surrogate_key(['TRIM(base.AcademicYearID)']) }} AS "AcademicYearKey",
     {{ dbt_utils.generate_surrogate_key(['TRIM(base.OfferingID)']) }} AS "CourseKey",
