@@ -74,7 +74,7 @@ WITH compliance_base AS (
     LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__staff S
         ON RSL.StaffID = S.StaffID
 
-    LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__registerstudent RST 
+    INNER JOIN CURRICULUM_DB.stg.stg_prosolution__registerstudent RST 
         ON R.RegisterID = RST.RegisterID
 
     LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__registermark M 
@@ -82,13 +82,13 @@ WITH compliance_base AS (
        AND RST.RegisterStudentID = M.RegisterStudentID
        AND CAST(M.CreatedDate AS DATE) = CAST(RS.Date AS DATE)
     
-    LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__enrolment E
+    INNER JOIN CURRICULUM_DB.stg.stg_prosolution__enrolment E
         ON RST.EnrolmentID = E.EnrolmentID
 
-    LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__offering O
+    INNER JOIN CURRICULUM_DB.stg.stg_prosolution__offering O
         ON E.OfferingID = O.OfferingID
 
-
+    WHERE O.SID IS NOT NULL
     GROUP BY 
         RSL.LecturerSessionID,
         RS.RegisterSessionID,
@@ -105,9 +105,10 @@ WITH compliance_base AS (
 )
 
 SELECT 
-    base.LecturerSessionID AS "LecturerSessionID",
-	base.RegisterSessionID AS "RegisterSessionID",
-	base.RegisterID AS "RegisterID",
+    md5(cast(coalesce(cast(base.LecturerSessionID as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(base.OfferingID as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS "RegisterComplianceKey",
+    md5(cast(coalesce(cast(base.LecturerSessionID as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS "LecturerSessionKey",
+	md5(cast(coalesce(cast(base.RegisterSessionID as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS "RegisterSessionKey",
+	md5(cast(coalesce(cast(base.RegisterID as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS "RegisterKey",
 	md5(cast(coalesce(cast(TRIM(base.SID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS "CollegeLevelKey",
 	md5(cast(coalesce(cast(TRIM(base.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS "AcademicYearKey",
     md5(cast(coalesce(cast(TRIM(base.OfferingID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS "CourseKey",
