@@ -120,6 +120,7 @@ SELECT
 	base.lecturer_full_name AS "Lecturer Name",
 	base.students_marked AS "Students Marked",
 	base.total_students_on_session AS "Total Students",
+    CAST(base.is_marked_late_over_15mins AS BOOLEAN) AS "Marked Late",
 	base.pct_students_marked AS "Percentage Marked"
 FROM compliance_base AS base
 ORDER BY session_date DESC
