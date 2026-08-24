@@ -1,0 +1,6 @@
+SELECT 
+MT.MeetingTypeID,
+MT.MeetingTypeName,
+MT.IsObsolete,
+MT.MeetingCategoryID
+FROM CURRICULUM_DB.RAW.PROMONITOR_ILP_MEETINGTYPE MT
