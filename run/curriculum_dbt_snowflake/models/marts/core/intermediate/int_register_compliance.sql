@@ -1,139 +1,32 @@
-
+-- back compat for old kwarg name
   
+  begin;
     
-
-create or replace transient table CURRICULUM_DB.int.int_register_compliance
-    
-    
-    
-    as (
-
-WITH compliance_base AS (
-    SELECT
-        RSL.LecturerSessionID,
-        RS.RegisterSessionID,
-        R.RegisterID,
-		R.AcademicYearID,
-		O.SID,
-        O.OfferingID,
-
         
-        CAST(RS.Date AS DATE) AS session_date,
-
-        TIMESTAMP_NTZ_FROM_PARTS(
-            YEAR(RS.Date), MONTH(RS.Date), DAY(RS.Date),
-            HOUR(RS.StartTime), MINUTE(RS.StartTime), SECOND(RS.StartTime)
-        ) AS session_start_datetime,
-
-        TIMESTAMP_NTZ_FROM_PARTS(
-            YEAR(RS.Date), MONTH(RS.Date), DAY(RS.Date),
-            HOUR(RS.EndTime), MINUTE(RS.EndTime), SECOND(RS.EndTime)
-        ) AS session_end_datetime,
+            
+                
+                
+            
         
-		RS.Duration AS session_duration_minutes,
-        
-        S.FirstName AS lecturer_first_name,
-        S.Surname AS lecturer_surname,
-        CONCAT(S.FirstName, ', ', S.Surname) AS lecturer_full_name,
-
-        
-        MIN(M.CreatedDate) AS first_mark_datetime,
-        MAX(M.CreatedDate) AS last_mark_datetime,
-
-        DATEDIFF(
-            'minute',
-            TIMESTAMP_NTZ_FROM_PARTS(
-                YEAR(RS.Date), MONTH(RS.Date), DAY(RS.Date),
-                HOUR(RS.StartTime), MINUTE(RS.StartTime), SECOND(RS.StartTime)
-            ),
-            MIN(M.CreatedDate)
-        ) AS minutes_to_first_mark,
-
-        CASE 
-            WHEN MIN(M.CreatedDate) IS NULL THEN 1
-            WHEN DATEDIFF(
-                    'minute',
-                    TIMESTAMP_NTZ_FROM_PARTS(
-                        YEAR(RS.Date), MONTH(RS.Date), DAY(RS.Date),
-                        HOUR(RS.StartTime), MINUTE(RS.StartTime), SECOND(RS.StartTime)
-                    ),
-                    MIN(M.CreatedDate)
-                 ) > 15 
-            THEN 1 
-            ELSE 0 
-        END AS is_marked_late_over_15mins,
-
-        COUNT(DISTINCT M.RegisterMarkID) AS students_marked,
-        COUNT(DISTINCT RST.RegisterStudentID) AS total_students_on_session,
-
-        ROUND(
-            COUNT(DISTINCT M.RegisterMarkID) * 100.0 / 
-            NULLIF(COUNT(DISTINCT RST.RegisterStudentID), 0), 
-            2
-        ) AS pct_students_marked
-
-    FROM CURRICULUM_DB.stg.stg_prosolution__registersessionlecturer RSL
-    INNER JOIN CURRICULUM_DB.stg.stg_prosolution__registersession RS 
-        ON RSL.RegisterSessionID = RS.RegisterSessionID
-
-    INNER JOIN CURRICULUM_DB.stg.stg_prosolution__register R 
-        ON RS.RegisterID = R.RegisterID
-
-    LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__staff S
-        ON RSL.StaffID = S.StaffID
-
-    INNER JOIN CURRICULUM_DB.stg.stg_prosolution__registerstudent RST 
-        ON R.RegisterID = RST.RegisterID
-
-    LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__registermark M 
-        ON M.RegisterSessionID = RS.RegisterSessionID
-       AND RST.RegisterStudentID = M.RegisterStudentID
-       AND CAST(M.CreatedDate AS DATE) = CAST(RS.Date AS DATE)
     
-    INNER JOIN CURRICULUM_DB.stg.stg_prosolution__enrolment E
-        ON RST.EnrolmentID = E.EnrolmentID
 
-    INNER JOIN CURRICULUM_DB.stg.stg_prosolution__offering O
-        ON E.OfferingID = O.OfferingID
+    
 
-    WHERE O.SID IS NOT NULL
-    GROUP BY 
-        RSL.LecturerSessionID,
-        RS.RegisterSessionID,
-        R.RegisterID,
-		O.SID,
-        O.OfferingID,
-		R.AcademicYearID,
-        RS.Date,                    
-        RS.StartTime,
-        RS.EndTime,
-        RS.Duration,
-        S.FirstName,
-        S.Surname
-)
+    merge into CURRICULUM_DB.int.int_register_compliance as DBT_INTERNAL_DEST
+        using CURRICULUM_DB.int.int_register_compliance__dbt_tmp as DBT_INTERNAL_SOURCE
+        on (
+                    DBT_INTERNAL_SOURCE."RegisterComplianceKey" = DBT_INTERNAL_DEST."RegisterComplianceKey"
+                )
 
-SELECT 
-    md5(cast(coalesce(cast(base.LecturerSessionID as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(base.OfferingID as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS "RegisterComplianceKey",
-    md5(cast(coalesce(cast(base.LecturerSessionID as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS "LecturerSessionKey",
-	md5(cast(coalesce(cast(base.RegisterSessionID as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS "RegisterSessionKey",
-	md5(cast(coalesce(cast(base.RegisterID as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS "RegisterKey",
-	md5(cast(coalesce(cast(TRIM(base.SID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS "CollegeLevelKey",
-	md5(cast(coalesce(cast(TRIM(base.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS "AcademicYearKey",
-    md5(cast(coalesce(cast(TRIM(base.OfferingID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS "CourseKey",
-    (YEAR(base.session_date) * 10000) + (MONTH(base.session_date) * 100) + DAY(base.session_date) AS "DateKey",
-	base.session_date AS "Session Date",
-	base.session_start_datetime AS "Session Start Date",
-	base.session_end_datetime AS "Session End Date",
-	base.session_duration_minutes AS "Session Duration",
-	base.lecturer_full_name AS "Lecturer Name",
-	base.students_marked AS "Students Marked",
-	base.total_students_on_session AS "Total Students",
-    CAST(base.is_marked_late_over_15mins AS BOOLEAN) AS "Marked Late",
-	base.pct_students_marked AS "Percentage Marked"
-FROM compliance_base AS base
-ORDER BY session_date DESC
-    )
+    
+    when matched then update set
+        "RegisterComplianceKey" = DBT_INTERNAL_SOURCE."RegisterComplianceKey","LecturerSessionKey" = DBT_INTERNAL_SOURCE."LecturerSessionKey","RegisterSessionKey" = DBT_INTERNAL_SOURCE."RegisterSessionKey","RegisterKey" = DBT_INTERNAL_SOURCE."RegisterKey","CollegeLevelKey" = DBT_INTERNAL_SOURCE."CollegeLevelKey","AcademicYearKey" = DBT_INTERNAL_SOURCE."AcademicYearKey","CourseKey" = DBT_INTERNAL_SOURCE."CourseKey","DateKey" = DBT_INTERNAL_SOURCE."DateKey","Session Date" = DBT_INTERNAL_SOURCE."Session Date","Session Start Date" = DBT_INTERNAL_SOURCE."Session Start Date","Session End Date" = DBT_INTERNAL_SOURCE."Session End Date","Session Duration" = DBT_INTERNAL_SOURCE."Session Duration","Lecturer Name" = DBT_INTERNAL_SOURCE."Lecturer Name","Students Marked" = DBT_INTERNAL_SOURCE."Students Marked","Total Students" = DBT_INTERNAL_SOURCE."Total Students","Marked Late" = DBT_INTERNAL_SOURCE."Marked Late","Percentage Marked" = DBT_INTERNAL_SOURCE."Percentage Marked"
+    
+
+    when not matched then insert
+        ("RegisterComplianceKey", "LecturerSessionKey", "RegisterSessionKey", "RegisterKey", "CollegeLevelKey", "AcademicYearKey", "CourseKey", "DateKey", "Session Date", "Session Start Date", "Session End Date", "Session Duration", "Lecturer Name", "Students Marked", "Total Students", "Marked Late", "Percentage Marked")
+    values
+        ("RegisterComplianceKey", "LecturerSessionKey", "RegisterSessionKey", "RegisterKey", "CollegeLevelKey", "AcademicYearKey", "CourseKey", "DateKey", "Session Date", "Session Start Date", "Session End Date", "Session Duration", "Lecturer Name", "Students Marked", "Total Students", "Marked Late", "Percentage Marked")
+
 ;
-
-
-  
+    commit;
