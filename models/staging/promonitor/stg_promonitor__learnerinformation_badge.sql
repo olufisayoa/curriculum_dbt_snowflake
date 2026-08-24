@@ -1,0 +1,4 @@
+SELECT
+B.BadgeID,
+B.NAME AS BadgeName
+FROM {{ source('Promonitor', 'PROMONITOR_LEARNERINFORMATION_BADGE') }} B

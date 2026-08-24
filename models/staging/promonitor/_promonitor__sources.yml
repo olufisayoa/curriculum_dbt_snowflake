@@ -6,4 +6,30 @@ sources:
     tables:
       - name: PROMONITOR_STUDENTCODEMAPPING
         description: "This table contains mapping information between ProMonitor and student codes."
+      - name: PROMONITOR_ILP_MEETINGCATEGORY
+        description: "This table contains information about the categories of ILP meetings in ProMonitor."
+      - name: PROMONITOR_ILP_MEETINGTYPE
+        description: "This table contains information about the types of ILP meetings in ProMonitor."
+      - name: PROMONITOR_LEARNERINFORMATION_ATRISK
+        description: "This table contains information about learners who are at risk, as recorded in ProMonitor."
+      - name: PROMONITOR_LEARNERINFORMATION_BADGE
+        description: "This table contains information about learners who have received badges, as recorded in ProMonitor."
+      - name: PROMONITOR_LEARNERINFORMATION_ACTIONPLAN
+        description: "This table contains information about action plans for learners, as recorded in ProMonitor."
+      - name: PROMONITOR_LEARNERINFORMATION_ACTIONPLAN_ACTIONTYPE
+        description: "This table contains information about the types of actions in action plans for learners, as recorded in ProMonitor."
+      - name: PROMONITOR_LEARNERINFORMATION_ACTIONPLAN_COMMENTTYPE
+        description: "This table contains information about the types of comments in action plans for learners, as recorded in ProMonitor."
+      - name: PROMONITOR_LEARNERINFORMATION_BADGESTUDENT
+        description: "This table contains information about learners who have received badges, as recorded in ProMonitor."
+      - name: PROMONITOR_LEARNERINFORMATION_BADGEVALUE
+        description: "This table contains information about the values associated with badges for learners, as recorded in ProMonitor."
+      - name: PROMONITOR_LEARNERINFORMATION_LEARNERSTATUS
+        description: "This table contains information about the status of learners, as recorded in ProMonitor."
+      - name: PROMONITOR_LEARNERINFORMATION_LEARNERSUPPLEMENTARY 
+        description: "This table contains supplementary information about learners, as recorded in ProMonitor."
+      - name: PROMONITOR_LEARNERINFORMATION_PROGRESSION
+        description: "This table contains information about the progression of learners, as recorded in ProMonitor."
+      - name: PROMONITOR_LEARNERINFORMATION_TUTORIAL
+        description: "This table contains information about tutorials for learners, as recorded in ProMonitor."
     
