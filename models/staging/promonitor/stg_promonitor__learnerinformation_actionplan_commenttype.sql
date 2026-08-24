@@ -1,0 +1,5 @@
+SELECT 
+CT.CommentTypeID,
+CT.Title AS CommentTypeName,
+CT.IsObsolete
+FROM {{ source('Promonitor', 'PROMONITOR_LEARNERINFORMATION_ACTIONPLAN_COMMENTTYPE') }} CT
