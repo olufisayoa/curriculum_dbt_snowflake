@@ -10,7 +10,7 @@ SELECT
 		WHEN ActionPlan.CommentDate IS NOT NULL THEN 1
 		ELSE 0
 	END AS IncludesComment,  
-    ActionType.ActionDescription AS Reason
+    ActionType.ActionTypeDescription AS Reason
 
 FROM {{ ref('stg_promonitor__learnerinformation_actionplan') }} AS ActionPlan 
 LEFT JOIN {{ ref('stg_promonitor__learnerinformation_tutorial') }} AS Tutorial
