@@ -32,4 +32,9 @@ sources:
         description: "This table contains information about the progression of learners, as recorded in ProMonitor."
       - name: PROMONITOR_LEARNERINFORMATION_TUTORIAL
         description: "This table contains information about tutorials for learners, as recorded in ProMonitor."
+
+      - name: PROMONITOR_vSTUDENT
+        description: "This view contains information about students, as recorded in ProMonitor."
+      - name: PROMONITOR_vSTAFF
+        description: "This view contains information about staff members, as recorded in ProMonitor."
     
