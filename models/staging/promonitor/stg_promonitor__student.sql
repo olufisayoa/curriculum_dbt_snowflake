@@ -2,4 +2,4 @@ SELECT
 S.StudentID,
 S.AcademicYearID,
 S.PMStudentID
-FROM {{ source('Promonitor', 'PROMONITOR_vStudent') }} S
+FROM {{ source('Promonitor', 'PROMONITOR_VSTUDENT') }} S
