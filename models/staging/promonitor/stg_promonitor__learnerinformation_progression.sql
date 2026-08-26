@@ -1,0 +1,4 @@
+SELECT
+P.PMStudentID,
+P.Information1
+FROM {{ source('Promonitor', 'PROMONITOR_LEARNERINFORMATION_PROGRESSION') }} AS P
