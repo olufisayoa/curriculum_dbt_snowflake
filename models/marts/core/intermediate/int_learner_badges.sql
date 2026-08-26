@@ -1,7 +1,7 @@
 SELECT 
 	  {{ dbt_utils.generate_surrogate_key(['BV.BadgeValueID']) }} AS BadgeValueKey
-	  ,B.Name AS BadgeName
-	  ,BV.Name AS BadgeValueName
+	  ,B.BadgeName
+	  ,BV.BadgeValueName
 	  ,BV.BadgeCode
 	  ,BV.IsObsolete
 	  ,P.Information1 AS Progression
