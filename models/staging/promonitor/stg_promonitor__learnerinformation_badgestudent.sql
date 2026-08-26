@@ -1,0 +1,4 @@
+SELECT
+BS.PMStudentID,
+BS.BadgeValueID
+FROM {{ source('Promonitor', 'PROMONITOR_LEARNERINFORMATION_BADGESTUDENT') }} BS

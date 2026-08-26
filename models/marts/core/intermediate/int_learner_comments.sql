@@ -4,6 +4,7 @@ SELECT
     {{ dbt_utils.generate_surrogate_key(['MT.MeetingTypeID']) }} AS MeetingTypeKey,
     {{ dbt_utils.generate_surrogate_key(['ActionPlan.CommentTypeID']) }} AS CommentTypeKey,
     {{ dbt_utils.generate_surrogate_key(['ActionPlan.ActionTypeID']) }} AS ActionTypeKey,
+    {{ dbt_utils.generate_surrogate_key(['TRIM(vStudent.AcademicYearID)']) }} AS AcademicYearKey,
 	(YEAR(ActionPlan.CommentDate) * 10000 + MONTH(ActionPlan.CommentDate) * 100 + DAY(ActionPlan.CommentDate)) AS DateKey, 
     CommentStaff.StaffName AS CommentStaffName, 
     CASE 
