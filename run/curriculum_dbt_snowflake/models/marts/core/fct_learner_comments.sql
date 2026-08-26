@@ -12,6 +12,7 @@ create or replace transient table CURRICULUM_DB.core.fct_learner_comments
     MeetingTypeKey AS "MeetingTypeKey",
     CommentTypeKey AS "CommentTypeKey",
     ActionTypeKey AS "ActionTypeKey",
+    AcademicYearKey AS "AcademicYearKey",
     DateKey AS "DateKey",
     CommentStaffName AS "CommentStaffName",
     CAST(IncludesComment AS BOOLEAN) AS "IncludesComment",

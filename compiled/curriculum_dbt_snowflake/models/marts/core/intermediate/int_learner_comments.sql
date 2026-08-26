@@ -4,6 +4,7 @@ SELECT
     md5(cast(coalesce(cast(MT.MeetingTypeID as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS MeetingTypeKey,
     md5(cast(coalesce(cast(ActionPlan.CommentTypeID as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS CommentTypeKey,
     md5(cast(coalesce(cast(ActionPlan.ActionTypeID as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS ActionTypeKey,
+    md5(cast(coalesce(cast(TRIM(vStudent.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS AcademicYearKey,
 	(YEAR(ActionPlan.CommentDate) * 10000 + MONTH(ActionPlan.CommentDate) * 100 + DAY(ActionPlan.CommentDate)) AS DateKey, 
     CommentStaff.StaffName AS CommentStaffName, 
     CASE 
