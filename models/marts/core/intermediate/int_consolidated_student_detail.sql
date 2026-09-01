@@ -141,4 +141,4 @@ Comment_Agg AS (
 	LEFT JOIN Onegrade_Student AS _os
 	 ON TRIM(ps.AcademicYearID) = TRIM(_os.AcademicYearID) AND TRIM(ps.StudentID) = TRIM(_os.StudentRef)
 	LEFT JOIN Comment_Agg AS ca
-	 ON ps.StudentKey = ca.StudentKey
+	 ON ps.StudentKey = ca."StudentKey"
