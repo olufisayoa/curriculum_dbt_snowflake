@@ -1,4 +1,12 @@
-WITH Prosolution_Student AS (
+
+  
+    
+
+create or replace transient table CURRICULUM_DB.int.int_consolidated_student_detail
+    
+    
+    
+    as (WITH Prosolution_Student AS (
 		SELECT  
            s.StudentKey AS StudentKey,
               s.StudentDetailID AS StudentDetailID,
@@ -142,3 +150,8 @@ Comment_Agg AS (
 	 ON TRIM(ps.AcademicYearID) = TRIM(_os.AcademicYearID) AND TRIM(ps.StudentID) = TRIM(_os.StudentRef)
 	LEFT JOIN Comment_Agg AS ca
 	 ON ps.StudentKey = ca."StudentKey"
+    )
+;
+
+
+  
