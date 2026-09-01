@@ -101,7 +101,14 @@ WITH Prosolution_Student AS (
 			  ,_os.FreeSchoolMeal
 		  FROM {{ ref('stg_onegrade__student') }} as _os
 	)
-
+,
+Comment_Agg AS (
+	SELECT 
+	 "StudentKey",
+	 SUM(CASE WHEN "IncludesComment" = TRUE THEN 1 ELSE 0 END) AS TotalComments
+	 FROM {{ ref('fct_learner_comments') }}
+	 GROUP BY "StudentKey"
+)
 	SELECT 
           ps.StudentKey AS "StudentKey",
           CAST(COALESCE(TRIM(ps.AcademicYearID), '00/00') AS VARCHAR) AS "AcademicYear",
@@ -127,8 +134,11 @@ WITH Prosolution_Student AS (
 		  CAST(COALESCE(ps.AchievedMaths,'No') AS VARCHAR) AS "AchievedMaths",
 		  CAST(COALESCE(ps.RiskAssessment,'-') AS VARCHAR) AS "RiskAssessment",
 		  CAST(COALESCE(ps.Safeguarding,'No') AS VARCHAR) AS "Safeguarding",
+		  COALESCE(ca.TotalComments, 0) AS "TotalComments",
 		  CAST(COALESCE(ps.StudentPhotoThumbnail,'-') AS VARCHAR) AS "StudentPhotoThumbnail",
 		  CAST(COALESCE(ps.StudentProfileUrl, '-') AS VARCHAR) AS "StudentProfileUrl"
 	FROM Prosolution_Student AS ps
 	LEFT JOIN Onegrade_Student AS _os
 	 ON TRIM(ps.AcademicYearID) = TRIM(_os.AcademicYearID) AND TRIM(ps.StudentID) = TRIM(_os.StudentRef)
+	LEFT JOIN Comment_Agg AS ca
+	 ON ps.StudentKey = ca."StudentKey"
