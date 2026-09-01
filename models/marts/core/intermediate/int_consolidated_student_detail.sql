@@ -134,7 +134,7 @@ Comment_Agg AS (
 		  CAST(COALESCE(ps.AchievedMaths,'No') AS VARCHAR) AS "AchievedMaths",
 		  CAST(COALESCE(ps.RiskAssessment,'-') AS VARCHAR) AS "RiskAssessment",
 		  CAST(COALESCE(ps.Safeguarding,'No') AS VARCHAR) AS "Safeguarding",
-		  COALESCE(c.TotalComments, 0) AS "TotalComments",
+		  COALESCE(ca.TotalComments, 0) AS "TotalComments",
 		  CAST(COALESCE(ps.StudentPhotoThumbnail,'-') AS VARCHAR) AS "StudentPhotoThumbnail",
 		  CAST(COALESCE(ps.StudentProfileUrl, '-') AS VARCHAR) AS "StudentProfileUrl"
 	FROM Prosolution_Student AS ps
