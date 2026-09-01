@@ -105,7 +105,7 @@ WITH Prosolution_Student AS (
 Comment_Agg AS (
 	SELECT 
 	 "StudentKey",
-	 SUM(CASE WHEN IncludesComment = TRUE THEN 1 ELSE 0 END) AS TotalComments
+	 SUM(CASE WHEN "IncludesComment" = TRUE THEN 1 ELSE 0 END) AS TotalComments
 	 FROM {{ ref('fct_learner_comments') }}
 	 GROUP BY "StudentKey"
 )
