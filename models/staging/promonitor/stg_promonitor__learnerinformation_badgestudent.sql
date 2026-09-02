@@ -1,5 +1,5 @@
 SELECT
 BS.PMStudentID,
-BS.BadgeValueID
+BS.BadgeValueID,
 BS.BadgeID
 FROM {{ source('Promonitor', 'PROMONITOR_LEARNERINFORMATION_BADGESTUDENT') }} BS
