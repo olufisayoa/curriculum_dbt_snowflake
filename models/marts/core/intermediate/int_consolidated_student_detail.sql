@@ -110,19 +110,26 @@ Comment_Agg AS (
 	 GROUP BY "StudentKey"
 ),
 Badges AS (
-	SELECT 
-	{{ dbt_utils.generate_surrogate_key(['TRIM(S.AcademicYearID)', 'TRIM(S.StudentID)'] ) }} AS StudentKey,
-	CASE WHEN B.BadgeName = 'Safeguarding' THEN BV.BadgeValueName ELSE '-' END AS SafeguardingFlag,
-	CASE WHEN B.BadgeName = 'Welfare' THEN BV.BadgeValueName ELSE '-' END AS WelfareFlag,
-	CASE WHEN B.BadgeName = 'Attendance' THEN BV.BadgeValueName ELSE '-' END AS AttendanceFlag,
-
-	FROM  {{ ref('stg_promonitor__student') }} AS S
-	LEFT JOIN {{ ref('stg_promonitor__learnerinformation_badgestudent') }} AS BS ON S.PMStudentID = BS.PMStudentID
-    LEFT JOIN {{ ref('stg_promonitor__learnerinformation_badge') }} AS B ON B.BadgeID = BS.BadgeID
-    LEFT JOIN {{ ref('stg_promonitor__learnerinformation_badgevalue') }} AS BV ON BV.BadgeValueID = BS.BadgeValueID
-
-    WHERE COALESCE(BV.IsObsolete, 0) = 0 AND B.BadgeName IN ('Safeguarding', 'Welfare', 'Attendance')
-	GROUP BY TRIM(S.AcademicYearID), TRIM(S.StudentID)
+	WITH RankedBadges AS (
+		SELECT 
+		{{ dbt_utils.generate_surrogate_key(['TRIM(S.AcademicYearID)', 'TRIM(S.StudentID)'] ) }} AS StudentKey,
+		B.BadgeName,
+		BV.BadgeValueName,
+		ROW_NUMBER() OVER (PARTITION BY S.AcademicYearID, S.StudentID, B.BadgeName ORDER BY BS.AuditDateCreated DESC) AS rn
+		FROM  {{ ref('stg_promonitor__student') }} AS S
+		LEFT JOIN {{ ref('stg_promonitor__learnerinformation_badgestudent') }} AS BS ON S.PMStudentID = BS.PMStudentID
+		LEFT JOIN {{ ref('stg_promonitor__learnerinformation_badge') }} AS B ON B.BadgeID = BS.BadgeID
+		LEFT JOIN {{ ref('stg_promonitor__learnerinformation_badgevalue') }} AS BV ON BV.BadgeValueID = BS.BadgeValueID
+		WHERE COALESCE(BV.IsObsolete, 0) = 0 AND B.BadgeName IN ('Safeguarding', 'Welfare', 'Attendance')
+	)
+	SELECT
+		StudentKey,
+		CASE WHEN DISTINCT B.BadgeName = 'Safeguarding' THEN BV.BadgeValueName ELSE '-' END AS SafeguardingFlag,
+		CASE WHEN DISTINCT B.BadgeName = 'Welfare' THEN BV.BadgeValueName ELSE '-' END AS WelfareFlag,
+		CASE WHEN DISTINCT B.BadgeName = 'Attendance' THEN BV.BadgeValueName ELSE '-' END AS AttendanceFlag
+	FROM RankedBadges
+	WHERE rn=1
+	GROUP BY StudentKey
  )
 	SELECT 
           ps.StudentKey AS "StudentKey",
