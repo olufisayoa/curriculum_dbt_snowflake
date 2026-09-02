@@ -108,7 +108,22 @@ Comment_Agg AS (
 	 SUM(CASE WHEN "IncludesComment" = TRUE THEN 1 ELSE 0 END) AS TotalComments
 	 FROM {{ ref('fct_learner_comments') }}
 	 GROUP BY "StudentKey"
-)
+),
+Badges AS (
+	SELECT 
+	{{ dbt_utils.generate_surrogate_key(['TRIM(S.AcademicYearID)', 'TRIM(S.StudentID)'] ) }} AS StudentKey,
+	CASE WHEN B.BadgeName = 'Safeguarding' THEN BV.BadgeValueName ELSE '-' END AS SafeguardingFlag,
+	CASE WHEN B.BadgeName = 'Welfare' THEN BV.BadgeValueName ELSE '-' END AS WelfareFlag,
+	CASE WHEN B.BadgeName = 'Attendance' THEN BV.BadgeValueName ELSE '-' END AS AttendanceFlag,
+
+	FROM  {{ ref('stg_promonitor__student') }} AS S
+	LEFT JOIN {{ ref('stg_promonitor__learnerinformation_badgestudent') }} AS BS ON S.PMStudentID = BS.PMStudentID
+    LEFT JOIN {{ ref('stg_promonitor__learnerinformation_badge') }} AS B ON B.BadgeID = BS.BadgeID
+    LEFT JOIN {{ ref('stg_promonitor__learnerinformation_badgevalue') }} AS BV ON BV.BadgeValueID = BS.BadgeValueID
+
+    WHERE COALESCE(BV.IsObsolete, 0) = 0 AND B.Name IN ('Safeguarding', 'Welfare', 'Attendance')
+	GROUP BY TRIM(S.AcademicYearID), TRIM(S.StudentID)
+ )
 	SELECT 
           ps.StudentKey AS "StudentKey",
           CAST(COALESCE(TRIM(ps.AcademicYearID), '00/00') AS VARCHAR) AS "AcademicYear",
@@ -135,6 +150,9 @@ Comment_Agg AS (
 		  CAST(COALESCE(ps.RiskAssessment,'-') AS VARCHAR) AS "RiskAssessment",
 		  CAST(COALESCE(ps.Safeguarding,'No') AS VARCHAR) AS "Safeguarding",
 		  COALESCE(ca.TotalComments, 0) AS "TotalComments",
+		  CAST(COALESCE(b.SafeguardingFlag, '-') AS VARCHAR) AS "SafeguardingFlag",
+		  CAST(COALESCE(b.WelfareFlag, '-') AS VARCHAR) AS "WelfareFlag",
+		  CAST(COALESCE(b.AttendanceFlag, '-') AS VARCHAR) AS "AttendanceFlag",
 		  CAST(COALESCE(ps.StudentPhotoThumbnail,'-') AS VARCHAR) AS "StudentPhotoThumbnail",
 		  CAST(COALESCE(ps.StudentProfileUrl, '-') AS VARCHAR) AS "StudentProfileUrl"
 	FROM Prosolution_Student AS ps
@@ -142,3 +160,5 @@ Comment_Agg AS (
 	 ON TRIM(ps.AcademicYearID) = TRIM(_os.AcademicYearID) AND TRIM(ps.StudentID) = TRIM(_os.StudentRef)
 	LEFT JOIN Comment_Agg AS ca
 	 ON ps.StudentKey = ca."StudentKey"
+	LEFT JOIN Badges AS b
+	 ON ps.StudentKey = b.StudentKey
