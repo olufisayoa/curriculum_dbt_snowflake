@@ -124,9 +124,9 @@ Badges AS (
 	)
 	SELECT
 		StudentKey,
-		CASE WHEN DISTINCT B.BadgeName = 'Safeguarding' THEN BV.BadgeValueName ELSE '-' END AS SafeguardingFlag,
-		CASE WHEN DISTINCT B.BadgeName = 'Welfare' THEN BV.BadgeValueName ELSE '-' END AS WelfareFlag,
-		CASE WHEN DISTINCT B.BadgeName = 'Attendance' THEN BV.BadgeValueName ELSE '-' END AS AttendanceFlag
+		CASE WHEN B.BadgeName = 'Safeguarding' THEN BV.BadgeValueName ELSE '-' END AS SafeguardingFlag,
+		CASE WHEN B.BadgeName = 'Welfare' THEN BV.BadgeValueName ELSE '-' END AS WelfareFlag,
+		CASE WHEN B.BadgeName = 'Attendance' THEN BV.BadgeValueName ELSE '-' END AS AttendanceFlag
 	FROM RankedBadges
 	WHERE rn=1
 	GROUP BY StudentKey
