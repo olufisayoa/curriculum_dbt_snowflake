@@ -123,13 +123,13 @@ Badges AS (
 		WHERE COALESCE(BV.IsObsolete, 0) = 0 AND B.BadgeName IN ('Safeguarding', 'Welfare', 'Attendance')
 	)
 	SELECT
-		StudentKey,
-		CASE WHEN B.BadgeName = 'Safeguarding' THEN BV.BadgeValueName ELSE '-' END AS SafeguardingFlag,
-		CASE WHEN B.BadgeName = 'Welfare' THEN BV.BadgeValueName ELSE '-' END AS WelfareFlag,
-		CASE WHEN B.BadgeName = 'Attendance' THEN BV.BadgeValueName ELSE '-' END AS AttendanceFlag
-	FROM RankedBadges
-	WHERE rn=1
-	GROUP BY StudentKey
+		RB.StudentKey,
+		CASE WHEN RB.BadgeName = 'Safeguarding' THEN RB.BadgeValueName ELSE '-' END AS SafeguardingFlag,
+		CASE WHEN RB.BadgeName = 'Welfare' THEN RB.BadgeValueName ELSE '-' END AS WelfareFlag,
+		CASE WHEN RB.BadgeName = 'Attendance' THEN RB.BadgeValueName ELSE '-' END AS AttendanceFlag
+	FROM RankedBadges RB
+	WHERE RB.rn=1
+	GROUP BY RB.StudentKey
  )
 	SELECT 
           ps.StudentKey AS "StudentKey",
