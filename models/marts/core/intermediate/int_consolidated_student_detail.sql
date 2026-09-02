@@ -130,6 +130,14 @@ Badges AS (
 	FROM RankedBadges RB
 	WHERE RB.rn=1
 	GROUP BY RB.StudentKey
+ ),
+ Progression AS (
+	SELECT 
+	{{ dbt_utils.generate_surrogate_key(['P.LearnerProgressionID'] ) }} AS LearnerProgressionKey,
+	{{ dbt_utils.generate_surrogate_key(['TRIM(S.AcademicYearID)','TRIM(S.StudentID)']) }} AS StudentKey,
+	P.Information1 AS Progression
+	FROM {{ ref('stg_promonitor__learnerinformation_progression') }} P
+	LEFT JOIN {{ ref('stg_promonitor__student') }} S ON P.PMStudentID=S.PMStudentID
  )
 	SELECT 
           ps.StudentKey AS "StudentKey",
@@ -157,6 +165,7 @@ Badges AS (
 		  CAST(COALESCE(ps.RiskAssessment,'-') AS VARCHAR) AS "RiskAssessment",
 		  CAST(COALESCE(ps.Safeguarding,'No') AS VARCHAR) AS "Safeguarding",
 		  COALESCE(ca.TotalComments, 0) AS "TotalComments",
+		  COALESCE(p.Progression, '-') AS "Progression",
 		  CAST(COALESCE(b.SafeguardingFlag, '-') AS VARCHAR) AS "SafeguardingFlag",
 		  CAST(COALESCE(b.WelfareFlag, '-') AS VARCHAR) AS "WelfareFlag",
 		  CAST(COALESCE(b.AttendanceFlag, '-') AS VARCHAR) AS "AttendanceFlag",
@@ -169,3 +178,5 @@ Badges AS (
 	 ON ps.StudentKey = ca."StudentKey"
 	LEFT JOIN Badges AS b
 	 ON ps.StudentKey = b.StudentKey
+	 LEFT JOIN Progression AS p
+	 ON ps.StudentKey = p.StudentKey
