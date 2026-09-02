@@ -133,7 +133,6 @@ Badges AS (
  ),
  Progression AS (
 	SELECT 
-	{{ dbt_utils.generate_surrogate_key(['P.LearnerProgressionID'] ) }} AS LearnerProgressionKey,
 	{{ dbt_utils.generate_surrogate_key(['TRIM(S.AcademicYearID)','TRIM(S.StudentID)']) }} AS StudentKey,
 	P.Information1 AS Progression
 	FROM {{ ref('stg_promonitor__learnerinformation_progression') }} P
