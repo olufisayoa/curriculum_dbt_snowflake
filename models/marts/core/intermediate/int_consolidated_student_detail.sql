@@ -121,7 +121,7 @@ Badges AS (
     LEFT JOIN {{ ref('stg_promonitor__learnerinformation_badge') }} AS B ON B.BadgeID = BS.BadgeID
     LEFT JOIN {{ ref('stg_promonitor__learnerinformation_badgevalue') }} AS BV ON BV.BadgeValueID = BS.BadgeValueID
 
-    WHERE COALESCE(BV.IsObsolete, 0) = 0 AND B.Name IN ('Safeguarding', 'Welfare', 'Attendance')
+    WHERE COALESCE(BV.IsObsolete, 0) = 0 AND B.BadgeName IN ('Safeguarding', 'Welfare', 'Attendance')
 	GROUP BY TRIM(S.AcademicYearID), TRIM(S.StudentID)
  )
 	SELECT 
