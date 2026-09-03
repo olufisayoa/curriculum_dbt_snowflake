@@ -164,6 +164,10 @@ Badges AS (
 		  CAST(COALESCE(ps.RiskAssessment,'-') AS VARCHAR) AS "RiskAssessment",
 		  CAST(COALESCE(ps.Safeguarding,'No') AS VARCHAR) AS "Safeguarding",
 		  COALESCE(ca.TotalComments, 0) AS "TotalComments",
+		  CASE 
+		  	WHEN COALESCE(ca.TotalComments, 0) = 0 THEN 0
+		  	ELSE -1 * POWER(COALESCE(ca.TotalComments, 0), 1.5)
+		  END AS "CommentsScore",
 		  COALESCE(p.Progression, '-') AS "Progression",
 		  CAST(COALESCE(b.SafeguardingFlag, '-') AS VARCHAR) AS "SafeguardingFlag",
 		  CASE WHEN b.SafeguardingFlag = 'Child In Our Care' THEN -4 
