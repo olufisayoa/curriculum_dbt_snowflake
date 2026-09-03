@@ -171,12 +171,12 @@ Badges AS (
 			WHEN b.SafeguardingFlag = 'Care Experienced' THEN -2
     		WHEN b.SafeguardingFlag = 'Safeguarding Closed' THEN 0
     		ELSE 0 
-			END AS SafeguardingScore,
+			END AS "SafeguardingScore",
 		  CAST(COALESCE(b.WelfareFlag, '-') AS VARCHAR) AS "WelfareFlag",
 		  CASE WHEN b.WelfareFlag = 'Know to Welfare' THEN -1
 		  	WHEN b.WelfareFlag = 'Welfare Closed' THEN 0
 			ELSE 0 
-		  END AS WelfareScore,
+		  END AS "WelfareScore",
 		  CAST(COALESCE(b.AttendanceFlag, '-') AS VARCHAR) AS "AttendanceFlag",
 		  CAST(COALESCE(ps.StudentPhotoThumbnail,'-') AS VARCHAR) AS "StudentPhotoThumbnail",
 		  CAST(COALESCE(ps.StudentProfileUrl, '-') AS VARCHAR) AS "StudentProfileUrl"
