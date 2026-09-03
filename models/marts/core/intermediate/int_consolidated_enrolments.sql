@@ -173,7 +173,15 @@ SELECT
     E.*,
     CAST(COALESCE(A.TotalPresent, 0)  AS INT)           AS "TotalPresent",
     CAST(COALESCE(A.TotalRequired, 0) AS INT)           AS "TotalRequired",
-    CAST(COALESCE(A.AttendanceRate, 0) AS DECIMAL(5,4)) AS "AttendanceRate"
+    CAST(COALESCE(A.AttendanceRate, 0) AS DECIMAL(5,4)) AS "AttendanceRate",
+    CASE 
+        WHEN COALESCE(A.TotalRequired, 0) = 0 THEN NULL
+        WHEN A.AttendanceRate >= 0.95 THEN 0
+        WHEN A.AttendanceRate >= 0.90 THEN -1
+        WHEN A.AttendanceRate >= 0.85 THEN -2
+        WHEN A.AttendanceRate >= 0.80 THEN -3
+        ELSE -4
+    END AS "AttendanceScore"
 FROM Enrolments E
 LEFT JOIN Attendance_Aggregated A
     ON E."EnrolmentKey" = A.EnrolmentKey
