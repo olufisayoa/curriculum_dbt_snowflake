@@ -1,7 +1,7 @@
 SELECT
 "EnrolmentKey",
-{{ dbt_utils.generate_surrogate_key(['TRIM(AcademicYear)']) }} AS "AcademicYearKey",
-{{ dbt_utils.generate_surrogate_key(['TRIM(AcademicYear)', 'TRIM(StudentID)']) }} AS "StudentKey",
+{{ dbt_utils.generate_surrogate_key(['TRIM("AcademicYear")']) }} AS "AcademicYearKey",
+{{ dbt_utils.generate_surrogate_key(['TRIM("AcademicYear")', 'TRIM("StudentID")']) }} AS "StudentKey",
 "TotalPresent",
 "TotalRequired",
 "AttendanceRate" AS "Attendance",
