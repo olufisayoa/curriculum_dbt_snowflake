@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: dim_student
+    columns:
+      - name: '"StudentKey"'
+        description: Surrogate key for the student
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_enrolment
+    columns:
+      - name: '"EnrolmentKey"'
+        description: Surrogate key for the enrolment
+        tests:
+          - unique
+          - not_null
+
+  - name: fct_learner_comments
+    columns:
+      - name: '"ActionPlanKey"'
+        description: Surrogate key for the action plan
+        tests:
+          - unique
+          - not_null
