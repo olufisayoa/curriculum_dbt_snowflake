@@ -123,6 +123,7 @@ Behaviour_Stage AS (
 	    RB.StudentKey,
 		MAX(RB."MeetingTypeName") AS BehaviourManagementStage
 	FROM RankedBehaviour RB
+	GROUP BY RB.StudentKey
 	WHERE RB.rn=1
 ),
 Badges AS (
