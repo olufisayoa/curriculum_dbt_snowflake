@@ -104,10 +104,10 @@ WITH Prosolution_Student AS (
 ,
 Comment_Agg AS (
 	SELECT 
-	 "StudentKey",
-	 SUM(CASE WHEN "IncludesComment" = TRUE THEN 1 ELSE 0 END) AS TotalComments
+	 StudentKey,
+	 SUM(CASE WHEN IncludesComment = TRUE THEN 1 ELSE 0 END) AS TotalComments
 	 FROM {{ ref('int_learner_comments') }}
-	 GROUP BY "StudentKey"
+	 GROUP BY StudentKey
 ),
 Behaviour_Stage AS (
 	WITH RankedBehaviour AS (
