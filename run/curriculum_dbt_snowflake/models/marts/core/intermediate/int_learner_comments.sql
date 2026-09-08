@@ -1,4 +1,12 @@
-SELECT 
+
+  
+    
+
+create or replace transient table CURRICULUM_DB.int.int_learner_comments
+    
+    
+    
+    as (SELECT 
     md5(cast(coalesce(cast(ActionPlan.ActionPlanID as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS ActionPlanKey,
     md5(cast(coalesce(cast(TRIM(vStudent.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(vStudent.StudentID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS StudentKey,
     md5(cast(coalesce(cast(MT.MeetingTypeID as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS MeetingTypeKey,
@@ -28,3 +36,8 @@ LEFT JOIN CURRICULUM_DB.stg.stg_promonitor__student AS vStudent
     ON ActionPlan.PMStudentID = vStudent.PMStudentID 
 LEFT JOIN CURRICULUM_DB.stg.stg_promonitor__learnerinformation_actionplan_actiontype AS ActionType
     ON ActionPlan.ActionTypeID = ActionType.ActionTypeID
+    )
+;
+
+
+  
