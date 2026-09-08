@@ -106,9 +106,25 @@ Comment_Agg AS (
 	SELECT 
 	 "StudentKey",
 	 SUM(CASE WHEN "IncludesComment" = TRUE THEN 1 ELSE 0 END) AS TotalComments
-	 FROM {{ ref('fct_learner_comments') }}
+	 FROM {{ ref('int_learner_comments') }}
 	 GROUP BY "StudentKey"
 ),
+Behaviour_Stage AS (
+	WITH RankedBehaviour AS (
+		SELECT 
+		C."StudentKey",
+		MT."MeetingTypeName",
+		ROW_NUMBER() OVER (PARTITION BY C."StudentKey" ORDER BY C."DateKey" DESC) AS rn
+		FROM {{ ref('int_learner_comments') }} C 
+		LEFT JOIN {{ ref('dim_meetingtype') }} MT ON C.MeetingTypeKey = MT.MeetingTypeKey
+		WHERE MT."MeetingCategoryName" = 'Behaviour Management'
+	)
+	SELECT
+	    RB."StudentKey",
+		MAX(RB."MeetingTypeName") AS BehaviourManagementStage
+	FROM RankedBehaviour RB
+	WHERE RB.rn=1
+)
 Badges AS (
 	WITH RankedBadges AS (
 		SELECT 
@@ -182,6 +198,16 @@ Badges AS (
 			ELSE 0 
 		  END AS "WelfareScore",
 		  CAST(COALESCE(b.AttendanceFlag, '-') AS VARCHAR) AS "AttendanceFlag",
+		  CAST(COALESCE(bs.BehaviourManagementStage, '-') AS VARCHAR) AS "BehaviourManagementStage",
+		  CASE WHEN bs.BehaviourManagementStage = '0 - Partnership Meeting' THEN -5
+		       WHEN bs.BehaviourManagementStage = '1 - Verbal Warning' THEN -10
+		  	   WHEN bs.BehaviourManagementStage = '2 - Written Warning' THEN -20
+			   WHEN bs.BehaviourManagementStage = 'Stage 2 - Written Warning Review' THEN -25
+			   WHEN bs.BehaviourManagementStage = '3 - Final Written Warning' THEN -30
+			   WHEN bs.BehaviourManagementStage = 'Stage 3 - Final Written Warning Review' THEN -35
+			   WHEN bs.BehaviourManagementStage = '4 - Gross Misconduct' THEN -40
+			   ELSE 0
+		  END AS "BehaviourScore",
 		  CAST(COALESCE(ps.StudentPhotoThumbnail,'-') AS VARCHAR) AS "StudentPhotoThumbnail",
 		  CAST(COALESCE(ps.StudentProfileUrl, '-') AS VARCHAR) AS "StudentProfileUrl"
 	FROM Prosolution_Student AS ps
@@ -191,5 +217,7 @@ Badges AS (
 	 ON ps.StudentKey = ca."StudentKey"
 	LEFT JOIN Badges AS b
 	 ON ps.StudentKey = b.StudentKey
-	 LEFT JOIN Progression AS p
+	LEFT JOIN Progression AS p
 	 ON ps.StudentKey = p.StudentKey
+	LEFT JOIN Behaviour_Stage AS bs
+	 ON ps.StudentKey = bs."StudentKey"
