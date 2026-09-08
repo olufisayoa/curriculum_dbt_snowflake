@@ -124,7 +124,7 @@ Behaviour_Stage AS (
 		MAX(RB."MeetingTypeName") AS BehaviourManagementStage
 	FROM RankedBehaviour RB
 	WHERE RB.rn=1
-)
+),
 Badges AS (
 	WITH RankedBadges AS (
 		SELECT 
