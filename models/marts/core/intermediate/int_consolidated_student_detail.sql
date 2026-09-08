@@ -114,7 +114,7 @@ Behaviour_Stage AS (
 		SELECT 
 		C.StudentKey,
 		MT."MeetingTypeName",
-		ROW_NUMBER() OVER (PARTITION BY C.StudentKey ORDER BY C.DateKey DESC) AS rn
+		ROW_NUMBER() OVER (PARTITION BY C.StudentKey, MT."MeetingTypeName" ORDER BY C.DateKey DESC) AS rn
 		FROM {{ ref('int_learner_comments') }} C 
 		LEFT JOIN {{ ref('dim_meetingtype') }} MT ON C.MeetingTypeKey = MT."MeetingTypeKey"
 		WHERE MT."MeetingCategoryName" = 'Behaviour Management'
