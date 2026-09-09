@@ -1,1 +1,25 @@
-select * from {{ ref('int_consolidated_enrolments') }}
+select 
+"EnrolmentKey",
+"AcademicYear",
+"StudentID",
+"CourseCode",
+"CourseName",
+"StartDate",
+"PlannedEndDate",
+"ActualEndDate",
+"CompletionStatus",
+"NotionalNVQLevel",
+"WDNumDaysAfterStart",
+"AgeOn31Aug",
+"VAType",
+"Cohort",
+"QualificationLevel",
+"StudyYear",
+"EnrolmentType",
+"Outcome",
+"SubjectType"
+"TotalPresent",
+"TotalRequired",
+"AttendanceRate",
+"AttendanceScore"
+from {{ ref('int_consolidated_enrolments') }}
