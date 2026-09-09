@@ -1,4 +1,12 @@
-WITH prosolution_enrolments AS (
+
+  
+    
+
+create or replace transient table CURRICULUM_DB.int.int_risk_register
+    
+    
+    
+    as (WITH prosolution_enrolments AS (
     SELECT
     md5(cast(coalesce(cast(TRIM(o.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(sd.RefNo) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(o.Code) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(o.QualID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(CAST(e.StartDate AS DATE) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(CAST(e.CompletionStatusID AS INTEGER) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS EnrolmentKey,
     md5(cast(coalesce(cast(TRIM(o.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS AcademicYearKey,
@@ -158,3 +166,8 @@ SELECT
       END AS DECIMAL(19,2)) AS "Value Added"
 FROM consolidated_enrolments e
 CROSS JOIN unpivot_helper h
+    )
+;
+
+
+  
