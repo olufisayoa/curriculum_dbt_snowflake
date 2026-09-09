@@ -100,7 +100,7 @@ consolidated_enrolments AS (
         CAST(CASE
           WHEN b.Cohort IN ('A level', 'Academic') THEN b.QOEPoints_GCSE_College2dp
           ELSE b.QOEPoints_College2dp
-       END AS DECIMAL(19,2)) AS PriorAttainmentPoint
+       END AS DECIMAL(19,2)) AS PriorAttainmentPoint,
         b.MostRecentCollegeEstGrade,
         b.MostRecentCollegeEstGradeNo,
         b.MostRecentCollegeEstGradeInflated,
