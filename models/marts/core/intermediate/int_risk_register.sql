@@ -128,7 +128,7 @@ consolidated_enrolments AS (
         b.EnrolmentGradeVAScore_vs_MostRecent2dp
     FROM prosolution_enrolments p
     LEFT JOIN onegrade_enrolments b 
-        ON p."EnrolmentKey" = b.EnrolmentKey
+        ON p.EnrolmentKey = b.EnrolmentKey
 ),
 unpivot_helper AS (
     SELECT 1 AS MonitoringPointID UNION ALL
