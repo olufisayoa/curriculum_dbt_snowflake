@@ -113,19 +113,18 @@ Behaviour_Stage AS (
 	WITH RankedBehaviour AS (
 		SELECT 
 		C.StudentKey,
+		C.DateKey,
 		MT."MeetingTypeName",
-		ROW_NUMBER() OVER (PARTITION BY C.StudentKey, MT."MeetingTypeName" ORDER BY C.DateKey DESC) AS rn
+		ROW_NUMBER() OVER (PARTITION BY C.StudentKey ORDER BY C.DateKey DESC) AS rn
 		FROM {{ ref('int_learner_comments') }} C 
 		LEFT JOIN {{ ref('dim_meetingtype') }} MT ON C.MeetingTypeKey = MT."MeetingTypeKey"
 		WHERE MT."MeetingCategoryName" = 'Behaviour Management'
 	)
 	SELECT
 	    RB.StudentKey,
-		MAX(RB."MeetingTypeName") AS BehaviourManagementStage
+		RB."MeetingTypeName" AS BehaviourManagementStage
 	FROM RankedBehaviour RB
-	WHERE RB.rn=1
-	GROUP BY RB.StudentKey
-	
+	WHERE RB."MeetingTypeName" IS NOT NULL AND RB.rn=1
 ),
 Badges AS (
 	WITH RankedBadges AS (
