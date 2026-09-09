@@ -2,22 +2,21 @@ WITH prosolution_enrolments AS (
     SELECT
     {{ dbt_utils.generate_surrogate_key([
     'TRIM(o.AcademicYearID)',   
-    'TRIM(e.StudentRef)',
-    'TRIM(e.CourseCode)',   
-    'TRIM(e.LearningAimRef)',            
+    'TRIM(sd.RefNo)',
+    'TRIM(o.Code)',   
+    'TRIM(o.QualID)',            
     'CAST(e.StartDate AS DATE)',      
     'CAST(e.CompletionStatusID AS INTEGER)'                            
     ]) }} AS EnrolmentKey,
     {{ dbt_utils.generate_surrogate_key(['TRIM(o.AcademicYearID)'])  }} AS AcademicYearKey,
     {{ dbt_utils.generate_surrogate_key(['TRIM(s.SiteID)']) }} AS SiteKey,
     {{ dbt_utils.generate_surrogate_key(['TRIM(o.SID)']) }} AS CollegeLevelKey,
-    {{ dbt_utils.generate_surrogate_key(['TRIM(o.AcademicYearID)', 'TRIM(e.StudentRef)']) }} AS StudentKey,
+    {{ dbt_utils.generate_surrogate_key(['TRIM(sd.AcademicYearID)', 'TRIM(sd.RefNo)']) }} AS StudentKey,
     {{ dbt_utils.generate_surrogate_key(['e.OfferingID']) }} AS CourseKey
     FROM {{ ref('stg_prosolution__enrolment') }} e
-    LEFT JOIN {{ ref('stg_prosolution__academicyear') }} ay ON TRIM(ay.AcademicYearID) = TRIM(e.AcademicYearID)
-    LEFT JOIN {{ ref('stg_prosolution__offering') }} AS o 
-        ON o.OfferingID = e.ProSolutionOfferingID
-        AND o.AcademicYearID = e.AcademicYearID
+    INNER JOIN {{ ref('stg_prosolution__offering') }} AS o ON o.OfferingID = e.OfferingID
+    INNER JOIN {{ ref('stg_prosolution__student') }} sd   ON e.StudentDetailID = sd.StudentDetailID
+    LEFT JOIN {{ ref('stg_prosolution__academicyear') }} ay ON TRIM(ay.AcademicYearID) = TRIM(o.AcademicYearID)
     LEFT JOIN {{ ref('stg_prosolution__site') }} AS s 
         ON s.SiteID = o.SiteID
     WHERE ay.Number BETWEEN YEAR(CURRENT_DATE()) - 2 AND YEAR(CURRENT_DATE())
