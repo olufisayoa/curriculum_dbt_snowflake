@@ -150,7 +150,8 @@ SELECT
 	CAST(COALESCE(PM.Outcome, '-') AS NVARCHAR(100)) 
         AS "Outcome",
     CAST(COALESCE(EM.EngMatType, 'Other') AS NVARCHAR(8))
-        AS "SubjectType"
+        AS "SubjectType",
+    PM.ProSolutionOfferingID
 
 FROM ProSolution_Master PM
 LEFT JOIN OneGrade_Enrichment_Deduped OE
