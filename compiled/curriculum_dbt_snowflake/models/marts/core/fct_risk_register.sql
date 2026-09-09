@@ -1,0 +1,1 @@
+SELECT * FROM CURRICULUM_DB.int.int_risk_register

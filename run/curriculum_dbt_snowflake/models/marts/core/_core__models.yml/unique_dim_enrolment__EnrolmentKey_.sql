@@ -12,12 +12,12 @@
     
 
 select
-    "StudentKey" as unique_field,
+    "EnrolmentKey" as unique_field,
     count(*) as n_records
 
-from CURRICULUM_DB.core.dim_student
-where "StudentKey" is not null
-group by "StudentKey"
+from CURRICULUM_DB.core.dim_enrolment
+where "EnrolmentKey" is not null
+group by "EnrolmentKey"
 having count(*) > 1
 
 

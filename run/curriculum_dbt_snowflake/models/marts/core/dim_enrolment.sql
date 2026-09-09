@@ -1,4 +1,12 @@
-select 
+
+  
+    
+
+create or replace transient table CURRICULUM_DB.core.dim_enrolment
+    
+    
+    
+    as (select 
 "EnrolmentKey",
 "AcademicYear",
 "StudentID",
@@ -23,3 +31,8 @@ select
 "AttendanceRate",
 "AttendanceScore"
 from CURRICULUM_DB.int.int_consolidated_enrolments
+    )
+;
+
+
+  

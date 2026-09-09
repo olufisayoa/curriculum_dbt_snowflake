@@ -13,9 +13,9 @@
 
 
 
-select "StudentKey"
-from CURRICULUM_DB.core.dim_student
-where "StudentKey" is null
+select "EnrolmentKey"
+from CURRICULUM_DB.core.dim_enrolment
+where "EnrolmentKey" is null
 
 
 
