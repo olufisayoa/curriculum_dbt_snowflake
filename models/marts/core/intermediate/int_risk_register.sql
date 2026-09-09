@@ -94,6 +94,7 @@ consolidated_enrolments AS (
         COALESCE(p.StudentKey, b.StudentKey) AS StudentKey,
         COALESCE(p.CourseKey, b.CourseKey) AS CourseKey,
         COALESCE(p.SiteKey, b.SiteKey) AS SiteKey,
+        COALESCE(p.AcademicYearKey, b.AcademicYearKey) AS AcademicYearKey,
         b.QOEPoints_GCSE_College2dp,
         b.QOEPoints_College2dp,
         CAST(CASE
@@ -143,6 +144,7 @@ SELECT
     e.CollegeLevelKey AS "CollegeLevelKey",
     e.CourseKey AS "CourseKey",
     e.SiteKey AS "SiteKey",
+    e.AcademicYearKey AS "AcademicYearKey",
     e.PriorAttainmentPoint AS "PriorAttainmentPoint",
     CAST(e.MostRecentCollegeEstGrade AS VARCHAR(50)) AS "MTG",
     CAST(e.MostRecentCollegeEstGradeInflated AS VARCHAR(50)) AS "ATG",
