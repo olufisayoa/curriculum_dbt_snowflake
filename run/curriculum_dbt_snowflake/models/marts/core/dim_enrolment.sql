@@ -25,7 +25,7 @@ create or replace transient table CURRICULUM_DB.core.dim_enrolment
 "StudyYear",
 "EnrolmentType",
 "Outcome",
-"SubjectType"
+"SubjectType",
 "TotalPresent",
 "TotalRequired",
 "AttendanceRate",
