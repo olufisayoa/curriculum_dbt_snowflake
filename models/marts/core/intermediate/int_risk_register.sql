@@ -8,7 +8,7 @@ WITH prosolution_enrolments AS (
     'CAST(e.StartDate AS DATE)',      
     'CAST(e.CompletionStatusID AS INTEGER)'                            
     ]) }} AS EnrolmentKey,
-    {{ dbt_utils.genrate_surrogate_key(['TRIM(o.AcademicYearID)'])  }} AS AcademicYearKey,
+    {{ dbt_utils.generate_surrogate_key(['TRIM(o.AcademicYearID)'])  }} AS AcademicYearKey,
     {{ dbt_utils.generate_surrogate_key(['TRIM(s.SiteID)']) }} AS SiteKey,
     {{ dbt_utils.generate_surrogate_key(['TRIM(o.SID)']) }} AS CollegeLevelKey,
     {{ dbt_utils.generate_surrogate_key(['TRIM(o.AcademicYearID)', 'TRIM(e.StudentRef)']) }} AS StudentKey,
