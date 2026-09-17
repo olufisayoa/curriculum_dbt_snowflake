@@ -6,7 +6,7 @@ create or replace transient table CURRICULUM_DB.core.bridge_student_characterist
     
     
     
-    as (SELECT "StudentKey", 'Gender' AS Category, "Gender" AS Value FROM CURRICULUM_DB.core.dim_student
+    as (SELECT "StudentKey", 'Gender' AS "Category", "Gender" AS "Value" FROM CURRICULUM_DB.core.dim_student
 UNION ALL
 SELECT "StudentKey", 'SEND', "SEND" FROM CURRICULUM_DB.core.dim_student
 UNION ALL
