@@ -1,4 +1,4 @@
-SELECT "StudentKey", 'Gender' AS Category, "Gender" AS Value FROM {{ ref('dim_student') }}
+SELECT "StudentKey", 'Gender' AS "Category", "Gender" AS "Value" FROM {{ ref('dim_student') }}
 UNION ALL
 SELECT "StudentKey", 'SEND', "SEND" FROM {{ ref('dim_student') }}
 UNION ALL
