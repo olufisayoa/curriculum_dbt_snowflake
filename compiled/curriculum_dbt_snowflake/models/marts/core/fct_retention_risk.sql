@@ -1,24 +1,27 @@
 WITH progress AS (
     SELECT
+        "AcademicYearKey",
         "StudentKey",
         "MPKey",
         AVG("Value Added") AS avg_value_added
     FROM CURRICULUM_DB.int.int_risk_register
-    GROUP BY "StudentKey", "MPKey"
+    GROUP BY "AcademicYearKey", "StudentKey", "MPKey"
 ),
 progress_agg AS (
     SELECT
+        "AcademicYearKey",
         "StudentKey", 
         "MPKey", 
         avg_value_added,
         CASE 
-            WHEN avg_value_added < 0 THEN -15 
+            WHEN avg_value_added < 0.0 THEN -15 
             ELSE 0
         END AS "ProgressScore"
     FROM progress
 ),
 combined AS (
     SELECT
+        pa."AcademicYearKey",
         pa."StudentKey", 
         pa."MPKey", 
         pa."ProgressScore",
