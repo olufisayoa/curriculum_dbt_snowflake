@@ -109,6 +109,18 @@ Comment_Agg AS (
 	 FROM {{ ref('int_learner_comments') }}
 	 GROUP BY StudentKey
 ),
+Attendance_Agg AS (
+	SELECT
+        StudentKey,
+        SUM(MrkPresent) AS TotalPresent,
+        SUM(MrkRequired) AS TotalRequired,
+        CASE 
+            WHEN SUM(MrkRequired) = 0 THEN NULL
+            ELSE SUM(MrkPresent) / SUM(MrkRequired)
+        END AS OverallAttendance
+    FROM {{ ref('int_attendance') }}
+    GROUP BY StudentKey
+),
 Behaviour_Stage AS (
 	WITH RankedBehaviour AS (
 		SELECT 
@@ -209,6 +221,12 @@ Badges AS (
 			   WHEN bs.BehaviourManagementStage = '4 - Gross Misconduct' THEN -40
 			   ELSE 0
 		  END AS "BehaviourScore",
+		  aa.OverallAttendance AS "Attendance YTD",
+		  CASE 
+		  	WHEN aa.OverallAttendance IS NULL THEN 0
+		  	WHEN aa.OverallAttendance >= 0.92 THEN 0
+		  	ELSE -15
+		  END AS "AttendanceScore",
 		  CAST(COALESCE(ps.StudentPhotoThumbnail,'-') AS VARCHAR) AS "StudentPhotoThumbnail",
 		  CAST(COALESCE(ps.StudentProfileUrl, '-') AS VARCHAR) AS "StudentProfileUrl"
 	FROM Prosolution_Student AS ps
@@ -222,3 +240,5 @@ Badges AS (
 	 ON ps.StudentKey = p.StudentKey
 	LEFT JOIN Behaviour_Stage AS bs
 	 ON ps.StudentKey = bs.StudentKey
+	LEFT JOIN Attendance_Agg AS aa
+	 ON ps.StudentKey = aa.StudentKey
