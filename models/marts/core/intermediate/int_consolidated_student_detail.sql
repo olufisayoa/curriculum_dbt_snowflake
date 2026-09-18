@@ -120,7 +120,7 @@ Attendance_Agg AS (
         END AS OverallAttendance
     FROM {{ ref('int_attendance') }}
     GROUP BY "StudentKey"
-)
+),
 Behaviour_Stage AS (
 	WITH RankedBehaviour AS (
 		SELECT 
