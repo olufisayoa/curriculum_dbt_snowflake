@@ -119,7 +119,7 @@ Attendance_Agg AS (
             ELSE SUM("MrkPresent") / SUM("MrkRequired")
         END AS OverallAttendance
     FROM {{ ref('int_attendance') }}
-    GROUP BY "StudentKey"
+    GROUP BY StudentKey
 ),
 Behaviour_Stage AS (
 	WITH RankedBehaviour AS (
