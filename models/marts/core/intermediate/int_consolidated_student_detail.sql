@@ -111,12 +111,12 @@ Comment_Agg AS (
 ),
 Attendance_Agg AS (
 	SELECT
-        "StudentKey" AS StudentKey,
-        SUM("MrkPresent") AS TotalPresent,
-        SUM("MrkRequired") AS TotalRequired,
+        StudentKey,
+        SUM(MrkPresent) AS TotalPresent,
+        SUM(MrkRequired) AS TotalRequired,
         CASE 
-            WHEN SUM("MrkRequired") = 0 THEN NULL
-            ELSE SUM("MrkPresent") / SUM("MrkRequired")
+            WHEN SUM(MrkRequired) = 0 THEN NULL
+            ELSE SUM(MrkPresent) / SUM(MrkRequired)
         END AS OverallAttendance
     FROM {{ ref('int_attendance') }}
     GROUP BY StudentKey
