@@ -1,4 +1,4 @@
-progress AS (
+WITH progress AS (
     SELECT
         "StudentKey",
         "MPKey",
