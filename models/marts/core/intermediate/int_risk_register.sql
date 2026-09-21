@@ -12,9 +12,10 @@ WITH prosolution_enrolments AS (
     {{ dbt_utils.generate_surrogate_key(['TRIM(s.SiteID)']) }} AS SiteKey,
     {{ dbt_utils.generate_surrogate_key(['TRIM(o.SID)']) }} AS CollegeLevelKey,
     {{ dbt_utils.generate_surrogate_key(['TRIM(sd.AcademicYearID)', 'TRIM(sd.RefNo)']) }} AS StudentKey,
-    {{ dbt_utils.generate_surrogate_key(['e.OfferingID']) }} AS CourseKey
+    {{ dbt_utils.generate_surrogate_key(['o.OfferingID','og.OfferingGroupID']) }} AS CourseKey
     FROM {{ ref('stg_prosolution__enrolment') }} e
     INNER JOIN {{ ref('stg_prosolution__offering') }} AS o ON o.OfferingID = e.OfferingID
+    LEFT JOIN {{ ref('stg_prosolution__offeringgroup') }} AS og ON og.OfferingID = o.OfferingID
     INNER JOIN {{ ref('stg_prosolution__student') }} sd   ON e.StudentDetailID = sd.StudentDetailID
     LEFT JOIN {{ ref('stg_prosolution__academicyear') }} ay ON TRIM(ay.AcademicYearID) = TRIM(o.AcademicYearID)
     LEFT JOIN {{ ref('stg_prosolution__site') }} AS s 
@@ -42,7 +43,7 @@ onegrade_enrolments AS (
        {{ dbt_utils.generate_surrogate_key(['e.VA_Type']) }} AS VATypeKey,
        {{ dbt_utils.generate_surrogate_key(['TRIM(e.AcademicYearID)',
        'TRIM(e.LearningAimRef)']) }} AS LearningAimKey,
-       {{ dbt_utils.generate_surrogate_key(['TRIM(o.OfferingID)']) }} AS CourseKey,
+       {{ dbt_utils.generate_surrogate_key(['o.OfferingID','og.OfferingGroupID']) }} AS CourseKey,
         e.Size,
         e.CourseCode,
         e.LearningAimRef,
@@ -83,6 +84,8 @@ onegrade_enrolments AS (
     LEFT JOIN {{ ref('stg_prosolution__offering') }} AS o 
         ON o.Code = c.CourseCode 
         AND o.AcademicYearID = c.AcademicYearID
+    LEFT JOIN {{ ref('stg_prosolution__offeringgroup') }} AS og 
+        ON og.OfferingID = o.OfferingID
     LEFT JOIN {{ ref('stg_prosolution__site') }} AS s 
         ON s.SiteID = o.SiteID
     --WHERE e.VA_Type = 'L3VA' AND e.AgeOn31Aug IN (16,17,18) AND e.CompletionID IN (1,2)

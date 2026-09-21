@@ -47,7 +47,8 @@ ProsolutionOffering AS (
 
             ELSE 'Taught'
         END AS CourseType,
-        o.OFFERINGID::INT AS _SOURCEPROSOLUTIONCOURSEID
+        o.OFFERINGID::INT AS OFFERINGID,
+        og.OfferingGroupID AS OFFERINGGROUPID
     FROM {{ ref('stg_prosolution__offering') }} AS o
     LEFT JOIN CourseStaff AS cs
         ON cs.OFFERINGID = o.OFFERINGID
@@ -58,7 +59,7 @@ ProsolutionOffering AS (
 )
 
 SELECT
-    {{ dbt_utils.generate_surrogate_key(['TRIM(p._SOURCEPROSOLUTIONCOURSEID)']) }} AS "CourseKey",
+    {{ dbt_utils.generate_surrogate_key(['p.OFFERINGID', 'p.OFFERINGGROUPID' ]) }} AS "CourseKey",
     COALESCE(TRIM(p.ACADEMICYEARID), '00/00')::CHAR(5) AS "AcademicYear",
     COALESCE(TRIM(p.COURSECODE), '-')::VARCHAR(50) AS "CourseCode",
     COALESCE(p.COURSENAME, '-')::VARCHAR(255) AS "CourseName",

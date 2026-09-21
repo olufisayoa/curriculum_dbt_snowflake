@@ -20,7 +20,7 @@ SELECT			M.RegisterMarkID,
                     'CAST(E.CompletionStatusID AS INTEGER)'                            
                     ]) }} AS EnrolmentKey,
 			{{ dbt_utils.generate_surrogate_key(['R.RegisterID']) }} AS RegisterKey,
-        {{ dbt_utils.generate_surrogate_key(['TRIM(O.OfferingID)']) }} AS CourseKey,
+        {{ dbt_utils.generate_surrogate_key(['O.OfferingID', 'OG.OfferingGroupID']) }} AS CourseKey,
 				{{ dbt_utils.generate_surrogate_key(['TRIM(O.SID)']) }} AS CollegeLevelKey,
 				{{ dbt_utils.generate_surrogate_key(['TRIM(O.SiteID)']) }} AS SiteKey,
                 {{ dbt_utils.generate_surrogate_key(['TRIM(M.MarkTypeID)']) }} AS MarkTypeKey,
@@ -57,6 +57,9 @@ ON				RS.EnrolmentID = E.EnrolmentID
 
 LEFT JOIN		{{ ref('stg_prosolution__offering') }}  O
 ON				E.OfferingID = O.OfferingID
+
+LEFT JOIN		{{ ref('stg_prosolution__offeringgroup') }} AS OG 
+    ON og.OfferingID = o.OfferingID
 
 LEFT JOIN		{{ ref('stg_prosolution__student') }} SD 
 ON			    E.StudentDetailID = SD.StudentDetailID

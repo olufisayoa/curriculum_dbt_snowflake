@@ -3,6 +3,7 @@ WITH base_data AS (
         e.*,
         s.SiteID AS SiteID,
         o.OfferingID AS OfferingID,
+        og.OfferingGroupID AS OfferingGroupID,
         o.SID AS CollegeLevelCode
     FROM {{ ref('stg_onegrade__estactva') }} AS e
     LEFT JOIN {{ ref('stg_onegrade__course') }} AS c 
@@ -11,6 +12,8 @@ WITH base_data AS (
     LEFT JOIN {{ ref('stg_prosolution__offering') }} AS o 
         ON o.Code = c.CourseCode 
         AND o.AcademicYearID = c.AcademicYearID
+    LEFT JOIN {{ ref('stg_prosolution__offeringgroup') }} AS og 
+        ON og.OfferingID = o.OfferingID
     LEFT JOIN {{ ref('stg_prosolution__site') }} AS s 
         ON s.SiteID = o.SiteID
     WHERE e.CompletionID IN (1,2,3)
@@ -27,7 +30,7 @@ unpivot_helper AS (
 SELECT 
     {{ dbt_utils.generate_surrogate_key(['TRIM(base.AcademicYearID)']) }} AS AcademicYearKey
     , {{ dbt_utils.generate_surrogate_key(['TRIM(base.AcademicYearID)', 'TRIM(base.StudentRef)']) }} AS StudentKey
-    , {{ dbt_utils.generate_surrogate_key(['TRIM(base.OfferingID)']) }} AS CourseKey
+    , {{ dbt_utils.generate_surrogate_key(['base.OfferingID','base.OfferingGroupID']) }} AS CourseKey
     ,{{ dbt_utils.generate_surrogate_key([
     'TRIM(base.AcademicYearID)',   
     'TRIM(base.StudentRef)',
