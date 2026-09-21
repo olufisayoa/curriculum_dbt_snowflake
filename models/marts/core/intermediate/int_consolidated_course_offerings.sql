@@ -30,6 +30,7 @@ ProsolutionOffering AS (
         o.ENDDATE::TIMESTAMP AS ENDDATE,
         pc.PARENTCOURSECODE,
         pc.PARENTCOURSENAME,
+        og.Description AS OFFERINGGROUPDESCRIPTION,
         cs.OFFERINGSTAFF,
         CASE 
             WHEN O.Code LIKE '%-TX%' 
@@ -52,6 +53,8 @@ ProsolutionOffering AS (
         ON cs.OFFERINGID = o.OFFERINGID
     LEFT JOIN ParentCourses AS pc
         ON pc.SUBOFFERINGID = o.OFFERINGID
+    LEFT JOIN {{ ref('stg_prosolution__offeringgroup') }} AS og
+        ON og.OFFERINGID = o.OFFERINGID
 )
 
 SELECT
@@ -64,6 +67,7 @@ SELECT
     COALESCE(p.ENDDATE, '9999-12-31'::TIMESTAMP) AS "EndDate",
     COALESCE(p.PARENTCOURSECODE, '-') AS "ParentCourseCode",
     COALESCE(p.PARENTCOURSENAME, '-') AS "ParentCourseName",
+    COALESCE(p.OFFERINGGROUPDESCRIPTION, '-') AS "CourseGroup",
     COALESCE(p.OFFERINGSTAFF, '-')::VARCHAR(1000) AS "OfferingStaff",
     COALESCE(p.CourseType, '-')::VARCHAR(50) AS "CourseType"
 FROM ProsolutionOffering AS p
