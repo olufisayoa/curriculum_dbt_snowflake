@@ -3,6 +3,7 @@ WITH base_data AS (
         e.*,
         s.SiteID AS SiteID,
         o.OfferingID AS OfferingID,
+        og.OfferingGroupID AS OfferingGroupID,
         o.SID AS CollegeLevelCode
     FROM CURRICULUM_DB.stg.stg_onegrade__estactva AS e
     LEFT JOIN CURRICULUM_DB.stg.stg_onegrade__course AS c 
@@ -11,6 +12,8 @@ WITH base_data AS (
     LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__offering AS o 
         ON o.Code = c.CourseCode 
         AND o.AcademicYearID = c.AcademicYearID
+    LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__offeringgroup AS og 
+        ON og.OfferingID = o.OfferingID
     LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__site AS s 
         ON s.SiteID = o.SiteID
     WHERE e.CompletionID IN (1,2,3)
@@ -27,7 +30,7 @@ unpivot_helper AS (
 SELECT 
     md5(cast(coalesce(cast(TRIM(base.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS AcademicYearKey
     , md5(cast(coalesce(cast(TRIM(base.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(base.StudentRef) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS StudentKey
-    , md5(cast(coalesce(cast(TRIM(base.OfferingID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS CourseKey
+    , md5(cast(coalesce(cast(base.OfferingID as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(base.OfferingGroupID as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS CourseKey
     ,md5(cast(coalesce(cast(TRIM(base.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(base.StudentRef) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(base.CourseCode) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(base.LearningAimRef) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(CAST(base.StartDate AS DATE) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(CAST(base.CompletionID AS INTEGER) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS EnrolmentKey
     , md5(cast(coalesce(cast(TRIM(base.SiteID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS SiteKey
     , md5(cast(coalesce(cast(TRIM(base.CollegeLevelCode) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS CollegeLevelKey

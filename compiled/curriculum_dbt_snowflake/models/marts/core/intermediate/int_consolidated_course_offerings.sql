@@ -47,7 +47,8 @@ ProsolutionOffering AS (
 
             ELSE 'Taught'
         END AS CourseType,
-        o.OFFERINGID::INT AS _SOURCEPROSOLUTIONCOURSEID
+        o.OFFERINGID::INT AS OFFERINGID,
+        og.OfferingGroupID AS OFFERINGGROUPID
     FROM CURRICULUM_DB.stg.stg_prosolution__offering AS o
     LEFT JOIN CourseStaff AS cs
         ON cs.OFFERINGID = o.OFFERINGID
@@ -58,7 +59,7 @@ ProsolutionOffering AS (
 )
 
 SELECT
-    md5(cast(coalesce(cast(TRIM(p._SOURCEPROSOLUTIONCOURSEID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS "CourseKey",
+    md5(cast(coalesce(cast(p.OFFERINGID as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(p.OFFERINGGROUPID as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS "CourseKey",
     COALESCE(TRIM(p.ACADEMICYEARID), '00/00')::CHAR(5) AS "AcademicYear",
     COALESCE(TRIM(p.COURSECODE), '-')::VARCHAR(50) AS "CourseCode",
     COALESCE(p.COURSENAME, '-')::VARCHAR(255) AS "CourseName",

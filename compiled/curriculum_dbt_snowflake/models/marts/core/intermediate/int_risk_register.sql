@@ -5,9 +5,10 @@ WITH prosolution_enrolments AS (
     md5(cast(coalesce(cast(TRIM(s.SiteID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS SiteKey,
     md5(cast(coalesce(cast(TRIM(o.SID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS CollegeLevelKey,
     md5(cast(coalesce(cast(TRIM(sd.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(sd.RefNo) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS StudentKey,
-    md5(cast(coalesce(cast(e.OfferingID as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS CourseKey
+    md5(cast(coalesce(cast(o.OfferingID as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(og.OfferingGroupID as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS CourseKey
     FROM CURRICULUM_DB.stg.stg_prosolution__enrolment e
     INNER JOIN CURRICULUM_DB.stg.stg_prosolution__offering AS o ON o.OfferingID = e.OfferingID
+    LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__offeringgroup AS og ON og.OfferingID = o.OfferingID
     INNER JOIN CURRICULUM_DB.stg.stg_prosolution__student sd   ON e.StudentDetailID = sd.StudentDetailID
     LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__academicyear ay ON TRIM(ay.AcademicYearID) = TRIM(o.AcademicYearID)
     LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__site AS s 
@@ -24,7 +25,7 @@ onegrade_enrolments AS (
        md5(cast(coalesce(cast(TRIM(e.Cohort) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS CohortKey,
        md5(cast(coalesce(cast(e.VA_Type as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS VATypeKey,
        md5(cast(coalesce(cast(TRIM(e.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(e.LearningAimRef) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS LearningAimKey,
-       md5(cast(coalesce(cast(TRIM(o.OfferingID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS CourseKey,
+       md5(cast(coalesce(cast(o.OfferingID as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(og.OfferingGroupID as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS CourseKey,
         e.Size,
         e.CourseCode,
         e.LearningAimRef,
@@ -65,6 +66,8 @@ onegrade_enrolments AS (
     LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__offering AS o 
         ON o.Code = c.CourseCode 
         AND o.AcademicYearID = c.AcademicYearID
+    LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__offeringgroup AS og 
+        ON og.OfferingID = o.OfferingID
     LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__site AS s 
         ON s.SiteID = o.SiteID
     --WHERE e.VA_Type = 'L3VA' AND e.AgeOn31Aug IN (16,17,18) AND e.CompletionID IN (1,2)

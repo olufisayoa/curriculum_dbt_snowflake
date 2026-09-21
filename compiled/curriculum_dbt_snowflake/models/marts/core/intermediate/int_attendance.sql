@@ -5,7 +5,7 @@ SELECT			M.RegisterMarkID,
 				md5(cast(coalesce(cast(TRIM(R.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(SD.RefNo) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS StudentKey,
                 md5(cast(coalesce(cast(TRIM(R.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(SD.RefNo) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(O.Code) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(O.QualID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(CAST(E.StartDate AS DATE) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(CAST(E.CompletionStatusID AS INTEGER) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS EnrolmentKey,
 			md5(cast(coalesce(cast(R.RegisterID as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS RegisterKey,
-        md5(cast(coalesce(cast(TRIM(O.OfferingID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS CourseKey,
+        md5(cast(coalesce(cast(O.OfferingID as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(OG.OfferingGroupID as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS CourseKey,
 				md5(cast(coalesce(cast(TRIM(O.SID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS CollegeLevelKey,
 				md5(cast(coalesce(cast(TRIM(O.SiteID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS SiteKey,
                 md5(cast(coalesce(cast(TRIM(M.MarkTypeID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS MarkTypeKey,
@@ -42,6 +42,9 @@ ON				RS.EnrolmentID = E.EnrolmentID
 
 LEFT JOIN		CURRICULUM_DB.stg.stg_prosolution__offering  O
 ON				E.OfferingID = O.OfferingID
+
+LEFT JOIN		CURRICULUM_DB.stg.stg_prosolution__offeringgroup AS OG 
+    ON og.OfferingID = o.OfferingID
 
 LEFT JOIN		CURRICULUM_DB.stg.stg_prosolution__student SD 
 ON			    E.StudentDetailID = SD.StudentDetailID
