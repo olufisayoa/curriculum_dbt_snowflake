@@ -122,42 +122,60 @@ unpivot_helper AS (
     SELECT 4 UNION ALL
     SELECT 5 UNION ALL
     SELECT 6
+),
+base_metrics AS (
+    SELECT
+        e.EnrolmentKey AS "EnrolmentKey",
+        e.StudentKey AS "StudentKey",
+        e.CollegeLevelKey AS "CollegeLevelKey",
+        e.CourseKey AS "CourseKey",
+        e.SiteKey AS "SiteKey",
+        e.AcademicYearKey AS "AcademicYearKey",
+        e.PriorAttainmentPoint AS "PriorAttainmentPoint",
+        CAST(e.MostRecentCollegeEstGrade AS VARCHAR(50)) AS "MTG",
+        CAST(e.MostRecentCollegeEstGradeInflated AS VARCHAR(50)) AS "ATG",
+        CAST(e.PersonalTargetGrade AS VARCHAR(50)) AS "PTG",
+        CAST(h.MonitoringPointID AS INTEGER) AS "MPKey",
+        CAST(CASE 
+            WHEN h.MonitoringPointID = 1 THEN e.Point1_Grade
+            WHEN h.MonitoringPointID = 2 THEN e.Point2_Grade
+            WHEN h.MonitoringPointID = 3 THEN e.Point3_Grade
+            WHEN h.MonitoringPointID = 4 THEN e.Point4_Grade
+            WHEN h.MonitoringPointID = 5 THEN e.Point5_Grade
+            WHEN h.MonitoringPointID = 6 THEN e.EnrolmentGrade
+        END AS VARCHAR(20)) AS "Current Grade",
+        CAST(CASE 
+            WHEN h.MonitoringPointID = 1 THEN e.Point1_Points
+            WHEN h.MonitoringPointID = 2 THEN e.Point2_Points
+            WHEN h.MonitoringPointID = 3 THEN e.Point3_Points
+            WHEN h.MonitoringPointID = 4 THEN e.Point4_Points
+            WHEN h.MonitoringPointID = 5 THEN e.Point5_Points
+            WHEN h.MonitoringPointID = 6 THEN e.EnrolmentPoints
+        END AS DECIMAL(19,2)) AS "Current Point",
+        CAST(CASE 
+            WHEN h.MonitoringPointID = 1 THEN e.Point1_vs_MostRecent2dp
+            WHEN h.MonitoringPointID = 2 THEN e.Point2_vs_MostRecent2dp
+            WHEN h.MonitoringPointID = 3 THEN e.Point3_vs_MostRecent2dp
+            WHEN h.MonitoringPointID = 4 THEN e.Point4_vs_MostRecent2dp
+            WHEN h.MonitoringPointID = 5 THEN e.Point5_vs_MostRecent2dp
+            WHEN h.MonitoringPointID = 6 THEN e.EnrolmentGradeVAScore_vs_MostRecent2dp
+        END AS DECIMAL(19,2)) AS "Value Added"
+    FROM consolidated_enrolments e
+    CROSS JOIN unpivot_helper h
+),
+calculated_scores AS (
+    SELECT
+        m.*,
+        CASE WHEN m."Value Added" < 0.0 THEN -15 ELSE 0 END AS "ProgressScore",
+        COALESCE(s."SafeguardingScore", 0) AS "SafeguardingScore",
+        COALESCE(s."WelfareScore", 0) AS "WelfareScore",
+        COALESCE(s."CommentsScore", 0) AS "CommentsScore",
+        COALESCE(s."BehaviourScore", 0) AS "BehaviourScore",
+        COALESCE(s."AttendanceScore", 0) AS "AttendanceScore"
+    FROM base_metrics m
+    LEFT JOIN CURRICULUM_DB.int.int_consolidated_student_detail s ON s."StudentKey" = m."StudentKey"
 )
 SELECT
-    e.EnrolmentKey AS "EnrolmentKey",
-    e.StudentKey AS "StudentKey",
-    e.CollegeLevelKey AS "CollegeLevelKey",
-    e.CourseKey AS "CourseKey",
-    e.SiteKey AS "SiteKey",
-    e.AcademicYearKey AS "AcademicYearKey",
-    e.PriorAttainmentPoint AS "PriorAttainmentPoint",
-    CAST(e.MostRecentCollegeEstGrade AS VARCHAR(50)) AS "MTG",
-    CAST(e.MostRecentCollegeEstGradeInflated AS VARCHAR(50)) AS "ATG",
-    CAST(e.PersonalTargetGrade AS VARCHAR(50)) AS "PTG",
-    CAST(h.MonitoringPointID AS INTEGER) AS "MPKey",
-    CAST(CASE 
-        WHEN h.MonitoringPointID = 1 THEN e.Point1_Grade
-        WHEN h.MonitoringPointID = 2 THEN e.Point2_Grade
-        WHEN h.MonitoringPointID = 3 THEN e.Point3_Grade
-        WHEN h.MonitoringPointID = 4 THEN e.Point4_Grade
-        WHEN h.MonitoringPointID = 5 THEN e.Point5_Grade
-        WHEN h.MonitoringPointID = 6 THEN e.EnrolmentGrade
-      END AS VARCHAR(20)) AS "Current Grade",
-    CAST(CASE 
-        WHEN h.MonitoringPointID = 1 THEN e.Point1_Points
-        WHEN h.MonitoringPointID = 2 THEN e.Point2_Points
-        WHEN h.MonitoringPointID = 3 THEN e.Point3_Points
-        WHEN h.MonitoringPointID = 4 THEN e.Point4_Points
-        WHEN h.MonitoringPointID = 5 THEN e.Point5_Points
-        WHEN h.MonitoringPointID = 6 THEN e.EnrolmentPoints
-      END AS DECIMAL(19,2)) AS "Current Point",
-    CAST(CASE 
-        WHEN h.MonitoringPointID = 1 THEN e.Point1_vs_MostRecent2dp
-        WHEN h.MonitoringPointID = 2 THEN e.Point2_vs_MostRecent2dp
-        WHEN h.MonitoringPointID = 3 THEN e.Point3_vs_MostRecent2dp
-        WHEN h.MonitoringPointID = 4 THEN e.Point4_vs_MostRecent2dp
-        WHEN h.MonitoringPointID = 5 THEN e.Point5_vs_MostRecent2dp
-        WHEN h.MonitoringPointID = 6 THEN e.EnrolmentGradeVAScore_vs_MostRecent2dp
-      END AS DECIMAL(19,2)) AS "Value Added"
-FROM consolidated_enrolments e
-CROSS JOIN unpivot_helper h
+    *,
+    "ProgressScore" + "SafeguardingScore" + "WelfareScore" + "CommentsScore" + "BehaviourScore" + "AttendanceScore" AS "TotalRiskScore"
+FROM calculated_scores
