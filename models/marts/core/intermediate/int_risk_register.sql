@@ -189,11 +189,13 @@ calculated_scores AS (
         COALESCE(s."WelfareScore", 0) AS "WelfareScore",
         COALESCE(s."CommentsScore", 0) AS "CommentsScore",
         COALESCE(s."BehaviourScore", 0) AS "BehaviourScore",
-        COALESCE(s."AttendanceScore", 0) AS "AttendanceScore"
+        COALESCE(s."AttendanceScore", 0) AS "AttendanceScore",
+        COALESCE(s."EHCPScore", 0) AS "EHCPScore",
+        COALESCE(s."HighNeedsScore", 0) AS "HighNeedsScore"
     FROM base_metrics m
     LEFT JOIN {{ ref('int_consolidated_student_detail') }} s ON s."StudentKey" = m."StudentKey"
 )
 SELECT
     *,
-    "ProgressScore" + "SafeguardingScore" + "WelfareScore" + "CommentsScore" + "BehaviourScore" + "AttendanceScore" AS "TotalRiskScore"
+    "ProgressScore" + "SafeguardingScore" + "WelfareScore" + "CommentsScore" + "BehaviourScore" + "AttendanceScore" + "EHCPScore" + "HighNeedsScore" AS "TotalRiskScore"
 FROM calculated_scores
