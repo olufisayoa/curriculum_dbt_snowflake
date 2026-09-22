@@ -179,5 +179,35 @@ calculated_scores AS (
 )
 SELECT
     *,
-    "ProgressScore" + "SafeguardingScore" + "WelfareScore" + "CommentsScore" + "BehaviourScore" + "AttendanceScore" + "EHCPScore" + "HighNeedsScore" AS "TotalRiskScore"
+    "ProgressScore" + "SafeguardingScore" + "WelfareScore" + "CommentsScore" + "BehaviourScore" + "AttendanceScore" + "EHCPScore" + "HighNeedsScore" AS "TotalRiskScore",
+    CASE
+        WHEN ARRAY_SIZE(
+            ARRAY_COMPACT(
+                ARRAY_CONSTRUCT(
+                    CASE WHEN "ProgressScore" < 0 THEN 'Progress' END,
+                    CASE WHEN "SafeguardingScore" < 0 THEN 'Safeguarding' END,
+                    CASE WHEN "WelfareScore" < 0 THEN 'Welfare' END,
+                    CASE WHEN "CommentsScore" < 0 THEN 'Comments' END,
+                    CASE WHEN "BehaviourScore" < 0 THEN 'Behaviour' END,
+                    CASE WHEN "AttendanceScore" < 0 THEN 'Attendance' END,
+                    CASE WHEN "EHCPScore" < 0 THEN 'EHCP' END,
+                    CASE WHEN "HighNeedsScore" < 0 THEN 'HighNeeds' END
+                )
+            )
+        ) = 0 THEN 'None'
+        ELSE ARRAY_TO_STRING(
+            ARRAY_COMPACT(
+                ARRAY_CONSTRUCT(
+                    CASE WHEN "ProgressScore" < 0 THEN 'Progress' END,
+                    CASE WHEN "SafeguardingScore" < 0 THEN 'Safeguarding' END,
+                    CASE WHEN "WelfareScore" < 0 THEN 'Welfare' END,
+                    CASE WHEN "CommentsScore" < 0 THEN 'Comments' END,
+                    CASE WHEN "BehaviourScore" < 0 THEN 'Behaviour' END,
+                    CASE WHEN "AttendanceScore" < 0 THEN 'Attendance' END,
+                    CASE WHEN "EHCPScore" < 0 THEN 'EHCP' END,
+                    CASE WHEN "HighNeedsScore" < 0 THEN 'HighNeeds' END
+                )
+            ), ', '
+        )
+    END AS "RiskFactors"
 FROM calculated_scores
