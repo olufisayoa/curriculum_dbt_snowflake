@@ -3,7 +3,7 @@
 {{
   config(
     materialized='incremental',
-    unique_key=['RegisterMarkID'],
+    unique_key=['M.RegisterMarkID', 'O.OfferingID', 'OG.OfferingGroupID'],
     incremental_strategy='merge'
   )
 }}
