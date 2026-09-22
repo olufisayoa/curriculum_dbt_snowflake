@@ -1,4 +1,12 @@
-WITH Prosolution_Student AS (
+
+  
+    
+
+create or replace transient table CURRICULUM_DB.int.int_consolidated_student_detail
+    
+    
+    
+    as (WITH Prosolution_Student AS (
 		SELECT  
            s.StudentKey AS StudentKey,
               s.StudentDetailID AS StudentDetailID,
@@ -244,3 +252,8 @@ Badges AS (
 	 ON ps.StudentKey = bs.StudentKey
 	LEFT JOIN Attendance_Agg AS aa
 	 ON ps.StudentKey = aa.StudentKey
+    )
+;
+
+
+  

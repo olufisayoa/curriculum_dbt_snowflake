@@ -37,13 +37,15 @@ combined AS (
         s."WelfareScore", 
         s."CommentsScore",
         s."BehaviourScore", 
-        s."AttendanceScore"
+        s."AttendanceScore",
+        s."EHCPScore",
+        s."HighNeedsScore"
     FROM progress_agg pa
     LEFT JOIN CURRICULUM_DB.int.int_consolidated_student_detail s ON s."StudentKey" = pa."StudentKey"
 )
 SELECT
     *,
-    "ProgressScore" + "SafeguardingScore" + "WelfareScore" + "CommentsScore" + "BehaviourScore" + "AttendanceScore" AS "TotalRiskScore",
+    "ProgressScore" + "SafeguardingScore" + "WelfareScore" + "CommentsScore" + "BehaviourScore" + "AttendanceScore" + "EHCPScore" + "HighNeedsScore" AS "TotalRiskScore",
      CASE
         WHEN ARRAY_SIZE(
             ARRAY_COMPACT(
@@ -53,7 +55,9 @@ SELECT
                     CASE WHEN "WelfareScore" < 0 THEN 'Welfare' END,
                     CASE WHEN "CommentsScore" < 0 THEN 'Comments' END,
                     CASE WHEN "BehaviourScore" < 0 THEN 'Behaviour' END,
-                    CASE WHEN "AttendanceScore" < 0 THEN 'Attendance' END
+                    CASE WHEN "AttendanceScore" < 0 THEN 'Attendance' END,
+                    CASE WHEN "EHCPScore" < 0 THEN 'EHCP' END,
+                    CASE WHEN "HighNeedsScore" < 0 THEN 'HighNeeds' END
                 )
             )
         ) = 0 THEN 'None'
@@ -65,7 +69,9 @@ SELECT
                     CASE WHEN "WelfareScore" < 0 THEN 'Welfare' END,
                     CASE WHEN "CommentsScore" < 0 THEN 'Comments' END,
                     CASE WHEN "BehaviourScore" < 0 THEN 'Behaviour' END,
-                    CASE WHEN "AttendanceScore" < 0 THEN 'Attendance' END
+                    CASE WHEN "AttendanceScore" < 0 THEN 'Attendance' END,
+                    CASE WHEN "EHCPScore" < 0 THEN 'EHCP' END,
+                    CASE WHEN "HighNeedsScore" < 0 THEN 'HighNeeds' END
                 )
             ), ', '
         )
