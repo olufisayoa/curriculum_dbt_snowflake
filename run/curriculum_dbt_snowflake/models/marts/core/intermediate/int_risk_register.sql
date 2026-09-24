@@ -21,7 +21,7 @@ create or replace transient table CURRICULUM_DB.int.int_risk_register
     LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__academicyear ay ON TRIM(ay.AcademicYearID) = TRIM(o.AcademicYearID)
     LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__site AS s 
         ON s.SiteID = o.SiteID
-    WHERE ay.Number BETWEEN YEAR(CURRENT_DATE()) - 2 AND YEAR(CURRENT_DATE())
+    WHERE ay.Number BETWEEN YEAR(CURRENT_DATE()) - 2 AND YEAR(CURRENT_DATE()) AND e.CompletionStatusID IN (1,2)
 ),
 onegrade_enrolments AS (
     SELECT 
@@ -78,7 +78,7 @@ onegrade_enrolments AS (
         ON og.OfferingID = o.OfferingID
     LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__site AS s 
         ON s.SiteID = o.SiteID
-    --WHERE e.VA_Type = 'L3VA' AND e.AgeOn31Aug IN (16,17,18) AND e.CompletionID IN (1,2)
+    WHERE  e.CompletionID IN (1,2)
 ),
 consolidated_enrolments AS (
     SELECT
