@@ -6,6 +6,5 @@ SELECT
 	  ,BadgeValueName AS "BadgeValueName"
 	  ,BadgeCode AS "BadgeCode"
 	  ,IsObsolete AS "IsObsolete"
-	  ,Progression AS "Progression"
 FROM {{ ref('int_learner_badges') }}
 	  
