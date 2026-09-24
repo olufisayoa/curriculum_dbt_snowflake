@@ -16,7 +16,7 @@ WITH base_data AS (
         ON og.OfferingID = o.OfferingID
     LEFT JOIN {{ ref('stg_prosolution__site') }} AS s 
         ON s.SiteID = o.SiteID
-    WHERE e.CompletionID IN (1,2,3)
+    WHERE e.CompletionID IN (1,2)
 ),
 unpivot_helper AS (
     SELECT 1 AS MonitoringPointID UNION ALL
@@ -91,8 +91,7 @@ SELECT
 
     , CAST(CASE 
         WHEN base.VA_Type = 'L3VA' AND base.AgeOn31Aug IN (16,17,18) AND base.CompletionID IN (1,2) THEN 'L3VA Rules'
-        WHEN base.VA_Type = 'CA' AND base.AgeOn31Aug IN (16,17,18) AND base.CompletionID IN (1,2,3) AND base.IsGraded='Yes' 
-            AND base.WDNumDaysAfterStart IS NULL OR base.WDNumDaysAfterStart >= 42 THEN 'CA Rules'
+        ELSE '-'
     END AS VARCHAR(20)) AS DfeRules
     , CAST(base.Size AS DECIMAL(19,2)) AS QualificationSize
 FROM base_data AS base
