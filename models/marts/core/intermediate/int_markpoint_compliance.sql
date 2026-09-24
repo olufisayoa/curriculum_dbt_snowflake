@@ -4,6 +4,7 @@ WITH Compliance AS (
 		   ST.Surname,
 		   E.StudentRef,
 		   O.OfferingID, 
+		   OG.OfferingGroupID,
 		   O.SiteID,
 		   O.SID AS CollegeLevel,
 		   C.CourseCode,
@@ -22,6 +23,8 @@ WITH Compliance AS (
 	INNER JOIN {{ ref('stg_onegrade__staff_teaching_group') }} STG ON STG.AcademicYearID = E.AcademicYearID AND	STG.TeachingGroupCode = E.TeachingGroupCode
 	INNER JOIN {{ ref('stg_onegrade__course') }} C ON	E.AcademicYearID = C.AcademicYearID AND	E.CourseID = C.ID
 	LEFT JOIN {{ ref('stg_prosolution__offering') }} O ON O.AcademicYearID = C.AcademicYearID AND O.Code = C.CourseCode
+	LEFT JOIN {{ ref('stg_prosolution__offeringgroup') }} AS OG
+        ON OG.OfferingID = O.OfferingID
 	INNER JOIN {{ ref('stg_onegrade__student') }} S ON E.StudentID = S.ID
 	LEFT JOIN {{ ref('stg_onegrade__inyeargrade') }} G ON	E.AcademicYearID = G.AcademicYearID AND	E.StudentID = G.StudentID AND E.CourseID = G.CourseID
 	LEFT JOIN {{ ref('stg_onegrade__staff') }} ST ON ST.StaffID = STG.StaffID
@@ -40,6 +43,7 @@ unpivoted AS (
 		   base.Surname,
 		   base.StudentRef,
 		   base.OfferingID,
+		   base.OfferingGroupID,
 		   base.CollegeLevel,
 		   base.SiteID,
 		   base.CourseCode,
@@ -65,7 +69,7 @@ unpivoted AS (
 SELECT 
        {{ dbt_utils.generate_surrogate_key(['TRIM(AcademicYearID)']) }} AS AcademicYearKey,
        {{ dbt_utils.generate_surrogate_key(['TRIM(AcademicYearID)', 'TRIM(StudentRef)']) }} AS StudentKey,
-       {{ dbt_utils.generate_surrogate_key(['TRIM(OfferingID)']) }} AS CourseKey,
+       {{ dbt_utils.generate_surrogate_key(['OfferingID', 'OfferingGroupID']) }} AS CourseKey,
        {{ dbt_utils.generate_surrogate_key(['TRIM(CollegeLevel)']) }} AS CollegeLevelKey,
        {{ dbt_utils.generate_surrogate_key(['TRIM(SiteID)']) }} AS SiteKey,
 	   MPKey,
