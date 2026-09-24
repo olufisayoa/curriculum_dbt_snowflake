@@ -1,4 +1,12 @@
-WITH Compliance AS (
+
+  
+    
+
+create or replace transient table CURRICULUM_DB.int.int_markpoint_compliance
+    
+    
+    
+    as (WITH Compliance AS (
 	SELECT E.AcademicYearID,
 		   ST.Forenames,
 		   ST.Surname,
@@ -80,3 +88,8 @@ SELECT
 	   CASE WHEN PointGrade IS NULL OR LTRIM(RTRIM(PointGrade)) = '' THEN 0 ELSE 1 END AS PointGradeMarked,
 	   CASE WHEN PointEffort IS NULL THEN 0 ELSE 1 END AS PointEffortMarked
 FROM Unpivoted
+    )
+;
+
+
+  
