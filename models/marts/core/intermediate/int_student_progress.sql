@@ -16,7 +16,7 @@ WITH base_data AS (
         ON og.OfferingID = o.OfferingID
     LEFT JOIN {{ ref('stg_prosolution__site') }} AS s 
         ON s.SiteID = o.SiteID
-    WHERE e.CompletionID IN (1,2,3)
+    WHERE e.CompletionID IN (1,2)
 ),
 unpivot_helper AS (
     SELECT 1 AS MonitoringPointID UNION ALL
