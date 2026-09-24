@@ -92,12 +92,12 @@ onegrade_enrolments AS (
 ),
 consolidated_enrolments AS (
     SELECT
-        COALESCE(p.EnrolmentKey, b.EnrolmentKey) AS EnrolmentKey,
-        COALESCE(p.CollegeLevelKey, b.CollegeLevelKey) AS CollegeLevelKey,
-        COALESCE(p.StudentKey, b.StudentKey) AS StudentKey,
-        COALESCE(p.CourseKey, b.CourseKey) AS CourseKey,
-        COALESCE(p.SiteKey, b.SiteKey) AS SiteKey,
-        COALESCE(p.AcademicYearKey, b.AcademicYearKey) AS AcademicYearKey,
+        p.EnrolmentKey AS EnrolmentKey,
+        p.CollegeLevelKey AS CollegeLevelKey,
+        p.StudentKey AS StudentKey,
+        p.CourseKey AS CourseKey,
+        p.SiteKey AS SiteKey,
+        p.AcademicYearKey AS AcademicYearKey,
         b.QOEPoints_GCSE_College2dp,
         b.QOEPoints_College2dp,
         CAST(CASE
