@@ -1,4 +1,12 @@
-WITH UniqueEnrolments AS (
+
+  
+    
+
+create or replace transient table CURRICULUM_DB.int.int_consolidated_course_offerings
+    
+    
+    
+    as (WITH UniqueEnrolments AS (
     SELECT DISTINCT
         OFFERINGID,
         OFFERINGGROUPID
@@ -76,3 +84,8 @@ SELECT
     COALESCE(p.STAFF, '-')::VARCHAR(1000) AS "Staff",
     COALESCE(p.CourseType, '-')::VARCHAR(50) AS "CourseType"
 FROM ProsolutionOffering AS p
+    )
+;
+
+
+  
