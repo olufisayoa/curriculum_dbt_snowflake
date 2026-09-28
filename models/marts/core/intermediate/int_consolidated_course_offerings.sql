@@ -1,13 +1,15 @@
-WITH CourseStaff AS (
-    SELECT
-        os.OFFERINGID,
-        UPPER(LISTAGG(s.FIRSTNAME || '.' || s.SURNAME, ', ')) AS OFFERINGSTAFF
-    FROM {{ ref('stg_prosolution__offeringstaff') }} AS os
-    INNER JOIN {{ ref('stg_prosolution__staff') }} AS s
-        ON os.STAFFID = s.STAFFID
-    GROUP BY os.OFFERINGID
+WITH UniqueEnrolments AS (
+    SELECT DISTINCT
+        OFFERINGID,
+        OFFERINGGROUPID
+    FROM {{ ref('stg_prosolution__enrolment') }}
 ),
-
+PrimaryOfferingStaff AS (
+    SELECT
+        OFFERINGID,
+        FullName
+    FROM {{ ref('stg_prosolution__offeringmainstaff') }}
+),
 ParentCourses AS (
     SELECT
         lo.SUBOFFERINGID,
@@ -31,7 +33,7 @@ ProsolutionOffering AS (
         pc.PARENTCOURSECODE,
         pc.PARENTCOURSENAME,
         og.Description AS OFFERINGGROUPDESCRIPTION,
-        cs.OFFERINGSTAFF,
+        COALESCE(s.FIRSTNAME || ' ' || s.SURNAME, pos.FULLNAME) AS STAFF,
         CASE 
             WHEN O.Code LIKE '%-TX%' 
                 OR O.Name LIKE '%Work Experience%' 
@@ -49,13 +51,15 @@ ProsolutionOffering AS (
         END AS CourseType,
         o.OFFERINGID::INT AS OFFERINGID,
         og.OfferingGroupID AS OFFERINGGROUPID
-    FROM {{ ref('stg_prosolution__offering') }} AS o
-    LEFT JOIN CourseStaff AS cs
-        ON cs.OFFERINGID = o.OFFERINGID
+    FROM UniqueEnrolments AS ue 
+    INNER JOIN {{ ref('stg_prosolution__offering') }} AS o
+        ON ue.OfferingID=o.OfferingID
+    LEFT JOIN {{ ref('stg_prosolution__offeringgroup') }} AS og
+        ON og.OFFERINGID = o.OFFERINGID AND ue.OfferingGroupID = og.OfferingGroupID
+    LEFT JOIN {{ ref('stg_prosolution__staff') }} AS s ON og.StaffID=s.StaffID
+    LEFT JOIN PrimaryOfferingStaff AS pos ON pos.OfferingID=ue.OfferingID
     LEFT JOIN ParentCourses AS pc
         ON pc.SUBOFFERINGID = o.OFFERINGID
-    LEFT JOIN {{ ref('stg_prosolution__offeringgroup') }} AS og
-        ON og.OFFERINGID = o.OFFERINGID
 )
 
 SELECT
@@ -69,7 +73,7 @@ SELECT
     COALESCE(p.PARENTCOURSECODE, '-') AS "ParentCourseCode",
     COALESCE(p.PARENTCOURSENAME, '-') AS "ParentCourseName",
     COALESCE(p.OFFERINGGROUPDESCRIPTION, '-') AS "CourseGroup",
-    COALESCE(p.OFFERINGSTAFF, '-')::VARCHAR(1000) AS "OfferingStaff",
+    COALESCE(p.STAFF, '-')::VARCHAR(1000) AS "Staff",
     COALESCE(p.CourseType, '-')::VARCHAR(50) AS "CourseType"
 FROM ProsolutionOffering AS p
 
