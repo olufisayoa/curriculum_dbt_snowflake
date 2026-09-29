@@ -50,13 +50,20 @@ ProsolutionOffering AS (
             ELSE 'Taught'
         END AS CourseType,
         o.OFFERINGID::INT AS OFFERINGID,
-        og.OfferingGroupID AS OFFERINGGROUPID
+        og.OfferingGroupID AS OFFERINGGROUPID,
+        o.QualID,
+        o.GLH,
+        o.Duration,
+        o.StudyYear,
+        o.NumberOfWeeks,
+        'Level ' || la.NOTIONAL_NVQ_LEVEL_CODE AS QualificationLevel
     FROM UniqueEnrolments AS ue 
     INNER JOIN CURRICULUM_DB.stg.stg_prosolution__offering AS o
         ON ue.OfferingID=o.OfferingID
     LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__offeringgroup AS og
         ON og.OFFERINGID = o.OFFERINGID AND ue.OfferingGroupID = og.OfferingGroupID
     LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__staff AS s ON og.StaffID=s.StaffID
+    LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__learningaim la ON o.QualID=la.LEARNING_AIM_REF
     LEFT JOIN PrimaryOfferingStaff AS pos ON pos.OfferingID=ue.OfferingID
     LEFT JOIN ParentCourses AS pc
         ON pc.SUBOFFERINGID = o.OFFERINGID
@@ -74,5 +81,11 @@ SELECT
     COALESCE(p.PARENTCOURSENAME, '-') AS "ParentCourseName",
     COALESCE(p.OFFERINGGROUPDESCRIPTION, '-') AS "CourseGroup",
     COALESCE(p.STAFF, '-')::VARCHAR(1000) AS "Staff",
-    COALESCE(p.CourseType, '-')::VARCHAR(50) AS "CourseType"
+    COALESCE(p.CourseType, '-')::VARCHAR(50) AS "CourseType",
+    p.DURATION AS "Duration",
+    p.GLH AS "GLH",
+    p.NUMBEROFWEEKS AS "NumberOfWeeks",
+    p.STUDYYEAR AS "StudyYear",
+    p.QUALID AS "LearningAim",
+    COALESCE(p.QualificationLevel, 'Unknown') AS "QualificationLevel"
 FROM ProsolutionOffering AS p
