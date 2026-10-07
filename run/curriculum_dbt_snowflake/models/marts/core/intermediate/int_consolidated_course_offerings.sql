@@ -43,6 +43,8 @@ ProsolutionOffering AS (
         og.Description AS OFFERINGGROUPDESCRIPTION,
         COALESCE(s.FIRSTNAME || ' ' || s.SURNAME, pos.FULLNAME) AS STAFF,
         CASE 
+            WHEN LEFT(O.QualID, 1) = 'Z' THEN 'Work Experience'
+            WHEN LEFT(O.QualID, 1) = 'C' THEN 'Tutorial'
             WHEN O.Code LIKE '%-TX%' 
                 OR O.Name LIKE '%Work Experience%' 
                 OR O.Name LIKE '%Work Placement%' 
