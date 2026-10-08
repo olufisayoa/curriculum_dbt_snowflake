@@ -57,7 +57,7 @@ ProsolutionOffering AS (
                 OR O.Name LIKE '%tutorial%' 
             THEN 'Tutorial'
 
-            ELSE 'Taught'
+            ELSE 'Course'
         END AS CourseType,
         o.OFFERINGID::INT AS OFFERINGID,
         og.OfferingGroupID AS OFFERINGGROUPID,
