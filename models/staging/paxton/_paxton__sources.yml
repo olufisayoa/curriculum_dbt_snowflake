@@ -1,0 +1,11 @@
+version: 2
+sources:
+  - name: Paxton
+    schema: RAW
+    database: CURRICULUM_DB
+    tables:
+      - name: Paxton_Events_Ex 
+        description: "This table contains information about events, and other relevant details."
+
+      - name: Paxton_Users_Ex
+        description: "This table contains information about users, and other relevant details."
