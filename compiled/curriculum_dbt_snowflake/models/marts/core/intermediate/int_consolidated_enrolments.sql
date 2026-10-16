@@ -1,6 +1,6 @@
 WITH  ProSolution_Master AS (
     SELECT 
-        PSE.EnrolmentID                                      AS ProSolutionEnrolmentID,
+        PSE.EnrolmentID                                      AS EnrolmentID,
         LTRIM(RTRIM(PSD.RefNo))                               AS StudentRef,
         LTRIM(RTRIM(PSO.Code))                               AS CourseCode,
         PSO.Name                                              AS CourseTitle,
@@ -11,7 +11,8 @@ WITH  ProSolution_Master AS (
         PSC.Description                                       AS CompletionStatus,
         PSE.Grade                                             AS Grade,
         O.Description                                         AS Outcome,
-        PSE.OfferingID                                        AS ProSolutionOfferingID,
+        PSE.OfferingID                                        AS OfferingID,
+        POG.OfferingGroupID                                   AS OfferingGroupID,
         PSE.CompletionStatusID                                AS CompletionStatusID,
         LTRIM(RTRIM(PSO.QualID))                              AS LearningAimRef,
         PSE.StudentDetailID                                   AS StudentDetailID,
@@ -20,6 +21,7 @@ WITH  ProSolution_Master AS (
     FROM CURRICULUM_DB.stg.stg_prosolution__enrolment PSE
     INNER JOIN CURRICULUM_DB.stg.stg_prosolution__student PSD   ON PSE.StudentDetailID = PSD.StudentDetailID
     INNER JOIN CURRICULUM_DB.stg.stg_prosolution__offering PSO       ON PSE.OfferingID = PSO.OfferingID
+    LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__offeringgroup AS POG ON POG.OfferingID = PSO.OfferingID AND POG.OfferingGroupID = PSE.OfferingGroupID
     LEFT  JOIN CURRICULUM_DB.stg.stg_prosolution__completionstatus PSC ON PSC.CompletionStatusID = PSE.CompletionStatusID
     LEFT  JOIN CURRICULUM_DB.stg.stg_prosolution__outcome O           ON O.OutcomeID = PSE.OutcomeID
     LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__enrolmenttype ET      ON ET.EnrolmentTypeID = PSE.EnrolmentTypeID
@@ -106,22 +108,22 @@ Enrolments AS (
 SELECT 
 
     md5(cast(coalesce(cast(TRIM(PM.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(PM.StudentRef) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(PM.CourseCode) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(PM.LearningAimRef) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(CAST(PM.StartDate AS DATE) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(CAST(PM.CompletionStatusID AS INTEGER) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS "EnrolmentKey",
-    CAST(COALESCE(LTRIM(RTRIM(PM.AcademicYearID)), OE.AcademicYearID) AS NCHAR(5)) AS "AcademicYear",
+    CAST(LTRIM(RTRIM(PM.AcademicYearID)) AS NCHAR(5)) AS "AcademicYear",
 
-    CAST(COALESCE(PM.StudentRef, OE.StudentRef) AS NCHAR(50)) AS "StudentID",
+    CAST(PM.StudentRef AS NCHAR(50)) AS "StudentID",
 
-    CAST(COALESCE(PM.CourseCode, OE.CourseCode) AS NVARCHAR(24)) AS "CourseCode",
+    CAST(PM.CourseCode AS NVARCHAR(24)) AS "CourseCode",
 
-    CAST(COALESCE(PM.CourseTitle, OE.CourseTitle) AS NVARCHAR(255)) AS "CourseName",
+    CAST(PM.CourseTitle AS NVARCHAR(255)) AS "CourseName",
 
-    CAST(COALESCE(PM.StartDate, OE.StartDate) AS TIMESTAMP_NTZ ) AS "StartDate",
+    CAST(PM.StartDate AS TIMESTAMP_NTZ ) AS "StartDate",
 
-    CAST(COALESCE(PM.PlannedEndDate, OE.PlannedEndDate) AS TIMESTAMP_NTZ ) AS "PlannedEndDate",
+    CAST(PM.PlannedEndDate AS TIMESTAMP_NTZ ) AS "PlannedEndDate",
 
-    CAST(COALESCE(PM.ActualEndDate, OE.ActualEndDate) AS TIMESTAMP_NTZ)     
+    CAST(PM.ActualEndDate AS TIMESTAMP_NTZ)     
         AS "ActualEndDate",
 
-    CAST(COALESCE(PM.CompletionStatus,OE.CompletionStatus) AS NVARCHAR(50)) AS "CompletionStatus",
+    CAST(PM.CompletionStatus AS NVARCHAR(50)) AS "CompletionStatus",
 	
     CAST(COALESCE(OE.NotionalNVQLevel, '-') AS NCHAR(1)) AS "NotionalNVQLevel",
 
@@ -144,7 +146,8 @@ SELECT
         AS "Outcome",
     CAST(COALESCE(EM.EngMatType, 'Other') AS NVARCHAR(8))
         AS "SubjectType",
-    PM.ProSolutionOfferingID
+    PM.OfferingID,
+    PM.OfferingGroupID
 
 FROM ProSolution_Master PM
 LEFT JOIN OneGrade_Enrichment_Deduped OE
