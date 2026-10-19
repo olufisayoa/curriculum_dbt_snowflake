@@ -25,6 +25,7 @@ create or replace transient table CURRICULUM_DB.int.int_consolidated_enrolments
         LTRIM(RTRIM(PSO.QualID))                              AS LearningAimRef,
         PSE.StudentDetailID                                   AS StudentDetailID,
         PSE.StudyYear                                         AS StudyYear,
+        PSO.SID                                                AS CollegeLevelCode,
         ET.Description AS EnrolmentType
     FROM CURRICULUM_DB.stg.stg_prosolution__enrolment PSE
     INNER JOIN CURRICULUM_DB.stg.stg_prosolution__student PSD   ON PSE.StudentDetailID = PSD.StudentDetailID
@@ -155,7 +156,8 @@ SELECT
     CAST(COALESCE(EM.EngMatType, 'Other') AS NVARCHAR(8))
         AS "SubjectType",
     PM.OfferingID,
-    PM.OfferingGroupID
+    PM.OfferingGroupID,
+    PM.CollegeLevelCode
 
 FROM ProSolution_Master PM
 LEFT JOIN OneGrade_Enrichment_Deduped OE
