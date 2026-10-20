@@ -1,6 +1,7 @@
 WITH Enrolments AS (
     SELECT * FROM {{ ref('int_consolidated_enrolments') }}
-)
+    WHERE CompletionStatusID IN (1,2)
+)   
 
 SELECT  "EnrolmentKey",
     {{ dbt_utils.generate_surrogate_key(['TRIM("AcademicYear")', 'TRIM("StudentID")']) }} AS "StudentKey",
