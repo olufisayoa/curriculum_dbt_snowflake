@@ -1,6 +1,6 @@
 WITH Enrolments AS (
     SELECT * FROM {{ ref('int_consolidated_enrolments') }}
-    WHERE CompletionStatus IN (1,2)
+    WHERE CompletionStatusID IN (1,2)
 )   
 
 SELECT  "EnrolmentKey",
