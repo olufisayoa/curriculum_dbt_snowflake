@@ -10,6 +10,9 @@ models:
     columns:
       - name: RegisterMarkID
         description: Unique identifier for register mark record
+        tests:
+          - unique
+          - not_null
       - name: RegisterSessionDate
         description: Date of the registration session
       - name: MrkPresent

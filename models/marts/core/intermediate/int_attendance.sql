@@ -3,7 +3,7 @@
 {{
   config(
     materialized='incremental',
-    unique_key=['RegisterMarkID', 'CourseKey'],
+    unique_key=['RegisterMarkID'],
     incremental_strategy='merge'
   )
 }}
@@ -59,7 +59,7 @@ LEFT JOIN		{{ ref('stg_prosolution__offering') }}  O
 ON				E.OfferingID = O.OfferingID
 
 LEFT JOIN		{{ ref('stg_prosolution__offeringgroup') }} AS OG 
-    ON og.OfferingID = o.OfferingID
+    ON OG.OfferingID = O.OfferingID AND E.OfferingGroupID = OG.OfferingGroupID
 
 LEFT JOIN		{{ ref('stg_prosolution__student') }} SD 
 ON			    E.StudentDetailID = SD.StudentDetailID
