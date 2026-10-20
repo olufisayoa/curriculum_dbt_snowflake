@@ -15,9 +15,15 @@ WITH Prosolution_Student AS (
 			CAST(CASE COALESCE(s.ReceivedFreeSchoolMeals, 0) WHEN 1 THEN 'Yes' ELSE 'No' END AS VARCHAR) AS FreeSchoolMeals,
 			CAST(CASE COALESCE(s.HighNeedsStudent, 0) WHEN 1 THEN 'Yes' ELSE 'No' END AS VARCHAR) AS HighNeeds,
 			CAST(CASE COALESCE(s.CareLeaver, 0)       WHEN 1 THEN 'Yes' ELSE 'No' END AS VARCHAR) AS CareLeaver,
-			CAST(CASE COALESCE(s.LookedAfter, 0)      WHEN 1 THEN 'Yes' ELSE 'No' END AS VARCHAR) AS LookedAfter,
+			CAST(CASE COALESCE(s.LookedAfter, 0)      WHEN 1 THEN 'Yes' ELSE 'No' END AS VARCHAR) AS ChildInOurCare,
+			CAST(CASE COALESCE(s.YoungCarer, 0)      WHEN 1 THEN 'Yes' ELSE 'No' END AS VARCHAR) AS IsCarer,
 			CAST(CASE COALESCE(s.HasEducationHealthCarePlan, 0)      WHEN 1 THEN 'Yes' ELSE 'No' END AS VARCHAR) AS EducationHealthCarePlan,
 			CAST(CASE COALESCE(s.HasSpecialEducationNeeds, 0)      WHEN 1 THEN 'Yes' ELSE 'No' END AS VARCHAR) AS SEND,
+			CAST(COALESCE(CAST(ras.Description AS VARCHAR), '-') AS VARCHAR) AS RefugeeAsylumSeekerStatus,
+			CAST(CASE COALESCE(ex.HasSpecialArrangements, 0) WHEN 1 THEN 'Yes' ELSE 'No' END AS VARCHAR) AS HasExamSpecialArrangement,
+			CAST(COALESCE(mo.MainOfferingCollegeLevelName, '-') AS VARCHAR) AS MainOfferingCollegeLevelName,
+			CAST(COALESCE(mo.MainOfferingName, '-') AS VARCHAR) AS MainOfferingName,
+			CAST(COALESCE(mo.StudentMainSite, '-') AS VARCHAR) AS StudentMainSite,
 	CAST(CASE
         WHEN (
                 (s.HasEducationHealthCarePlan = 1) OR
@@ -44,7 +50,6 @@ WITH Prosolution_Student AS (
     END AS VARCHAR) AS SENDWithALSSupport,
 			CAST(COALESCE(eg.Description, 'Not provided') AS VARCHAR)        AS EthnicGroup,
 			CAST(CASE COALESCE(s.Safeguarding, 0)      WHEN 1 THEN 'Yes' ELSE 'No' END AS VARCHAR) AS Safeguarding,
-			CAST(CASE COALESCE(s.YoungCarer, 0)      WHEN 1 THEN 'Yes' ELSE 'No' END AS VARCHAR) AS YoungCarer,
 			CAST(CASE WHEN COALESCE(s.YoungCarer, 0)=1  AND s.Safeguarding=1 THEN 'Yes' ELSE 'No' END AS VARCHAR) AS WelfareCaseload,
 			CAST(CASE COALESCE(s.EstrangedFromParents , 0)      WHEN 1 THEN 'Yes' ELSE 'No' END AS VARCHAR) AS EstrangedFromParents,
 			CAST(CASE  WHEN s.GCSEEnglishQualificationGrade IN ( '4', '5', '6', '7', '8', '9', 'A*', 'A', 'B', 'C', 'A*A', 'AA', 'AB', 'BB', 'BC', 'CC' ) THEN 'Yes' ELSE 'No' END AS VARCHAR) AS AchievedEnglish,
@@ -84,6 +89,12 @@ WITH Prosolution_Student AS (
 			FROM    {{ ref('stg_prosolution__academicyear') }}
 		) Y 
 			ON TRIM(s.AcademicYearID) = TRIM(Y.AcademicYearID)
+		LEFT JOIN {{ ref('stg_prosolution__studentdetailmainoffering') }} AS mo
+			ON s.StudentDetailID = mo.StudentDetailID
+		LEFT JOIN {{ ref('stg_prosolution__examstudent_stats') }} AS ex
+			ON s.StudentID = ex.StudentID
+		LEFT JOIN {{ ref('stg_prosolution__refugeeasylumseekerstatus') }} AS ras
+			ON s.RefugeeAsylumSeekerStatus = ras.RefugeeAsylumSeekerStatusID
 
 	)
 ,
@@ -183,9 +194,15 @@ Badges AS (
 		  CAST(COALESCE(ps.EducationHealthCarePlan,'No') AS VARCHAR) AS "EducationHealthCarePlan",
 		  CASE WHEN ps.EducationHealthCarePlan = 'Yes' THEN -15 ELSE 0 END AS "EHCPScore",
 		  CAST(COALESCE(ps.CareLeaver,'No') AS VARCHAR) AS "CareLeaver",
-		  CAST(COALESCE(ps.LookedAfter,'No') AS VARCHAR) AS "LookedAfter",
+		  CAST(COALESCE(ps.ChildInOurCare,'No') AS VARCHAR) AS "ChildInOurCare",
 		  CAST(COALESCE(ps.HighNeeds,'No') AS VARCHAR) AS "HighNeeds",
 		  CASE WHEN ps.HighNeeds = 'Yes' THEN -15 ELSE 0 END AS "HighNeedsScore",
+		  ps.IsCarer AS "IsCarer",
+		  ps.HasExamSpecialArrangement AS "HasExamSpecialArrangement",
+		  ps.RefugeeAsylumSeekerStatus AS "RefugeeAsylumSeekerStatus",
+		  ps.MainOfferingCollegeLevelName AS "MainOfferingCollegeLevelName",
+		  ps.MainOfferingName AS "MainOfferingName",
+		  ps.StudentMainSite AS "StudentMainSite",
 		  CAST(COALESCE(ps.EthnicGroup, 'unknown') AS VARCHAR) AS "EthnicGroup",
 		  CAST(COALESCE(ps.SEND,'No') AS VARCHAR) AS "SEND",
 		  CAST(COALESCE(ps.EstrangedFromParents,'No') AS VARCHAR) AS "EstrangedFromParents",
