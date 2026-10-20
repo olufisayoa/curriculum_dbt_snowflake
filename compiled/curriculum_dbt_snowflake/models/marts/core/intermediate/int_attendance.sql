@@ -44,7 +44,7 @@ LEFT JOIN		CURRICULUM_DB.stg.stg_prosolution__offering  O
 ON				E.OfferingID = O.OfferingID
 
 LEFT JOIN		CURRICULUM_DB.stg.stg_prosolution__offeringgroup AS OG 
-    ON og.OfferingID = o.OfferingID
+    ON OG.OfferingID = O.OfferingID AND E.OfferingGroupID = OG.OfferingGroupID
 
 LEFT JOIN		CURRICULUM_DB.stg.stg_prosolution__student SD 
 ON			    E.StudentDetailID = SD.StudentDetailID
