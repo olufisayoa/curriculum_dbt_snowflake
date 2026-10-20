@@ -156,7 +156,8 @@ SELECT
         AS "SubjectType",
     PM.OfferingID,
     PM.OfferingGroupID,
-    PM.CollegeLevelCode
+    PM.CollegeLevelCode,
+    PM.CompletionStatusID
 
 FROM ProSolution_Master PM
 LEFT JOIN OneGrade_Enrichment_Deduped OE
