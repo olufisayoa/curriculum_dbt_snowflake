@@ -166,17 +166,18 @@ base_metrics AS (
 calculated_scores AS (
     SELECT
         m.*,
-        CASE WHEN m."Value Added" < 0.0 THEN -15 ELSE 0 END AS "ProgressScore",
-        COALESCE(s."SafeguardingScore", 0) AS "SafeguardingScore",
-        COALESCE(s."WelfareScore", 0) AS "WelfareScore",
-        COALESCE(s."CommentsScore", 0) AS "CommentsScore",
-        COALESCE(s."BehaviourScore", 0) AS "BehaviourScore",
-        COALESCE(s."AttendanceScore", 0) AS "AttendanceScore",
-        COALESCE(s."EHCPScore", 0) AS "EHCPScore",
-        COALESCE(s."HighNeedsScore", 0) AS "HighNeedsScore"
+        CASE WHEN AVG(m."Value Added") OVER (PARTITION BY m."StudentKey", m."MPKey") < 0.0 THEN -15 ELSE 0 END AS "ProgressScore",
+        s."SafeguardingScore" AS "SafeguardingScore",
+        s."WelfareScore" AS "WelfareScore",
+        s."CommentsScore" AS "CommentsScore",
+        s."BehaviourScore" AS "BehaviourScore",
+        s."AttendanceScore" AS "AttendanceScore",
+        s."EHCPScore" AS "EHCPScore",
+        s."HighNeedsScore" AS "HighNeedsScore"
     FROM base_metrics m
     LEFT JOIN CURRICULUM_DB.int.int_consolidated_student_detail s ON s."StudentKey" = m."StudentKey"
-)
+),
+scored AS (
 SELECT
     *,
     "ProgressScore" + "SafeguardingScore" + "WelfareScore" + "CommentsScore" + "BehaviourScore" + "AttendanceScore" + "EHCPScore" + "HighNeedsScore" AS "TotalRiskScore",
@@ -211,3 +212,19 @@ SELECT
         )
     END AS "RiskFactors"
 FROM calculated_scores
+)
+
+SELECT
+    *,
+    CASE
+        WHEN "TotalRiskScore" < -60 THEN 'High Risk'
+        WHEN "TotalRiskScore" < 0   THEN 'Medium Risk'
+        ELSE 'Low Risk'
+    END AS "RiskBand",
+    IFF("ProgressScore" < 0, 1, 0)                           AS "ProgressConcern",
+    IFF("AttendanceScore" < 0, 1, 0)                         AS "AttendanceConcern",
+    IFF("EHCPScore" + "HighNeedsScore" < 0, 1, 0)                      AS "EHCPHighNeedsConcern",
+    IFF("BehaviourScore" < 0, 1, 0)                          AS "BehaviourConcern",
+    IFF("SafeguardingScore" + "WelfareScore" < 0, 1, 0)      AS "SafeguardingWelfareConcern",
+    IFF("CommentsScore" < 0, 1, 0)                           AS "ProMonitorCommentsConcern"
+FROM scored
