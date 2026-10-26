@@ -235,7 +235,7 @@ FROM calculated_scores
 SELECT
     *,
     CASE
-        WHEN "TotalRiskScore" < -60 THEN 'High Risk'
+        WHEN "TotalRiskScore" <= -60 THEN 'High Risk'
         WHEN "TotalRiskScore" < 0   THEN 'Medium Risk'
         ELSE 'Low Risk'
     END AS "RiskBand",
