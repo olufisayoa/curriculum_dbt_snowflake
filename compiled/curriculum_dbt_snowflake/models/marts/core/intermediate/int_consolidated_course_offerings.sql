@@ -33,6 +33,7 @@ ProsolutionOffering AS (
         pc.PARENTCOURSECODE,
         pc.PARENTCOURSENAME,
         og.Description AS OFFERINGGROUPDESCRIPTION,
+        og.Code AS OFFERINGGROUPCODE,
         COALESCE(s.FIRSTNAME || ' ' || s.SURNAME, pos.FULLNAME) AS STAFF,
         CASE 
             WHEN LEFT(O.QualID, 1) = 'Z' THEN 'Work Experience'
@@ -77,11 +78,12 @@ SELECT
     COALESCE(TRIM(p.COURSECODE), '-')::VARCHAR(50) AS "CourseCode",
     COALESCE(p.COURSENAME, '-')::VARCHAR(255) AS "CourseName",
     COALESCE(p.FULLCOURSENAME, '-')::VARCHAR(355) AS "FullCourseName",
-    COALESCE(p.STARTDATE, '1753-01-01'::TIMESTAMP) AS "StartDate",
-    COALESCE(p.ENDDATE, '9999-12-31'::TIMESTAMP) AS "EndDate",
+    p.STARTDATE::TIMESTAMP AS "StartDate",
+    p.ENDDATE::TIMESTAMP AS "EndDate",
     COALESCE(p.PARENTCOURSECODE, '-') AS "ParentCourseCode",
     COALESCE(p.PARENTCOURSENAME, '-') AS "ParentCourseName",
-    COALESCE(p.OFFERINGGROUPDESCRIPTION, '-') AS "CourseGroup",
+    COALESCE(p.OFFERINGGROUPDESCRIPTION, '-')::VARCHAR(50) AS "CourseGroup",
+    COALESCE(p.OFFERINGGROUPCODE, '-')::VARCHAR(3) AS "CourseGroupCode",
     COALESCE(p.STAFF, '-')::VARCHAR(1000) AS "Staff",
     COALESCE(p.CourseType, '-')::VARCHAR(50) AS "CourseType",
     p.DURATION AS "Duration",
