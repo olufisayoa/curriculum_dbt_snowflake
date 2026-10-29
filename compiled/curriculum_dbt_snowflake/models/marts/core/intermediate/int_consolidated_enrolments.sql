@@ -49,7 +49,7 @@ OneGrade_Enrichment AS (
          OGE.WholeQualID,
          OGE.CourseID              AS OneGradeCourseID,
 		 C.Description AS CompletionStatus,
-         ROW_NUMBER() OVER (PARTITION BY OGE.AcademicYearID, OGE.StudentRef, OGC.CourseCode, OGE.LearningAimRef, OGE.StartDate, OGE.CompletionID
+         ROW_NUMBER() OVER (PARTITION BY OGE.AcademicYearID, OGE.StudentRef, OGC.CourseCode, OGE.LearningAimRef, OGE.StartDate
          ORDER BY OGE.ID DESC) AS rn
      FROM CURRICULUM_DB.stg.stg_onegrade__enrolment OGE
      LEFT  JOIN CURRICULUM_DB.stg.stg_onegrade__course OGC ON OGE.CourseID = OGC.ID
@@ -80,19 +80,6 @@ OneGrade_Enrichment_Deduped AS (
     FROM OneGrade_Enrichment
     WHERE rn = 1 
 ),
-EngMat_Enrichment AS (
-    SELECT 
-        e."ID" AS EnrolmentID,
-        e."EngMatType" AS EngMatType,
-        LTRIM(RTRIM(e."AcademicYearID")) AS AcademicYearID,
-        LTRIM(RTRIM(e."StudentRef")) AS StudentRef,
-        LTRIM(RTRIM(e."LearningAimRef")) AS LearningAimRef,
-        LTRIM(RTRIM(e."CourseCode")) AS CourseCode,
-        e."StartDate" AS StartDate,
-        e."ActualEndDate" AS ActualEndDate,
-        e."CompletionID" AS CompletionID,
-    FROM CURRICULUM_DB.stg.stg_onegrade__engmat_enrolment_inyear e
-),
 Attendance_Aggregated AS (
     SELECT
         EnrolmentKey,
@@ -108,65 +95,37 @@ Attendance_Aggregated AS (
 Enrolments AS (
 SELECT 
 
-    md5(cast(coalesce(cast(TRIM(PM.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(PM.StudentRef) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(PM.CourseCode) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(PM.LearningAimRef) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(CAST(PM.StartDate AS DATE) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(CAST(PM.CompletionStatusID AS INTEGER) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS "EnrolmentKey",
-    CAST(LTRIM(RTRIM(PM.AcademicYearID)) AS NCHAR(5)) AS "AcademicYear",
-
-    CAST(PM.StudentRef AS NCHAR(50)) AS "StudentID",
-
-    CAST(PM.CourseCode AS NVARCHAR(24)) AS "CourseCode",
-
-    CAST(PM.CourseTitle AS NVARCHAR(255)) AS "CourseName",
-
-    CAST(PM.StartDate AS TIMESTAMP_NTZ ) AS "StartDate",
-
-    CAST(PM.PlannedEndDate AS TIMESTAMP_NTZ ) AS "PlannedEndDate",
-
-    CAST(PM.ActualEndDate AS TIMESTAMP_NTZ)     
-        AS "ActualEndDate",
-
-    CAST(PM.CompletionStatus AS NVARCHAR(50)) AS "CompletionStatus",
-	
+     md5(cast(coalesce(cast(TRIM(COALESCE(PM.AcademicYearID, OE.AcademicYearID)) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(COALESCE(PM.StudentRef, OE.StudentRef)) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(COALESCE(PM.CourseCode, OE.CourseCode)) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(COALESCE(PM.LearningAimRef, OE.LearningAimRef)) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(CAST(COALESCE(PM.StartDate, OE.StartDate) AS DATE) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS "EnrolmentKey",
+    CAST(COALESCE(TRIM(PM.AcademicYearID), TRIM(OE.AcademicYearID)) AS NCHAR(5)) AS "AcademicYear",
+    CAST(COALESCE(PM.StudentRef, OE.StudentRef) AS NCHAR(50)) AS "StudentID",
+    CAST(COALESCE(PM.CourseCode, OE.CourseCode) AS NVARCHAR(24)) AS "CourseCode",
+    CAST(COALESCE(PM.CourseTitle, OE.CourseTitle, '-') AS NVARCHAR(255)) AS "CourseName",
+    CAST(COALESCE(PM.StartDate, OE.StartDate) AS TIMESTAMP_NTZ) AS "StartDate",
+    CAST(COALESCE(PM.PlannedEndDate, OE.PlannedEndDate) AS TIMESTAMP_NTZ) AS "PlannedEndDate",
+    CAST(COALESCE(PM.ActualEndDate, OE.ActualEndDate) AS TIMESTAMP_NTZ) AS "ActualEndDate",
+    CAST(COALESCE(PM.CompletionStatus, OE.CompletionStatus, '-') AS NVARCHAR(50)) AS "CompletionStatus",
+        
     CAST(COALESCE(OE.NotionalNVQLevel, '-') AS NCHAR(1)) AS "NotionalNVQLevel",
+    CAST(COALESCE(OE.WDNumDaysAfterStart, -1) AS INT) AS "WDNumDaysAfterStart",
+    CAST(COALESCE(OE.AgeOn31Aug, -1) AS INT) AS "AgeOn31Aug",
+    CAST(COALESCE(OE.VAType, '-') AS NVARCHAR(100)) AS "VAType",
+    CAST(COALESCE(OE.Cohort, '-') AS NVARCHAR(20)) AS "Cohort",
+    CAST(COALESCE(OE.QualificationLevel, '-') AS NVARCHAR(255)) AS "QualificationLevel",
 
-	CAST(COALESCE(OE.WDNumDaysAfterStart, -1) AS INT) AS "WDNumDaysAfterStart",
-
-	CAST(COALESCE(OE.AgeOn31Aug, -1) AS INT) AS "AgeOn31Aug",
-
-    CAST(COALESCE(OE.VAType, '-') AS NVARCHAR(100)) 
-        AS "VAType",
-
-	CAST(COALESCE(OE.Cohort, '-')  AS NVARCHAR(20)) AS "Cohort",
-    CAST(COALESCE(OE.QualificationLevel, '-') AS NVARCHAR(255)) 
-        AS "QualificationLevel",
-
-    CAST(PM.StudyYear AS DECIMAL(19,2)) 
-        AS "StudyYear",
-    CAST(PM.EnrolmentType AS NVARCHAR(100)) 
-        AS "EnrolmentType",
-	CAST(COALESCE(PM.Outcome, '-') AS NVARCHAR(100)) 
-        AS "Outcome",
-    CAST(COALESCE(EM.EngMatType, 'Other') AS NVARCHAR(8))
-        AS "SubjectType",
+    CAST(COALESCE(PM.StudyYear, 1) AS DECIMAL(19,2)) AS "StudyYear",
+    CAST(COALESCE(PM.EnrolmentType, '-') AS NVARCHAR(100)) AS "EnrolmentType",
+    CAST(COALESCE(PM.Outcome, '-') AS NVARCHAR(100)) AS "Outcome",
     PM.OfferingID,
     PM.OfferingGroupID,
     PM.CollegeLevelCode,
     PM.CompletionStatusID
-
 FROM ProSolution_Master PM
-LEFT JOIN OneGrade_Enrichment_Deduped OE
+FULL OUTER JOIN OneGrade_Enrichment_Deduped OE
     ON  PM.StudentRef   = OE.StudentRef
     AND PM.CourseCode  = OE.CourseCode
     AND PM.AcademicYearID            = OE.AcademicYearID
 	AND PM.StartDate                  = OE.StartDate
     AND PM.LearningAimRef            = OE.LearningAimRef
-    AND PM.CompletionStatusID          = OE.CompletionID
-LEFT JOIN EngMat_Enrichment EM
-    ON  PM.StudentRef   = EM.StudentRef
-    AND PM.CourseCode  = EM.CourseCode
-    AND PM.AcademicYearID            = EM.AcademicYearID
-    AND PM.StartDate                  = EM.StartDate
-    AND PM.LearningAimRef            = EM.LearningAimRef
-    AND PM.CompletionStatusID          = EM.CompletionID
 )
 
 SELECT

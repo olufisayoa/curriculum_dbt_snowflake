@@ -179,7 +179,7 @@ Badges AS (
 	LEFT JOIN CURRICULUM_DB.stg.stg_promonitor__student S ON P.PMStudentID=S.PMStudentID
  )
 	SELECT 
-          ps.StudentKey AS "StudentKey",
+          md5(cast(coalesce(cast(TRIM(COALESCE(ps.AcademicYearID, _os.AcademicYearID)) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(COALESCE(ps.StudentID, _os.StudentRef)) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS "StudentKey",
           CAST(COALESCE(TRIM(ps.AcademicYearID), '00/00') AS VARCHAR) AS "AcademicYear",
 		  CAST(COALESCE(ps.StudentID, '-') AS VARCHAR) AS "StudentID",
 		  CAST(COALESCE(ps.FirstName,'-') AS VARCHAR) AS "Firstname",
@@ -249,7 +249,7 @@ Badges AS (
 		  CAST(COALESCE(ps.StudentPhotoThumbnail,'-') AS VARCHAR) AS "StudentPhotoThumbnail",
 		  CAST(COALESCE(ps.StudentProfileUrl, '-') AS VARCHAR) AS "StudentProfileUrl"
 	FROM Prosolution_Student AS ps
-	LEFT JOIN Onegrade_Student AS _os
+	FULL OUTER JOIN Onegrade_Student AS _os
 	 ON TRIM(ps.AcademicYearID) = TRIM(_os.AcademicYearID) AND TRIM(ps.StudentID) = TRIM(_os.StudentRef)
 	LEFT JOIN Comment_Agg AS ca
 	 ON ps.StudentKey = ca.StudentKey
