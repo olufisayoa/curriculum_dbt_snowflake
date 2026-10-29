@@ -24,3 +24,33 @@ models:
         tests:
           - unique
           - not_null
+
+  - name: fct_studentprogress
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - '"EnrolmentKey"'
+              - '"MPKey"'
+    columns:
+      - name: '"StudentKey"'
+        description: Surrogate key for the student
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_student')
+                field: '"StudentKey"'
+      - name: '"EnrolmentKey"'
+        description: Surrogate key for the enrolment
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_enrolment')
+                field: '"EnrolmentKey"'
+      - name: '"CourseKey"'
+        description: Surrogate key for the course
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_course')
+                field: '"CourseKey"'

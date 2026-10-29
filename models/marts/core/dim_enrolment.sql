@@ -17,7 +17,6 @@ select
 "StudyYear",
 "EnrolmentType",
 "Outcome",
-"SubjectType",
 "TotalPresent",
 "TotalRequired",
 "AttendanceRate",

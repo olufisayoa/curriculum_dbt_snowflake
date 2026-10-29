@@ -1,19 +1,35 @@
-WITH base_data AS (
+WITH prosolution_enrolment AS (
+    SELECT
+        TRIM(po.AcademicYearID)  AS AcademicYearID,
+        TRIM(ps.RefNo)           AS StudentRef,
+        TRIM(po.Code)            AS CourseCode,
+        TRIM(po.QualID)          AS LearningAimRef,
+        CAST(pe.StartDate AS DATE) AS StartDate,
+        pe.OfferingGroupID
+    FROM {{ ref('stg_prosolution__enrolment') }} AS pe
+    JOIN {{ ref('stg_prosolution__offering') }}  AS po ON pe.OfferingID = po.OfferingID
+    JOIN {{ ref('stg_prosolution__student') }}   AS ps ON pe.StudentDetailID = ps.StudentDetailID
+),
+ base_data AS (
     SELECT 
         e.*,
         s.SiteID AS SiteID,
         o.OfferingID AS OfferingID,
-        og.OfferingGroupID AS OfferingGroupID,
+        pen.OfferingGroupID AS OfferingGroupID,
         o.SID AS CollegeLevelCode
     FROM {{ ref('stg_onegrade__estactva') }} AS e
     LEFT JOIN {{ ref('stg_onegrade__course') }} AS c 
         ON e.CourseCode = c.CourseCode 
         AND e.AcademicYearID = c.AcademicYearID
+    LEFT JOIN prosolution_enrolment AS pen
+        ON  TRIM(pen.AcademicYearID) = TRIM(e.AcademicYearID)
+        AND TRIM(pen.StudentRef)     = TRIM(e.StudentRef)
+        AND TRIM(pen.CourseCode)     = TRIM(e.CourseCode)
+        AND TRIM(pen.LearningAimRef) = TRIM(e.LearningAimRef)
+        AND pen.StartDate      = CAST(e.StartDate AS DATE)
     LEFT JOIN {{ ref('stg_prosolution__offering') }} AS o 
         ON o.Code = c.CourseCode 
         AND o.AcademicYearID = c.AcademicYearID
-    LEFT JOIN {{ ref('stg_prosolution__offeringgroup') }} AS og 
-        ON og.OfferingID = o.OfferingID
     LEFT JOIN {{ ref('stg_prosolution__site') }} AS s 
         ON s.SiteID = o.SiteID
     WHERE e.CompletionID IN (1,2)
@@ -36,8 +52,7 @@ SELECT
     'TRIM(base.StudentRef)',
     'TRIM(base.CourseCode)',   
     'TRIM(base.LearningAimRef)',            
-    'CAST(base.StartDate AS DATE)',      
-    'CAST(base.CompletionID AS INTEGER)'                            
+    'CAST(base.StartDate AS DATE)'                            
     ]) }} AS EnrolmentKey
     , {{ dbt_utils.generate_surrogate_key(['TRIM(base.SiteID)']) }} AS SiteKey
     , {{ dbt_utils.generate_surrogate_key(['TRIM(base.CollegeLevelCode)']) }} AS CollegeLevelKey

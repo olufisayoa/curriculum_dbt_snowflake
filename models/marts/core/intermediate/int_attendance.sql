@@ -16,8 +16,7 @@ SELECT			M.RegisterMarkID,
                     'TRIM(SD.RefNo)',
                     'TRIM(O.Code)',   
                     'TRIM(O.QualID)',            
-                    'CAST(E.StartDate AS DATE)',      
-                    'CAST(E.CompletionStatusID AS INTEGER)'                            
+                    'CAST(E.StartDate AS DATE)'                          
                     ]) }} AS EnrolmentKey,
 			{{ dbt_utils.generate_surrogate_key(['R.RegisterID']) }} AS RegisterKey,
         {{ dbt_utils.generate_surrogate_key(['O.OfferingID', 'OG.OfferingGroupID']) }} AS CourseKey,
