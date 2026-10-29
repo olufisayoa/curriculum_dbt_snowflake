@@ -1,21 +1,17 @@
 WITH prosolution_enrolments AS (
     SELECT
-    {{ dbt_utils.generate_surrogate_key([
-    'TRIM(o.AcademicYearID)',   
-    'TRIM(sd.RefNo)',
-    'TRIM(o.Code)',   
-    'TRIM(o.QualID)',            
-    'CAST(e.StartDate AS DATE)',      
-    'CAST(e.CompletionStatusID AS INTEGER)'                            
-    ]) }} AS EnrolmentKey,
-    {{ dbt_utils.generate_surrogate_key(['TRIM(o.AcademicYearID)'])  }} AS AcademicYearKey,
-    {{ dbt_utils.generate_surrogate_key(['TRIM(s.SiteID)']) }} AS SiteKey,
-    {{ dbt_utils.generate_surrogate_key(['TRIM(o.SID)']) }} AS CollegeLevelKey,
-    {{ dbt_utils.generate_surrogate_key(['TRIM(sd.AcademicYearID)', 'TRIM(sd.RefNo)']) }} AS StudentKey,
-    {{ dbt_utils.generate_surrogate_key(['o.OfferingID','og.OfferingGroupID']) }} AS CourseKey
+        TRIM(o.AcademicYearID)     AS AcademicYearID,
+        TRIM(sd.RefNo)             AS StudentRef,
+        TRIM(o.Code)               AS CourseCode,
+        TRIM(o.QualID)             AS LearningAimRef,
+        CAST(e.StartDate AS DATE)  AS StartDate,
+        TRIM(s.SiteID)             AS SiteID,
+        TRIM(o.SID)                AS CollegeLevelCode,
+        o.OfferingID               AS OfferingID,
+        e.OfferingGroupID         AS OfferingGroupID
     FROM {{ ref('stg_prosolution__enrolment') }} e
     INNER JOIN {{ ref('stg_prosolution__offering') }} AS o ON o.OfferingID = e.OfferingID
-    LEFT JOIN {{ ref('stg_prosolution__offeringgroup') }} AS og ON og.OfferingID = o.OfferingID
+    LEFT JOIN {{ ref('stg_prosolution__offeringgroup') }} AS og ON og.OfferingID = o.OfferingID AND e.OfferingGroupID = og.OfferingGroupID
     INNER JOIN {{ ref('stg_prosolution__student') }} sd   ON e.StudentDetailID = sd.StudentDetailID
     LEFT JOIN {{ ref('stg_prosolution__academicyear') }} ay ON TRIM(ay.AcademicYearID) = TRIM(o.AcademicYearID)
     LEFT JOIN {{ ref('stg_prosolution__site') }} AS s 
@@ -24,26 +20,14 @@ WITH prosolution_enrolments AS (
 ),
 onegrade_enrolments AS (
     SELECT 
-        {{ dbt_utils.generate_surrogate_key([
-        'TRIM(e.AcademicYearID)',   
-        'TRIM(e.StudentRef)',
-        'TRIM(e.CourseCode)',   
-        'TRIM(e.LearningAimRef)',            
-        'CAST(e.StartDate AS DATE)',      
-        'CAST(e.CompletionID AS INTEGER)'                            
-        ]) }} AS EnrolmentKey,
-         {{ dbt_utils.generate_surrogate_key([
-        'TRIM(e.AcademicYearID)']) }} AS AcademicYearKey,
-        {{ dbt_utils.generate_surrogate_key([
-        'TRIM(e.AcademicYearID)',   
-        'TRIM(e.StudentRef)']) }} AS StudentKey,
-       {{ dbt_utils.generate_surrogate_key(['TRIM(s.SiteID)']) }} AS SiteKey,
-       {{ dbt_utils.generate_surrogate_key(['TRIM(o.SID)']) }} AS CollegeLevelKey,
-       {{ dbt_utils.generate_surrogate_key(['TRIM(e.Cohort)']) }} AS CohortKey,
-       {{ dbt_utils.generate_surrogate_key(['e.VA_Type']) }} AS VATypeKey,
-       {{ dbt_utils.generate_surrogate_key(['TRIM(e.AcademicYearID)',
-       'TRIM(e.LearningAimRef)']) }} AS LearningAimKey,
-       {{ dbt_utils.generate_surrogate_key(['o.OfferingID','og.OfferingGroupID']) }} AS CourseKey,
+        TRIM(e.AcademicYearID)     AS AcademicYearID,
+        TRIM(e.StudentRef)         AS StudentRef,
+        TRIM(e.CourseCode)         AS CourseCode,
+        TRIM(e.LearningAimRef)     AS LearningAimRef,
+        CAST(e.StartDate AS DATE)  AS StartDate,
+        TRIM(s.SiteID)             AS SiteID,
+        TRIM(o.SID)                AS CollegeLevelCode,
+        o.OfferingID               AS OfferingID,
         e.Size,
         e.CourseCode,
         e.LearningAimRef,
@@ -76,28 +60,55 @@ onegrade_enrolments AS (
         e.Point3_vs_MostRecent2dp,
         e.Point4_vs_MostRecent2dp,
         e.Point5_vs_MostRecent2dp,
-        e.EnrolmentGradeVAScore_vs_MostRecent2dp
+        e.EnrolmentGradeVAScore_vs_MostRecent2dp,
+        p.OfferingGroupID AS OfferingGroupID
     FROM {{ ref('stg_onegrade__estactva') }} AS e
     LEFT JOIN {{ ref('stg_onegrade__course') }} AS c 
         ON e.CourseCode = c.CourseCode 
         AND e.AcademicYearID = c.AcademicYearID
+    LEFT JOIN prosolution_enrolments p 
+        ON e.AcademicYearID = p.AcademicYearID 
+        AND e.StudentRef = p.StudentRef 
+        AND e.CourseCode = p.CourseCode 
+        AND e.LearningAimRef = p.LearningAimRef 
+        AND CAST(e.StartDate AS DATE) = CAST(p.StartDate AS DATE)
     LEFT JOIN {{ ref('stg_prosolution__offering') }} AS o 
         ON o.Code = c.CourseCode 
         AND o.AcademicYearID = c.AcademicYearID
-    LEFT JOIN {{ ref('stg_prosolution__offeringgroup') }} AS og 
-        ON og.OfferingID = o.OfferingID
     LEFT JOIN {{ ref('stg_prosolution__site') }} AS s 
         ON s.SiteID = o.SiteID
     WHERE  e.CompletionID IN (1,2)
 ),
 consolidated_enrolments AS (
     SELECT
-        p.EnrolmentKey AS EnrolmentKey,
-        p.CollegeLevelKey AS CollegeLevelKey,
-        p.StudentKey AS StudentKey,
-        p.CourseKey AS CourseKey,
-        p.SiteKey AS SiteKey,
-        p.AcademicYearKey AS AcademicYearKey,
+         {{ dbt_utils.generate_surrogate_key([
+            'COALESCE(p.AcademicYearID, b.AcademicYearID)',   
+            'COALESCE(p.StudentRef, b.StudentRef)',
+            'COALESCE(p.CourseCode, b.CourseCode)',   
+            'COALESCE(p.LearningAimRef, b.LearningAimRef)',            
+            'COALESCE(p.StartDate, b.StartDate)'                            
+        ]) }} AS EnrolmentKey,
+        {{ dbt_utils.generate_surrogate_key([
+            'COALESCE(p.AcademicYearID, b.AcademicYearID)',   
+            'COALESCE(p.StudentRef, b.StudentRef)'
+        ]) }} AS StudentKey,
+
+        {{ dbt_utils.generate_surrogate_key([
+            'COALESCE(p.AcademicYearID, b.AcademicYearID)'
+        ]) }} AS AcademicYearKey,
+
+        {{ dbt_utils.generate_surrogate_key([
+            'COALESCE(p.SiteID, b.SiteID)'
+        ]) }} AS SiteKey,
+
+        {{ dbt_utils.generate_surrogate_key([
+            'COALESCE(p.CollegeLevelCode, b.CollegeLevelCode)'
+        ]) }} AS CollegeLevelKey,
+
+        {{ dbt_utils.generate_surrogate_key([
+            'COALESCE(p.OfferingID, b.OfferingID)',
+            'COALESCE(p.OfferingGroupID, b.OfferingGroupID)'
+        ]) }} AS CourseKey,
         b.QOEPoints_GCSE_College2dp,
         b.QOEPoints_College2dp,
         CAST(CASE
@@ -130,7 +141,7 @@ consolidated_enrolments AS (
         b.Point5_vs_MostRecent2dp,
         b.EnrolmentGradeVAScore_vs_MostRecent2dp
     FROM prosolution_enrolments p
-    LEFT JOIN onegrade_enrolments b 
+    FULL OUTER JOIN onegrade_enrolments b 
         ON p.EnrolmentKey = b.EnrolmentKey
 ),
 unpivot_helper AS (
