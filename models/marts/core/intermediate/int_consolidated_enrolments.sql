@@ -39,7 +39,7 @@ OneGrade_Enrichment AS (
 		 OGE.ActualEndDate,
 		 OGC.Title AS CourseTitle,
          OGE.CompletionID,
-		 OGE.VAType,
+		 OGE.VA_Type,
 		 vla.QualType AS Cohort,
 		 OGE.NotionalNVQLevel,
          OGE.WDNumDaysAfterStart,
