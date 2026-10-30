@@ -47,7 +47,7 @@ OneGrade_Enrichment AS (
          LTRIM(RTRIM(OGE.LearningAimRef)) AS LearningAimRef,
          OGE.WholeQualID,
 		 OGE.CompletionDescription AS CompletionStatus,
-         ROW_NUMBER() OVER (PARTITION BY OGE.AcademicYearID, OGE.StudentRef, OGC.CourseCode, OGE.LearningAimRef, OGE.StartDate
+         ROW_NUMBER() OVER (PARTITION BY OGE.AcademicYearID, OGE.StudentRef, OGE.CourseCode, OGE.LearningAimRef, OGE.StartDate
          ORDER BY OGE.ID DESC) AS rn
      FROM {{ ref('stg_onegrade__estactva') }} OGE
 	 LEFT JOIN {{ ref('stg_onegrade__ofqual') }} ofq ON ofq."QualificationNumber"=OGE.LearningAimRef
