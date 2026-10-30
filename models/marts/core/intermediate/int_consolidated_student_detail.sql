@@ -218,14 +218,14 @@ Badges AS (
 		  END AS "CommentsScore",
 		  COALESCE(p.Progression, '-') AS "Progression",
 		  CAST(COALESCE(b.SafeguardingFlag, '-') AS VARCHAR) AS "SafeguardingFlag",
-		  CASE WHEN b.SafeguardingFlag = 'Child In Our Care' THEN -4 
-		  	WHEN b.SafeguardingFlag = 'Known to Safeguarding' THEN -3
-			WHEN b.SafeguardingFlag = 'Care Experienced' THEN -2
+		  CASE WHEN b.SafeguardingFlag = 'Child In Our Care' THEN -15
+		  	WHEN b.SafeguardingFlag = 'Known to Safeguarding' THEN -15
+			WHEN b.SafeguardingFlag = 'Care Experienced' THEN -15
     		WHEN b.SafeguardingFlag = 'Safeguarding Closed' THEN 0
     		ELSE 0 
 			END AS "SafeguardingScore",
 		  CAST(COALESCE(b.WelfareFlag, '-') AS VARCHAR) AS "WelfareFlag",
-		  CASE WHEN b.WelfareFlag = 'Know to Welfare' THEN -1
+		  CASE WHEN b.WelfareFlag = 'Know to Welfare' THEN -15
 		  	WHEN b.WelfareFlag = 'Welfare Closed' THEN 0
 			ELSE 0 
 		  END AS "WelfareScore",
