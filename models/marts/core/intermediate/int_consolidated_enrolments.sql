@@ -46,7 +46,6 @@ OneGrade_Enrichment AS (
          OGE.AgeOn31Aug,
          LTRIM(RTRIM(OGE.LearningAimRef)) AS LearningAimRef,
          OGE.WholeQualID,
-         OGE.CourseID              AS OneGradeCourseID,
 		 OGE.CompletionDescription AS CompletionStatus,
          ROW_NUMBER() OVER (PARTITION BY OGE.AcademicYearID, OGE.StudentRef, OGC.CourseCode, OGE.LearningAimRef, OGE.StartDate
          ORDER BY OGE.ID DESC) AS rn
