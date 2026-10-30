@@ -34,7 +34,7 @@ create or replace transient table CURRICULUM_DB.int.int_student_progress
         AND TRIM(pen.StudentRef)     = TRIM(e.StudentRef)
         AND TRIM(pen.CourseCode)     = TRIM(e.CourseCode)
         AND TRIM(pen.LearningAimRef) = TRIM(e.LearningAimRef)
-        AND pen.StartDate      = CAST(e.StartDate AS DATE)
+        AND CAST(pen.StartDate AS DATE) = CAST(e.StartDate AS DATE)
     LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__offering AS o 
         ON o.Code = c.CourseCode 
         AND o.AcademicYearID = c.AcademicYearID

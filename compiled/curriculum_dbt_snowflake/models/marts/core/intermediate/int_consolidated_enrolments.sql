@@ -32,28 +32,24 @@ OneGrade_Enrichment AS (
      SELECT 
          OGE.ID                    AS OneGradeEnrolmentID,
          LTRIM(RTRIM(OGE.StudentRef)) AS StudentRef,
-         LTRIM(RTRIM(OGC.CourseCode)) AS CourseCode,
+         LTRIM(RTRIM(OGE.CourseCode)) AS CourseCode,
          LTRIM(RTRIM(OGE.AcademicYearID)) AS AcademicYearID,
          OGE.StartDate,
 		 OGE.PlannedEndDate,
 		 OGE.ActualEndDate,
-		 OGC.Title AS CourseTitle,
+		 OGE.CourseTitle AS CourseTitle,
          OGE.CompletionID,
-		 OGE.VAType,
+		 OGE.VA_Type,
 		 vla.QualType AS Cohort,
-		 OGE.NotionalNVQLevel,
          OGE.WDNumDaysAfterStart,
 		 ofq."QualificationLevel" AS QualificationLevel,
          OGE.AgeOn31Aug,
          LTRIM(RTRIM(OGE.LearningAimRef)) AS LearningAimRef,
          OGE.WholeQualID,
-         OGE.CourseID              AS OneGradeCourseID,
-		 C.Description AS CompletionStatus,
-         ROW_NUMBER() OVER (PARTITION BY OGE.AcademicYearID, OGE.StudentRef, OGC.CourseCode, OGE.LearningAimRef, OGE.StartDate
+		 OGE.CompletionDescription AS CompletionStatus,
+         ROW_NUMBER() OVER (PARTITION BY OGE.AcademicYearID, OGE.StudentRef, OGE.CourseCode, OGE.LearningAimRef, OGE.StartDate
          ORDER BY OGE.ID DESC) AS rn
-     FROM CURRICULUM_DB.stg.stg_onegrade__enrolment OGE
-     LEFT  JOIN CURRICULUM_DB.stg.stg_onegrade__course OGC ON OGE.CourseID = OGC.ID
-	 LEFT  JOIN CURRICULUM_DB.stg.stg_onegrade__completion C ON C.ID=OGE.CompletionID
+     FROM CURRICULUM_DB.stg.stg_onegrade__estactva OGE
 	 LEFT JOIN CURRICULUM_DB.stg.stg_onegrade__ofqual ofq ON ofq."QualificationNumber"=OGE.LearningAimRef
 	 LEFT JOIN CURRICULUM_DB.stg.stg_onegrade__learningaim vla ON vla.LearningAimRef=OGE.LearningAimRef AND vla.WholeQualID=OGE.WholeQualID
      WHERE OGE.StudentRef IS NOT NULL
@@ -69,9 +65,8 @@ OneGrade_Enrichment_Deduped AS (
         ActualEndDate,
         LearningAimRef,
         CourseTitle,
-        VAType,
+        VA_Type,
         Cohort,
-        NotionalNVQLevel,
         WDNumDaysAfterStart,
         QualificationLevel,
         AgeOn31Aug,
@@ -105,10 +100,9 @@ SELECT
     CAST(COALESCE(PM.ActualEndDate, OE.ActualEndDate) AS TIMESTAMP_NTZ) AS "ActualEndDate",
     CAST(COALESCE(PM.CompletionStatus, OE.CompletionStatus, '-') AS NVARCHAR(50)) AS "CompletionStatus",
         
-    CAST(COALESCE(OE.NotionalNVQLevel, '-') AS NCHAR(1)) AS "NotionalNVQLevel",
     CAST(COALESCE(OE.WDNumDaysAfterStart, -1) AS INT) AS "WDNumDaysAfterStart",
     CAST(COALESCE(OE.AgeOn31Aug, -1) AS INT) AS "AgeOn31Aug",
-    CAST(COALESCE(OE.VAType, '-') AS NVARCHAR(100)) AS "VAType",
+    CAST(COALESCE(OE.VA_Type, '-') AS NVARCHAR(100)) AS "VAType",
     CAST(COALESCE(OE.Cohort, '-') AS NVARCHAR(20)) AS "Cohort",
     CAST(COALESCE(OE.QualificationLevel, '-') AS NVARCHAR(255)) AS "QualificationLevel",
 
@@ -121,11 +115,11 @@ SELECT
     PM.CompletionStatusID
 FROM ProSolution_Master PM
 FULL OUTER JOIN OneGrade_Enrichment_Deduped OE
-    ON  PM.StudentRef   = OE.StudentRef
-    AND PM.CourseCode  = OE.CourseCode
-    AND PM.AcademicYearID            = OE.AcademicYearID
-	AND PM.StartDate                  = OE.StartDate
-    AND PM.LearningAimRef            = OE.LearningAimRef
+        ON  TRIM(PM.AcademicYearID) = TRIM(OE.AcademicYearID)
+        AND TRIM(PM.StudentRef)     = TRIM(OE.StudentRef)
+        AND TRIM(PM.CourseCode)     = TRIM(OE.CourseCode)
+        AND TRIM(PM.LearningAimRef) = TRIM(OE.LearningAimRef)
+        AND CAST(PM.StartDate AS DATE) = CAST(OE.StartDate AS DATE)
 )
 
 SELECT

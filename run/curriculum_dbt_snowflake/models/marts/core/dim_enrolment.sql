@@ -16,7 +16,6 @@ create or replace transient table CURRICULUM_DB.core.dim_enrolment
 "PlannedEndDate",
 "ActualEndDate",
 "CompletionStatus",
-"NotionalNVQLevel",
 "WDNumDaysAfterStart",
 "AgeOn31Aug",
 "VAType",

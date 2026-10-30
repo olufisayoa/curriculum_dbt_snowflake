@@ -1,14 +1,17 @@
 WITH prosolution_enrolments AS (
     SELECT
-    md5(cast(coalesce(cast(TRIM(o.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(sd.RefNo) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(o.Code) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(o.QualID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(CAST(e.StartDate AS DATE) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(CAST(e.CompletionStatusID AS INTEGER) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS EnrolmentKey,
-    md5(cast(coalesce(cast(TRIM(o.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS AcademicYearKey,
-    md5(cast(coalesce(cast(TRIM(s.SiteID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS SiteKey,
-    md5(cast(coalesce(cast(TRIM(o.SID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS CollegeLevelKey,
-    md5(cast(coalesce(cast(TRIM(sd.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(sd.RefNo) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS StudentKey,
-    md5(cast(coalesce(cast(o.OfferingID as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(og.OfferingGroupID as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS CourseKey
+        TRIM(o.AcademicYearID)     AS AcademicYearID,
+        TRIM(sd.RefNo)             AS StudentRef,
+        TRIM(o.Code)               AS CourseCode,
+        TRIM(o.QualID)             AS LearningAimRef,
+        CAST(e.StartDate AS DATE)  AS StartDate,
+        TRIM(s.SiteID)             AS SiteID,
+        TRIM(o.SID)                AS CollegeLevelCode,
+        o.OfferingID               AS OfferingID,
+        e.OfferingGroupID         AS OfferingGroupID
     FROM CURRICULUM_DB.stg.stg_prosolution__enrolment e
     INNER JOIN CURRICULUM_DB.stg.stg_prosolution__offering AS o ON o.OfferingID = e.OfferingID
-    LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__offeringgroup AS og ON og.OfferingID = o.OfferingID
+    LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__offeringgroup AS og ON og.OfferingID = o.OfferingID AND e.OfferingGroupID = og.OfferingGroupID
     INNER JOIN CURRICULUM_DB.stg.stg_prosolution__student sd   ON e.StudentDetailID = sd.StudentDetailID
     LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__academicyear ay ON TRIM(ay.AcademicYearID) = TRIM(o.AcademicYearID)
     LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__site AS s 
@@ -17,19 +20,15 @@ WITH prosolution_enrolments AS (
 ),
 onegrade_enrolments AS (
     SELECT 
-        md5(cast(coalesce(cast(TRIM(e.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(e.StudentRef) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(e.CourseCode) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(e.LearningAimRef) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(CAST(e.StartDate AS DATE) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(CAST(e.CompletionID AS INTEGER) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS EnrolmentKey,
-         md5(cast(coalesce(cast(TRIM(e.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS AcademicYearKey,
-        md5(cast(coalesce(cast(TRIM(e.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(e.StudentRef) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS StudentKey,
-       md5(cast(coalesce(cast(TRIM(s.SiteID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS SiteKey,
-       md5(cast(coalesce(cast(TRIM(o.SID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS CollegeLevelKey,
-       md5(cast(coalesce(cast(TRIM(e.Cohort) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS CohortKey,
-       md5(cast(coalesce(cast(e.VA_Type as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS VATypeKey,
-       md5(cast(coalesce(cast(TRIM(e.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(e.LearningAimRef) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS LearningAimKey,
-       md5(cast(coalesce(cast(o.OfferingID as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(og.OfferingGroupID as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS CourseKey,
+        TRIM(e.AcademicYearID)     AS AcademicYearID,
+        TRIM(e.StudentRef)         AS StudentRef,
+        TRIM(e.CourseCode)         AS CourseCode,
+        TRIM(e.LearningAimRef)     AS LearningAimRef,
+        CAST(e.StartDate AS DATE)  AS StartDate,
+        TRIM(s.SiteID)             AS SiteID,
+        TRIM(o.SID)                AS CollegeLevelCode,
+        o.OfferingID               AS OfferingID,
         e.Size,
-        e.CourseCode,
-        e.LearningAimRef,
-        e.StartDate,
         e.Cohort,
         e.CompletionID,
         e.QOEPoints_GCSE_College2dp,
@@ -58,28 +57,37 @@ onegrade_enrolments AS (
         e.Point3_vs_MostRecent2dp,
         e.Point4_vs_MostRecent2dp,
         e.Point5_vs_MostRecent2dp,
-        e.EnrolmentGradeVAScore_vs_MostRecent2dp
+        e.EnrolmentGradeVAScore_vs_MostRecent2dp,
+        p.OfferingGroupID AS OfferingGroupID
     FROM CURRICULUM_DB.stg.stg_onegrade__estactva AS e
     LEFT JOIN CURRICULUM_DB.stg.stg_onegrade__course AS c 
         ON e.CourseCode = c.CourseCode 
         AND e.AcademicYearID = c.AcademicYearID
+    LEFT JOIN prosolution_enrolments p 
+        ON e.AcademicYearID = p.AcademicYearID 
+        AND e.StudentRef = p.StudentRef 
+        AND e.CourseCode = p.CourseCode 
+        AND e.LearningAimRef = p.LearningAimRef 
+        AND CAST(e.StartDate AS DATE) = CAST(p.StartDate AS DATE)
     LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__offering AS o 
         ON o.Code = c.CourseCode 
         AND o.AcademicYearID = c.AcademicYearID
-    LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__offeringgroup AS og 
-        ON og.OfferingID = o.OfferingID
     LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__site AS s 
         ON s.SiteID = o.SiteID
     WHERE  e.CompletionID IN (1,2)
 ),
 consolidated_enrolments AS (
     SELECT
-        p.EnrolmentKey AS EnrolmentKey,
-        p.CollegeLevelKey AS CollegeLevelKey,
-        p.StudentKey AS StudentKey,
-        p.CourseKey AS CourseKey,
-        p.SiteKey AS SiteKey,
-        p.AcademicYearKey AS AcademicYearKey,
+         md5(cast(coalesce(cast(COALESCE(p.AcademicYearID, b.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(COALESCE(p.StudentRef, b.StudentRef) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(COALESCE(p.CourseCode, b.CourseCode) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(COALESCE(p.LearningAimRef, b.LearningAimRef) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(COALESCE(p.StartDate, b.StartDate) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS EnrolmentKey,
+        md5(cast(coalesce(cast(COALESCE(p.AcademicYearID, b.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(COALESCE(p.StudentRef, b.StudentRef) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS StudentKey,
+
+        md5(cast(coalesce(cast(COALESCE(p.AcademicYearID, b.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS AcademicYearKey,
+
+        md5(cast(coalesce(cast(COALESCE(p.SiteID, b.SiteID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS SiteKey,
+
+        md5(cast(coalesce(cast(COALESCE(p.CollegeLevelCode, b.CollegeLevelCode) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS CollegeLevelKey,
+
+        md5(cast(coalesce(cast(COALESCE(p.OfferingID, b.OfferingID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(COALESCE(p.OfferingGroupID, b.OfferingGroupID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS CourseKey,
         b.QOEPoints_GCSE_College2dp,
         b.QOEPoints_College2dp,
         CAST(CASE
@@ -112,8 +120,12 @@ consolidated_enrolments AS (
         b.Point5_vs_MostRecent2dp,
         b.EnrolmentGradeVAScore_vs_MostRecent2dp
     FROM prosolution_enrolments p
-    LEFT JOIN onegrade_enrolments b 
-        ON p.EnrolmentKey = b.EnrolmentKey
+    FULL OUTER JOIN onegrade_enrolments b 
+        ON b.AcademicYearID = p.AcademicYearID 
+        AND b.StudentRef = p.StudentRef 
+        AND b.CourseCode = p.CourseCode 
+        AND b.LearningAimRef = p.LearningAimRef 
+        AND CAST(b.StartDate AS DATE) = CAST(p.StartDate AS DATE)
 ),
 unpivot_helper AS (
     SELECT 1 AS MonitoringPointID UNION ALL

@@ -8,7 +8,6 @@ select
 "PlannedEndDate",
 "ActualEndDate",
 "CompletionStatus",
-"NotionalNVQLevel",
 "WDNumDaysAfterStart",
 "AgeOn31Aug",
 "VAType",
