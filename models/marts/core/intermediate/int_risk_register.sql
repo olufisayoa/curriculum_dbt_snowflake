@@ -139,7 +139,11 @@ consolidated_enrolments AS (
         b.EnrolmentGradeVAScore_vs_MostRecent2dp
     FROM prosolution_enrolments p
     FULL OUTER JOIN onegrade_enrolments b 
-        ON p.EnrolmentKey = b.EnrolmentKey
+        ON b.AcademicYearID = p.AcademicYearID 
+        AND b.StudentRef = p.StudentRef 
+        AND b.CourseCode = p.CourseCode 
+        AND b.LearningAimRef = p.LearningAimRef 
+        AND CAST(b.StartDate AS DATE) = CAST(p.StartDate AS DATE)
 ),
 unpivot_helper AS (
     SELECT 1 AS MonitoringPointID UNION ALL
