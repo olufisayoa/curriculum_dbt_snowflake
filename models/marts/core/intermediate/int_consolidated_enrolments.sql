@@ -69,7 +69,7 @@ OneGrade_Enrichment_Deduped AS (
         ActualEndDate,
         LearningAimRef,
         CourseTitle,
-        VAType,
+        VA_Type,
         Cohort,
         NotionalNVQLevel,
         WDNumDaysAfterStart,
@@ -114,7 +114,7 @@ SELECT
     CAST(COALESCE(OE.NotionalNVQLevel, '-') AS NCHAR(1)) AS "NotionalNVQLevel",
     CAST(COALESCE(OE.WDNumDaysAfterStart, -1) AS INT) AS "WDNumDaysAfterStart",
     CAST(COALESCE(OE.AgeOn31Aug, -1) AS INT) AS "AgeOn31Aug",
-    CAST(COALESCE(OE.VAType, '-') AS NVARCHAR(100)) AS "VAType",
+    CAST(COALESCE(OE.VA_Type, '-') AS NVARCHAR(100)) AS "VAType",
     CAST(COALESCE(OE.Cohort, '-') AS NVARCHAR(20)) AS "Cohort",
     CAST(COALESCE(OE.QualificationLevel, '-') AS NVARCHAR(255)) AS "QualificationLevel",
 
