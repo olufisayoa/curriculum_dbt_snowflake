@@ -51,7 +51,7 @@ OneGrade_Enrichment AS (
 		 C.Description AS CompletionStatus,
          ROW_NUMBER() OVER (PARTITION BY OGE.AcademicYearID, OGE.StudentRef, OGC.CourseCode, OGE.LearningAimRef, OGE.StartDate
          ORDER BY OGE.ID DESC) AS rn
-     FROM {{ ref('stg_onegrade__enrolment') }} OGE
+     FROM {{ ref('stg_onegrade__estactva') }} OGE
      LEFT  JOIN {{ ref('stg_onegrade__course') }} OGC ON OGE.CourseID = OGC.ID
 	 LEFT  JOIN {{ ref('stg_onegrade__completion') }} C ON C.ID=OGE.CompletionID
 	 LEFT JOIN {{ ref('stg_onegrade__ofqual') }} ofq ON ofq."QualificationNumber"=OGE.LearningAimRef
@@ -127,11 +127,11 @@ SELECT
     PM.CompletionStatusID
 FROM ProSolution_Master PM
 FULL OUTER JOIN OneGrade_Enrichment_Deduped OE
-    ON  PM.StudentRef   = OE.StudentRef
-    AND PM.CourseCode  = OE.CourseCode
-    AND PM.AcademicYearID            = OE.AcademicYearID
-	AND PM.StartDate                  = OE.StartDate
-    AND PM.LearningAimRef            = OE.LearningAimRef
+        ON  TRIM(PM.AcademicYearID) = TRIM(OE.AcademicYearID)
+        AND TRIM(PM.StudentRef)     = TRIM(OE.StudentRef)
+        AND TRIM(PM.CourseCode)     = TRIM(OE.CourseCode)
+        AND TRIM(PM.LearningAimRef) = TRIM(OE.LearningAimRef)
+        AND CAST(PM.StartDate AS DATE) = CAST(OE.StartDate AS DATE)
 )
 
 SELECT
