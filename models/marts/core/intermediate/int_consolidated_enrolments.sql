@@ -41,7 +41,6 @@ OneGrade_Enrichment AS (
          OGE.CompletionID,
 		 OGE.VA_Type,
 		 vla.QualType AS Cohort,
-		 OGE.NotionalNVQLevel,
          OGE.WDNumDaysAfterStart,
 		 ofq."QualificationLevel" AS QualificationLevel,
          OGE.AgeOn31Aug,
@@ -71,7 +70,6 @@ OneGrade_Enrichment_Deduped AS (
         CourseTitle,
         VA_Type,
         Cohort,
-        NotionalNVQLevel,
         WDNumDaysAfterStart,
         QualificationLevel,
         AgeOn31Aug,
@@ -111,7 +109,6 @@ SELECT
     CAST(COALESCE(PM.ActualEndDate, OE.ActualEndDate) AS TIMESTAMP_NTZ) AS "ActualEndDate",
     CAST(COALESCE(PM.CompletionStatus, OE.CompletionStatus, '-') AS NVARCHAR(50)) AS "CompletionStatus",
         
-    CAST(COALESCE(OE.NotionalNVQLevel, '-') AS NCHAR(1)) AS "NotionalNVQLevel",
     CAST(COALESCE(OE.WDNumDaysAfterStart, -1) AS INT) AS "WDNumDaysAfterStart",
     CAST(COALESCE(OE.AgeOn31Aug, -1) AS INT) AS "AgeOn31Aug",
     CAST(COALESCE(OE.VA_Type, '-') AS NVARCHAR(100)) AS "VAType",
