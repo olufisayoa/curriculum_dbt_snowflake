@@ -210,7 +210,7 @@ calculated_scores AS (
 scored AS (
 SELECT
     *,
-    "ProgressScore" + "SafeguardingScore" + "WelfareScore" + "CommentsScore" + "BehaviourScore" + "AttendanceScore" + "EHCPScore" + "HighNeedsScore" AS "TotalRiskScore",
+    CAST(ROUND("ProgressScore" + "SafeguardingScore" + "WelfareScore" + "CommentsScore" + "BehaviourScore" + "AttendanceScore" + "EHCPScore" + "HighNeedsScore") AS INT) AS "TotalRiskScore",
     CASE
         WHEN ARRAY_SIZE(
             ARRAY_COMPACT(
