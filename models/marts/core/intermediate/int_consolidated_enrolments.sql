@@ -32,12 +32,12 @@ OneGrade_Enrichment AS (
      SELECT 
          OGE.ID                    AS OneGradeEnrolmentID,
          LTRIM(RTRIM(OGE.StudentRef)) AS StudentRef,
-         LTRIM(RTRIM(OGC.CourseCode)) AS CourseCode,
+         LTRIM(RTRIM(OGE.CourseCode)) AS CourseCode,
          LTRIM(RTRIM(OGE.AcademicYearID)) AS AcademicYearID,
          OGE.StartDate,
 		 OGE.PlannedEndDate,
 		 OGE.ActualEndDate,
-		 OGC.Title AS CourseTitle,
+		 OGE.CourseTitle AS CourseTitle,
          OGE.CompletionID,
 		 OGE.VA_Type,
 		 vla.QualType AS Cohort,
@@ -47,12 +47,10 @@ OneGrade_Enrichment AS (
          LTRIM(RTRIM(OGE.LearningAimRef)) AS LearningAimRef,
          OGE.WholeQualID,
          OGE.CourseID              AS OneGradeCourseID,
-		 C.Description AS CompletionStatus,
+		 OGE.CompletionDescription AS CompletionStatus,
          ROW_NUMBER() OVER (PARTITION BY OGE.AcademicYearID, OGE.StudentRef, OGC.CourseCode, OGE.LearningAimRef, OGE.StartDate
          ORDER BY OGE.ID DESC) AS rn
      FROM {{ ref('stg_onegrade__estactva') }} OGE
-     LEFT  JOIN {{ ref('stg_onegrade__course') }} OGC ON OGE.CourseID = OGC.ID
-	 LEFT  JOIN {{ ref('stg_onegrade__completion') }} C ON C.ID=OGE.CompletionID
 	 LEFT JOIN {{ ref('stg_onegrade__ofqual') }} ofq ON ofq."QualificationNumber"=OGE.LearningAimRef
 	 LEFT JOIN {{ ref('stg_onegrade__learningaim') }} vla ON vla.LearningAimRef=OGE.LearningAimRef AND vla.WholeQualID=OGE.WholeQualID
      WHERE OGE.StudentRef IS NOT NULL
