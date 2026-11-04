@@ -237,8 +237,8 @@ FROM calculated_scores
 SELECT
     *,
     CASE
-        WHEN "TotalRiskScore" <= -60 THEN 'High Risk'
-        WHEN "TotalRiskScore" < 0   THEN 'Medium Risk'
+        WHEN "TotalRiskScore" <= -45 THEN 'High Risk'
+        WHEN "TotalRiskScore" < -15   THEN 'Medium Risk'
         ELSE 'Low Risk'
     END AS "RiskBand",
     IFF("ProgressScore" < 0, 1, 0)                           AS "ProgressConcern",
