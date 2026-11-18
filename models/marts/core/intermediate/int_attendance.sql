@@ -55,10 +55,11 @@ LEFT JOIN		{{ ref('stg_prosolution__offeringgroup') }} AS OG
 LEFT JOIN		{{ ref('stg_prosolution__student') }} SD 
 ON			    E.StudentDetailID = SD.StudentDetailID
 
-WHERE 1=1 AND (E.ActualEndDate IS NULL OR S.Date <= E.ActualEndDate)
+WHERE 1=1 
+AND (E.ActualEndDate IS NULL OR S.Date <= E.ActualEndDate)
 AND MT.MarkTypeStatusID IN (0,1)
 
 
 {% if is_incremental() %}
-WHERE RegisterSessionDate >= DATEADD(day, -60, (SELECT MAX(RegisterSessionDate) FROM {{ this }}))
+AND S.Date >= DATEADD(day, -60, (SELECT MAX(RegisterSessionDate) FROM {{ this }}))
 {% endif %}
