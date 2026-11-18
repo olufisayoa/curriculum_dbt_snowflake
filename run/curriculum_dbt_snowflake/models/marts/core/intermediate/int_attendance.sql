@@ -1,61 +1,32 @@
-
+-- back compat for old kwarg name
   
+  begin;
+    
+        
+            
+                
+                
+            
+        
     
 
-create or replace transient table CURRICULUM_DB.int.int_attendance
     
+
+    merge into CURRICULUM_DB.int.int_attendance as DBT_INTERNAL_DEST
+        using CURRICULUM_DB.int.int_attendance__dbt_tmp as DBT_INTERNAL_SOURCE
+        on (
+                    DBT_INTERNAL_SOURCE.RegisterMarkID = DBT_INTERNAL_DEST.RegisterMarkID
+                )
+
     
+    when matched then update set
+        "REGISTERMARKID" = DBT_INTERNAL_SOURCE."REGISTERMARKID","ACADEMICYEARKEY" = DBT_INTERNAL_SOURCE."ACADEMICYEARKEY","STUDENTKEY" = DBT_INTERNAL_SOURCE."STUDENTKEY","ENROLMENTKEY" = DBT_INTERNAL_SOURCE."ENROLMENTKEY","REGISTERKEY" = DBT_INTERNAL_SOURCE."REGISTERKEY","COURSEKEY" = DBT_INTERNAL_SOURCE."COURSEKEY","COLLEGELEVELKEY" = DBT_INTERNAL_SOURCE."COLLEGELEVELKEY","SITEKEY" = DBT_INTERNAL_SOURCE."SITEKEY","MARKTYPEKEY" = DBT_INTERNAL_SOURCE."MARKTYPEKEY","DATEKEY" = DBT_INTERNAL_SOURCE."DATEKEY","REGISTERSESSIONDATE" = DBT_INTERNAL_SOURCE."REGISTERSESSIONDATE","MRKPRESENT" = DBT_INTERNAL_SOURCE."MRKPRESENT","MRKABSENT" = DBT_INTERNAL_SOURCE."MRKABSENT","MRKAUTHABSENT" = DBT_INTERNAL_SOURCE."MRKAUTHABSENT","MRKLATE" = DBT_INTERNAL_SOURCE."MRKLATE","MRKREQUIRED" = DBT_INTERNAL_SOURCE."MRKREQUIRED"
     
-    as (
 
-SELECT			M.RegisterMarkID,
-				md5(cast(coalesce(cast(TRIM(R.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS AcademicYearKey,
-				md5(cast(coalesce(cast(TRIM(R.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(SD.RefNo) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS StudentKey,
-                md5(cast(coalesce(cast(TRIM(R.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(SD.RefNo) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(O.Code) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(O.QualID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(CAST(E.StartDate AS DATE) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS EnrolmentKey,
-			md5(cast(coalesce(cast(R.RegisterID as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS RegisterKey,
-        md5(cast(coalesce(cast(O.OfferingID as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(OG.OfferingGroupID as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS CourseKey,
-				md5(cast(coalesce(cast(TRIM(O.SID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS CollegeLevelKey,
-				md5(cast(coalesce(cast(TRIM(O.SiteID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS SiteKey,
-                md5(cast(coalesce(cast(TRIM(M.MarkTypeID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS MarkTypeKey,
-                (YEAR(S.Date) * 10000) + (MONTH(S.Date) * 100) + DAY(S.Date) AS DateKey,
-				CAST(S.Date AS DATE) AS RegisterSessionDate,
-				CASE WHEN MT.MarkTypeStatusID = 1 AND MT.IsAuthorisedAbsence = 0 THEN 1 ELSE 0 END AS MrkPresent,           
-				CASE WHEN MT.MarkTypeStatusID = 0 AND MT.IsAuthorisedAbsence = 0 THEN 1 ELSE 0 END AS MrkAbsent,              
-				CASE WHEN MT.IsAuthorisedAbsence = 1 THEN 1 ELSE 0 END AS MrkAuthAbsent,
-				CASE WHEN MT.MarkTypeStatusID = 1 AND MT.IsLate = 1 THEN 1 ELSE 0 END AS MrkLate,
-        CASE WHEN MT.MarkTypeStatusID IN (0,1) THEN 1 ELSE 0 END AS MrkRequired
-FROM			CURRICULUM_DB.stg.stg_prosolution__registermark  M
-JOIN            CURRICULUM_DB.stg.stg_prosolution__marktype  MT
-ON				M.MarkTypeID = MT.MarkTypeID
+    when not matched then insert
+        ("REGISTERMARKID", "ACADEMICYEARKEY", "STUDENTKEY", "ENROLMENTKEY", "REGISTERKEY", "COURSEKEY", "COLLEGELEVELKEY", "SITEKEY", "MARKTYPEKEY", "DATEKEY", "REGISTERSESSIONDATE", "MRKPRESENT", "MRKABSENT", "MRKAUTHABSENT", "MRKLATE", "MRKREQUIRED")
+    values
+        ("REGISTERMARKID", "ACADEMICYEARKEY", "STUDENTKEY", "ENROLMENTKEY", "REGISTERKEY", "COURSEKEY", "COLLEGELEVELKEY", "SITEKEY", "MARKTYPEKEY", "DATEKEY", "REGISTERSESSIONDATE", "MRKPRESENT", "MRKABSENT", "MRKAUTHABSENT", "MRKLATE", "MRKREQUIRED")
 
-JOIN			CURRICULUM_DB.stg.stg_prosolution__registersession  S
-ON				M.RegisterSessionID = S.RegisterSessionID
-
-JOIN			CURRICULUM_DB.stg.stg_prosolution__register  R
-ON				S.RegisterID = R.RegisterID
-
-JOIN			CURRICULUM_DB.stg.stg_prosolution__registerstudent  RS
-ON				M.RegisterStudentID = RS.RegisterStudentID
-
-JOIN		CURRICULUM_DB.stg.stg_prosolution__enrolment  E
-ON				RS.EnrolmentID = E.EnrolmentID
-
-JOIN		CURRICULUM_DB.stg.stg_prosolution__offering  O
-ON				E.OfferingID = O.OfferingID
-
-LEFT JOIN		CURRICULUM_DB.stg.stg_prosolution__offeringgroup AS OG 
-    ON OG.OfferingID = O.OfferingID AND E.OfferingGroupID = OG.OfferingGroupID
-
-LEFT JOIN		CURRICULUM_DB.stg.stg_prosolution__student SD 
-ON			    E.StudentDetailID = SD.StudentDetailID
-
-WHERE 1=1 AND (E.ActualEndDate IS NULL OR S.Date <= E.ActualEndDate)
-AND MT.MarkTypeStatusID IN (0,1)
-
-
-
-    )
 ;
-
-
-  
+    commit;
