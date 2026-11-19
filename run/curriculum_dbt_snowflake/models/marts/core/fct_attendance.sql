@@ -20,7 +20,8 @@ create or replace transient table CURRICULUM_DB.core.fct_attendance
 	MrkAbsent AS "MrkAbsent",              
     MrkAuthAbsent   AS "MrkAuthAbsent",
     MrkLate AS "MrkLate",             
-    MrkRequired AS "MrkRequired"
+    MrkRequired AS "MrkRequired",
+	MrkNotReq AS "MrkNotReq"
 FROM CURRICULUM_DB.int.int_attendance
     )
 ;

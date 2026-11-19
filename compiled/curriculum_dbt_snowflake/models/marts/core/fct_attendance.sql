@@ -12,5 +12,6 @@ SELECT	 AcademicYearKey AS "AcademicYearKey",
 	MrkAbsent AS "MrkAbsent",              
     MrkAuthAbsent   AS "MrkAuthAbsent",
     MrkLate AS "MrkLate",             
-    MrkRequired AS "MrkRequired"
+    MrkRequired AS "MrkRequired",
+	MrkNotReq AS "MrkNotReq"
 FROM CURRICULUM_DB.int.int_attendance
