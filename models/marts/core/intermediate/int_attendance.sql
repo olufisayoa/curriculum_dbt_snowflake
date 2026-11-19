@@ -29,7 +29,8 @@ SELECT			M.RegisterMarkID,
 				CASE WHEN MT.MarkTypeStatusID = 0 AND MT.IsAuthorisedAbsence = 0 THEN 1 ELSE 0 END AS MrkAbsent,              
 				CASE WHEN MT.IsAuthorisedAbsence = 1 THEN 1 ELSE 0 END AS MrkAuthAbsent,
 				CASE WHEN MT.MarkTypeStatusID = 1 AND MT.IsLate = 1 THEN 1 ELSE 0 END AS MrkLate,
-        CASE WHEN MT.MarkTypeStatusID IN (0,1) THEN 1 ELSE 0 END AS MrkRequired
+        CASE WHEN MT.MarkTypeStatusID IN (0,1) THEN 1 ELSE 0 END AS MrkRequired,
+        0 AS MrkNotReq
 FROM			{{ ref('stg_prosolution__registermark') }}  M
 JOIN            {{ ref('stg_prosolution__marktype') }}  MT
 ON				M.MarkTypeID = MT.MarkTypeID
