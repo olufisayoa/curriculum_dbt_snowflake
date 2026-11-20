@@ -27,7 +27,7 @@ SELECT			M.RegisterMarkID,
 				CAST(S.Date AS DATE) AS RegisterSessionDate,
 				CASE WHEN MT.MarkTypeStatusID = 1 THEN 1 ELSE 0 END AS MrkPresent,           
 				CASE WHEN MT.MarkTypeStatusID = 0 AND MT.IsAuthorisedAbsence = 0 THEN 1 ELSE 0 END AS MrkAbsent,              
-				CASE WHEN MT.IsAuthorisedAbsence = 1 THEN 1 ELSE 0 END AS MrkAuthAbsent,
+				CASE WHEN MT.MarkTypeStatusID = 0 AND MT.IsAuthorisedAbsence = 1 THEN 1 ELSE 0 END AS MrkAuthAbsent,
 				CASE WHEN MT.MarkTypeStatusID = 1 AND MT.IsLate = 1 THEN 1 ELSE 0 END AS MrkLate,
         CASE WHEN MT.MarkTypeStatusID IN (0,1) THEN 1 ELSE 0 END AS MrkRequired,
         0 AS MrkNotReq
