@@ -20,7 +20,48 @@ ParentCourses AS (
         ON po.OFFERINGID = lo.MAINOFFERINGID
     GROUP BY lo.SUBOFFERINGID
 ),
-
+LatestAnnualValues AS (
+    SELECT
+        LEARNING_AIM_REF,
+        BASIC_SKILL_TYPE_CODE
+    FROM CURRICULUM_DB.stg.stg_prosolution__all_annual_values
+    QUALIFY ROW_NUMBER() OVER (
+        PARTITION BY LEARNING_AIM_REF
+        ORDER BY ACADEMIC_YEAR_CODE DESC
+    ) = 1
+),
+EMHierarchy AS (
+    SELECT
+        QA_AIM_R,
+        MAPCODE
+    FROM CURRICULUM_DB.stg.stg_prosolution__hierarchylad
+    WHERE MAPCODE IN ('B1220137', 'B0220076')
+),
+LearningAimClassification AS (
+    SELECT
+        la.LEARNING_AIM_REF,
+        'Level ' || la.NOTIONAL_NVQ_LEVEL_CODE AS QualificationLevel,
+        CASE
+            WHEN h.MAPCODE = 'B1220137' THEN 'GCSE English'
+            WHEN aav.BASIC_SKILL_TYPE_CODE IN ('33', '01', '20', '23', '29') THEN 'FS English'
+            WHEN h.MAPCODE = 'B0220076' THEN 'GCSE Maths'
+            WHEN aav.BASIC_SKILL_TYPE_CODE IN ('34', '02', '19', '21', '30') THEN 'FS Maths'
+            WHEN la.LEARNING_AIM_REF ILIKE 'Z000%'
+                AND la.LEARNING_AIM_TITLE ILIKE 'Non regulated Adult skills formula funded provision%'
+                AND la.LEARNING_AIM_TITLE ILIKE '%English%'
+            THEN 'NR English'
+            WHEN la.LEARNING_AIM_REF ILIKE 'Z000%'
+                AND la.LEARNING_AIM_TITLE ILIKE 'Non regulated Adult skills formula funded provision%'
+                AND la.LEARNING_AIM_TITLE ILIKE '%Maths%'
+            THEN 'NR Maths'
+            ELSE NULL
+        END AS SubjectType
+    FROM CURRICULUM_DB.stg.stg_prosolution__learningaim AS la
+    LEFT JOIN EMHierarchy AS h
+        ON la.LEARNING_AIM_REF = h.QA_AIM_R
+    LEFT JOIN LatestAnnualValues AS aav
+        ON la.LEARNING_AIM_REF = aav.LEARNING_AIM_REF
+),
 ProsolutionOffering AS (
     SELECT
 
@@ -59,14 +100,16 @@ ProsolutionOffering AS (
         o.Duration,
         o.StudyYear,
         o.NumberOfWeeks,
-        'Level ' || la.NOTIONAL_NVQ_LEVEL_CODE AS QualificationLevel
+        lac.QualificationLevel,
+        lac.SubjectType
     FROM UniqueEnrolments AS ue 
     INNER JOIN CURRICULUM_DB.stg.stg_prosolution__offering AS o
         ON ue.OfferingID=o.OfferingID
     LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__offeringgroup AS og
         ON og.OFFERINGID = o.OFFERINGID AND ue.OfferingGroupID = og.OfferingGroupID
     LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__staff AS s ON og.StaffID=s.StaffID
-    LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__learningaim la ON o.QualID=la.LEARNING_AIM_REF
+    LEFT JOIN LearningAimClassification AS lac
+        ON o.QualID = lac.LEARNING_AIM_REF
     LEFT JOIN PrimaryOfferingStaff AS pos ON pos.OfferingID=ue.OfferingID
     LEFT JOIN ParentCourses AS pc
         ON pc.SUBOFFERINGID = o.OFFERINGID
@@ -86,6 +129,7 @@ SELECT
     COALESCE(p.OFFERINGGROUPCODE, '-')::VARCHAR(3) AS "CourseGroupCode",
     COALESCE(p.STAFF, '-')::VARCHAR(1000) AS "Staff",
     COALESCE(p.CourseType, '-')::VARCHAR(50) AS "CourseType",
+    COALESCE(p.SubjectType, '-') AS "SubjectType",
     p.DURATION AS "Duration",
     p.GLH AS "GLH",
     p.NUMBEROFWEEKS AS "NumberOfWeeks",
