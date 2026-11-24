@@ -79,32 +79,32 @@ onegrade_enrolments AS (
 consolidated_enrolments AS (
     SELECT
          {{ dbt_utils.generate_surrogate_key([
-            'COALESCE(p.AcademicYearID, b.AcademicYearID)',   
-            'COALESCE(p.StudentRef, b.StudentRef)',
-            'COALESCE(p.CourseCode, b.CourseCode)',   
-            'COALESCE(p.LearningAimRef, b.LearningAimRef)',            
-            'COALESCE(p.StartDate, b.StartDate)'                            
+            'TRIM(p.AcademicYearID)',   
+            'TRIM(p.StudentRef)',
+            'TRIM(p.CourseCode)',   
+            'TRIM(p.LearningAimRef)',            
+            'TRIM(p.StartDate)'                            
         ]) }} AS EnrolmentKey,
         {{ dbt_utils.generate_surrogate_key([
-            'COALESCE(p.AcademicYearID, b.AcademicYearID)',   
-            'COALESCE(p.StudentRef, b.StudentRef)'
+            'TRIM(p.AcademicYearID)',   
+            'TRIM(p.StudentRef)'
         ]) }} AS StudentKey,
 
         {{ dbt_utils.generate_surrogate_key([
-            'COALESCE(p.AcademicYearID, b.AcademicYearID)'
+            'TRIM(p.AcademicYearID)'
         ]) }} AS AcademicYearKey,
 
         {{ dbt_utils.generate_surrogate_key([
-            'COALESCE(p.SiteID, b.SiteID)'
+            'p.SiteID'
         ]) }} AS SiteKey,
 
         {{ dbt_utils.generate_surrogate_key([
-            'COALESCE(p.CollegeLevelCode, b.CollegeLevelCode)'
+            'TRIM(p.CollegeLevelCode)'
         ]) }} AS CollegeLevelKey,
 
         {{ dbt_utils.generate_surrogate_key([
-            'COALESCE(p.OfferingID, b.OfferingID)',
-            'COALESCE(p.OfferingGroupID, b.OfferingGroupID)'
+            'p.OfferingID',
+            'p.OfferingGroupID'
         ]) }} AS CourseKey,
         b.QOEPoints_GCSE_College2dp,
         b.QOEPoints_College2dp,
