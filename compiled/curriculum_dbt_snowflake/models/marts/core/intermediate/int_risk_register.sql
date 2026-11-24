@@ -78,16 +78,16 @@ onegrade_enrolments AS (
 ),
 consolidated_enrolments AS (
     SELECT
-         md5(cast(coalesce(cast(COALESCE(p.AcademicYearID, b.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(COALESCE(p.StudentRef, b.StudentRef) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(COALESCE(p.CourseCode, b.CourseCode) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(COALESCE(p.LearningAimRef, b.LearningAimRef) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(COALESCE(p.StartDate, b.StartDate) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS EnrolmentKey,
-        md5(cast(coalesce(cast(COALESCE(p.AcademicYearID, b.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(COALESCE(p.StudentRef, b.StudentRef) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS StudentKey,
+         md5(cast(coalesce(cast(TRIM(p.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(p.StudentRef) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(p.CourseCode) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(p.LearningAimRef) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(p.StartDate) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS EnrolmentKey,
+        md5(cast(coalesce(cast(TRIM(p.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(p.StudentRef) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS StudentKey,
 
-        md5(cast(coalesce(cast(COALESCE(p.AcademicYearID, b.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS AcademicYearKey,
+        md5(cast(coalesce(cast(TRIM(p.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS AcademicYearKey,
 
-        md5(cast(coalesce(cast(COALESCE(p.SiteID, b.SiteID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS SiteKey,
+        md5(cast(coalesce(cast(p.SiteID as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS SiteKey,
 
-        md5(cast(coalesce(cast(COALESCE(p.CollegeLevelCode, b.CollegeLevelCode) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS CollegeLevelKey,
+        md5(cast(coalesce(cast(TRIM(p.CollegeLevelCode) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS CollegeLevelKey,
 
-        md5(cast(coalesce(cast(COALESCE(p.OfferingID, b.OfferingID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(COALESCE(p.OfferingGroupID, b.OfferingGroupID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS CourseKey,
+        md5(cast(coalesce(cast(p.OfferingID as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(p.OfferingGroupID as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS CourseKey,
         b.QOEPoints_GCSE_College2dp,
         b.QOEPoints_College2dp,
         CAST(CASE
