@@ -87,7 +87,7 @@ WITH compliance_base AS (
         ON E.OfferingID = O.OfferingID
 
     LEFT JOIN CURRICULUM_DB.stg.stg_prosolution__offeringgroup AS OG
-        ON OG.OfferingID = O.OfferingID
+        ON OG.OfferingID = O.OfferingID AND E.OfferingGroupID = OG.OfferingGroupID
 
     WHERE O.SID IS NOT NULL
     GROUP BY 
