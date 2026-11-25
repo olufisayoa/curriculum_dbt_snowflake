@@ -7,5 +7,6 @@ SELECT
         COALESCE(Level3Description::VARCHAR(165), '-') AS "Department",
         COALESCE(Level2Description::VARCHAR(165), '-') AS "Campus",
         COALESCE(Level1Description::VARCHAR(165), '-') AS "Company",
-        COALESCE(Level0Description::VARCHAR(165), '-') AS "Group"
+        COALESCE(Level0Description::VARCHAR(165), '-') AS "Group",
+        SID
 FROM college_hierarchy
