@@ -23,7 +23,7 @@ WITH Prosolution_Student AS (
 			CAST(CASE COALESCE(ex.HasSpecialArrangements, 0) WHEN 1 THEN 'Yes' ELSE 'No' END AS VARCHAR) AS HasExamSpecialArrangement,
 			CAST(COALESCE(mo.MainOfferingCollegeLevelName, '-') AS VARCHAR) AS MainOfferingCollegeLevelName,
 			CAST(COALESCE(mo.MainOfferingName, '-') AS VARCHAR) AS MainOfferingName,
-			CAST(COALESCE(cl.Level3Description, '-') AS VARCHAR) AS MainOfferingDepartment,
+			CAST(COALESCE(cl."Department", '-') AS VARCHAR) AS MainOfferingDepartment,
 			CAST(COALESCE(mo.StudentMainSite, '-') AS VARCHAR) AS StudentMainSite,
 	CAST(CASE
         WHEN (
