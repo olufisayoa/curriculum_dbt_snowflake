@@ -23,6 +23,7 @@ WITH Prosolution_Student AS (
 			CAST(CASE COALESCE(ex.HasSpecialArrangements, 0) WHEN 1 THEN 'Yes' ELSE 'No' END AS VARCHAR) AS HasExamSpecialArrangement,
 			CAST(COALESCE(mo.MainOfferingCollegeLevelName, '-') AS VARCHAR) AS MainOfferingCollegeLevelName,
 			CAST(COALESCE(mo.MainOfferingName, '-') AS VARCHAR) AS MainOfferingName,
+			CAST(COALESCE(cl."Department", '-') AS VARCHAR) AS MainOfferingDepartment,
 			CAST(COALESCE(mo.StudentMainSite, '-') AS VARCHAR) AS StudentMainSite,
 	CAST(CASE
         WHEN (
@@ -91,6 +92,8 @@ WITH Prosolution_Student AS (
 			ON TRIM(s.AcademicYearID) = TRIM(Y.AcademicYearID)
 		LEFT JOIN {{ ref('stg_prosolution__studentdetailmainoffering') }} AS mo
 			ON s.StudentDetailID = mo.StudentDetailID
+		LEFT JOIN {{ ref('stg_prosolution__collegelevel') }} AS cl
+			ON mo.SID = cl.SID
 		LEFT JOIN {{ ref('stg_prosolution__examstudent_stats') }} AS ex
 			ON s.StudentID = ex.StudentID
 		LEFT JOIN {{ ref('stg_prosolution__refugeeasylumseekerstatus') }} AS ras
@@ -201,6 +204,7 @@ Badges AS (
 		  ps.HasExamSpecialArrangement AS "HasExamSpecialArrangement",
 		  ps.RefugeeAsylumSeekerStatus AS "RefugeeAsylumSeekerStatus",
 		  ps.MainOfferingCollegeLevelName AS "MainOfferingCollegeLevelName",
+		  ps.MainOfferingDepartment AS "MainOfferingDepartment",
 		  ps.MainOfferingName AS "MainOfferingName",
 		  ps.StudentMainSite AS "StudentMainSite",
 		  CAST(COALESCE(ps.EthnicGroup, 'unknown') AS VARCHAR) AS "EthnicGroup",
