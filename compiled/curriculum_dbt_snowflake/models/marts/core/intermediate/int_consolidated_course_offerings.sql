@@ -49,11 +49,11 @@ LearningAimClassification AS (
             WHEN la.LEARNING_AIM_REF ILIKE 'Z000%'
                 AND la.LEARNING_AIM_TITLE ILIKE 'Non regulated Adult skills formula funded provision%'
                 AND la.LEARNING_AIM_TITLE ILIKE '%English%'
-            THEN 'NR English'
+            THEN 'PREP English'
             WHEN la.LEARNING_AIM_REF ILIKE 'Z000%'
                 AND la.LEARNING_AIM_TITLE ILIKE 'Non regulated Adult skills formula funded provision%'
                 AND la.LEARNING_AIM_TITLE ILIKE '%Maths%'
-            THEN 'NR Maths'
+            THEN 'PREP Maths'
             ELSE NULL
         END AS SubjectType
     FROM CURRICULUM_DB.stg.stg_prosolution__learningaim AS la
