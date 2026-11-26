@@ -141,7 +141,7 @@ Behaviour_Stage AS (
 			{{ dbt_utils.generate_surrogate_key(['TRIM(S.AcademicYearID)', 'TRIM(S.StudentID)']) }} AS StudentKey,
 			MT.MeetingTypeName,
 			ROW_NUMBER() OVER (
-				PARTITION BY S.AcademicYearID, S.StudentID 
+				PARTITION BY TRIM(S.AcademicYearID), TRIM(S.StudentID) 
 				ORDER BY 
 					T.TutorialDate DESC,
 					T.TutorialID DESC
@@ -154,6 +154,8 @@ Behaviour_Stage AS (
 		INNER JOIN {{ ref('stg_promonitor__ilp_meetingcategory') }} AS MC 
 			ON MT.MeetingCategoryID = MC.MeetingCategoryID
 		WHERE MC.MeetingCategoryName = 'Behaviour Management'
+		AND T.CancelledWhen IS NULL
+		AND COALESCE(T.DidNotTakePlace, 0) = 0
 	)
 	SELECT
 		RB.StudentKey,
