@@ -4,4 +4,4 @@ MT.MeetingTypeName AS "MeetingTypeName",
 MC.MeetingCategoryName AS "MeetingCategoryName",
 CAST(MT.IsObsolete AS BOOLEAN) AS "IsObsolete"
 FROM CURRICULUM_DB.stg.stg_promonitor__ilp_meetingtype MT
-LEFT JOIN CURRICULUM_DB.stg.stg_promonitor_ilp_meetingcategory MC ON MT.MeetingCategoryID = MC.MeetingCategoryID
+LEFT JOIN CURRICULUM_DB.stg.stg_promonitor__ilp_meetingcategory MC ON MT.MeetingCategoryID = MC.MeetingCategoryID

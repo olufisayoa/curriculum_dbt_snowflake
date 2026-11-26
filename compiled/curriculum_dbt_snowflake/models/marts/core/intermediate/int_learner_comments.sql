@@ -18,8 +18,6 @@ LEFT JOIN CURRICULUM_DB.stg.stg_promonitor__learnerinformation_tutorial AS Tutor
     ON Tutorial.TutorialID = ActionPlan.TutorialID 
 LEFT JOIN CURRICULUM_DB.stg.stg_promonitor__ilp_meetingtype AS MT
     ON Tutorial.TutorialTypeID = MT.MeetingTypeID 
-LEFT JOIN CURRICULUM_DB.stg.stg_promonitor_ilp_meetingcategory AS MC
-    ON MC.MeetingCategoryID = MT.MeetingCategoryID
 LEFT JOIN CURRICULUM_DB.stg.stg_promonitor__staff AS CommentStaff 
     ON ActionPlan.CommentStaffID = CommentStaff.StaffID 
 LEFT JOIN CURRICULUM_DB.stg.stg_promonitor__learnerinformation_actionplan_commenttype AS CommentType 

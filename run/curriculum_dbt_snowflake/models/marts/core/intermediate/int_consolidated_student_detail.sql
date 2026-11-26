@@ -146,19 +146,30 @@ Attendance_Agg AS (
 Behaviour_Stage AS (
 	WITH RankedBehaviour AS (
 		SELECT 
-		C.StudentKey,
-		C.DateKey,
-		MT."MeetingTypeName",
-		ROW_NUMBER() OVER (PARTITION BY C.StudentKey ORDER BY C.DateKey DESC) AS rn
-		FROM CURRICULUM_DB.int.int_learner_comments C 
-		LEFT JOIN CURRICULUM_DB.core.dim_meetingtype MT ON C.MeetingTypeKey = MT."MeetingTypeKey"
-		WHERE MT."MeetingCategoryName" = 'Behaviour Management'
+			md5(cast(coalesce(cast(TRIM(S.AcademicYearID) as TEXT), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(TRIM(S.StudentID) as TEXT), '_dbt_utils_surrogate_key_null_') as TEXT)) AS StudentKey,
+			MT.MeetingTypeName,
+			ROW_NUMBER() OVER (
+				PARTITION BY TRIM(S.AcademicYearID), TRIM(S.StudentID) 
+				ORDER BY 
+					T.TutorialDate DESC,
+					T.TutorialID DESC
+			) AS rn
+		FROM CURRICULUM_DB.stg.stg_promonitor__learnerinformation_tutorial AS T
+		INNER JOIN CURRICULUM_DB.stg.stg_promonitor__student AS S 
+			ON T.PMStudentID = S.PMStudentID
+		INNER JOIN CURRICULUM_DB.stg.stg_promonitor__ilp_meetingtype AS MT 
+			ON T.TutorialTypeID = MT.MeetingTypeID
+		INNER JOIN CURRICULUM_DB.stg.stg_promonitor__ilp_meetingcategory AS MC 
+			ON MT.MeetingCategoryID = MC.MeetingCategoryID
+		WHERE MC.MeetingCategoryName = 'Behaviour Management'
+		AND T.CancelledWhen IS NULL
+		AND COALESCE(T.DidNotTakePlace, 0) = 0
 	)
 	SELECT
-	    RB.StudentKey,
-		RB."MeetingTypeName" AS BehaviourManagementStage
+		RB.StudentKey,
+		RB.MeetingTypeName AS BehaviourManagementStage
 	FROM RankedBehaviour RB
-	WHERE RB."MeetingTypeName" IS NOT NULL AND RB.rn=1
+	WHERE RB.rn = 1
 ),
 Badges AS (
 	WITH RankedBadges AS (
