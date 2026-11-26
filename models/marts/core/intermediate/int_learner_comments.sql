@@ -18,8 +18,6 @@ LEFT JOIN {{ ref('stg_promonitor__learnerinformation_tutorial') }} AS Tutorial
     ON Tutorial.TutorialID = ActionPlan.TutorialID 
 LEFT JOIN {{ ref('stg_promonitor__ilp_meetingtype') }} AS MT
     ON Tutorial.TutorialTypeID = MT.MeetingTypeID 
-LEFT JOIN {{ ref('stg_promonitor_ilp_meetingcategory') }} AS MC
-    ON MC.MeetingCategoryID = MT.MeetingCategoryID
 LEFT JOIN {{ ref('stg_promonitor__staff') }} AS CommentStaff 
     ON ActionPlan.CommentStaffID = CommentStaff.StaffID 
 LEFT JOIN {{ ref('stg_promonitor__learnerinformation_actionplan_commenttype') }} AS CommentType 
