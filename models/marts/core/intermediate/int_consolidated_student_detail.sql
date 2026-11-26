@@ -193,7 +193,7 @@ Badges AS (
 	LEFT JOIN {{ ref('stg_promonitor__student') }} S ON P.PMStudentID=S.PMStudentID
  )
 	SELECT 
-          {{ dbt_utils.generate_surrogate_key(['TRIM(ps.AcademicYearID)', 'TRIM(ps.StudentID)']) }} AS "StudentKey",
+          {{ dbt_utils.generate_surrogate_key(['TRIM(COALESCE(ps.AcademicYearID, _os.AcademicYearID))', 'TRIM(COALESCE(ps.StudentID, _os.StudentRef))']) }} AS "StudentKey",
           CAST(COALESCE(TRIM(ps.AcademicYearID), '00/00') AS VARCHAR) AS "AcademicYear",
 		  CAST(COALESCE(ps.StudentID, '-') AS VARCHAR) AS "StudentID",
 		  CAST(COALESCE(ps.FirstName,'-') AS VARCHAR) AS "Firstname",
