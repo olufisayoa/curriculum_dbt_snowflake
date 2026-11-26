@@ -4,4 +4,4 @@ MT.MeetingTypeName AS "MeetingTypeName",
 MC.MeetingCategoryName AS "MeetingCategoryName",
 CAST(MT.IsObsolete AS BOOLEAN) AS "IsObsolete"
 FROM {{ ref('stg_promonitor__ilp_meetingtype') }} MT
-LEFT JOIN {{ ref('stg_promonitor_ilp_meetingcategory') }} MC ON MT.MeetingCategoryID = MC.MeetingCategoryID
+LEFT JOIN {{ ref('stg_promonitor__ilp_meetingcategory') }} MC ON MT.MeetingCategoryID = MC.MeetingCategoryID
