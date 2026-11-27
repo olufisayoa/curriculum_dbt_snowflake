@@ -55,7 +55,7 @@ LearningAimClassification AS (
                 AND la.LEARNING_AIM_TITLE ILIKE '%Maths%'
             THEN 'Pre Maths'
             ELSE NULL
-        END AS SubjectType
+        END AS EMStatus
     FROM CURRICULUM_DB.stg.stg_prosolution__learningaim AS la
     LEFT JOIN EMHierarchy AS h
         ON la.LEARNING_AIM_REF = h.QA_AIM_R
@@ -101,7 +101,7 @@ ProsolutionOffering AS (
         o.StudyYear,
         o.NumberOfWeeks,
         lac.QualificationLevel,
-        lac.SubjectType
+        lac.EMStatus
     FROM UniqueEnrolments AS ue 
     INNER JOIN CURRICULUM_DB.stg.stg_prosolution__offering AS o
         ON ue.OfferingID=o.OfferingID
@@ -129,7 +129,7 @@ SELECT
     COALESCE(p.OFFERINGGROUPCODE, '-')::VARCHAR(3) AS "CourseGroupCode",
     COALESCE(p.STAFF, '-')::VARCHAR(1000) AS "Staff",
     COALESCE(p.CourseType, '-')::VARCHAR(50) AS "CourseType",
-    COALESCE(p.SubjectType, '-') AS "SubjectType",
+    COALESCE(p.EMStatus, '-') AS "EMStatus",
     p.DURATION AS "Duration",
     p.GLH AS "GLH",
     p.NUMBEROFWEEKS AS "NumberOfWeeks",

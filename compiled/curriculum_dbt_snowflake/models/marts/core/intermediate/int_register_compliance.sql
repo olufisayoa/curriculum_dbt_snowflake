@@ -24,7 +24,7 @@ WITH compliance_base AS (
         
         S.FirstName AS lecturer_first_name,
         S.Surname AS lecturer_surname,
-        CONCAT(S.FirstName, ', ', S.Surname) AS lecturer_full_name,
+        CONCAT(S.FirstName, ' ', S.Surname) AS lecturer_full_name,
 
         
         MIN(M.CreatedDate) AS first_mark_datetime,
