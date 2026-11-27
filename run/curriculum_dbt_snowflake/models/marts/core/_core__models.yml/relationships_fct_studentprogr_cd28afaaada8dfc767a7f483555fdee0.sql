@@ -12,14 +12,14 @@
     
 
 with child as (
-    select "CourseKey" as from_field
+    select "StudentKey" as from_field
     from CURRICULUM_DB.core.fct_studentprogress
-    where "CourseKey" is not null
+    where "StudentKey" is not null
 ),
 
 parent as (
-    select "CourseKey" as to_field
-    from CURRICULUM_DB.core.dim_course
+    select "StudentKey" as to_field
+    from CURRICULUM_DB.core.dim_student
 )
 
 select
