@@ -101,7 +101,7 @@ ProsolutionOffering AS (
         o.StudyYear,
         o.NumberOfWeeks,
         lac.QualificationLevel,
-        lac.SubjectType
+        lac.EMStatus
     FROM UniqueEnrolments AS ue 
     INNER JOIN {{ ref('stg_prosolution__offering') }} AS o
         ON ue.OfferingID=o.OfferingID
